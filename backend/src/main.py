@@ -7,7 +7,7 @@ from summary import resumo_financeiro, saldo_final
 
 
 def main():
-    df = pd.read_csv("data/data.csv")
+    df = pd.read_csv("backend/data/data.csv")
 
     validate_columns(df)
     df = convert_to_datetime(df, "date")
