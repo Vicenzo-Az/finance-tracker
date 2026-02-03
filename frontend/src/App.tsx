@@ -1,35 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<null | {
+    income: number;
+    expense: number;
+    balance: number;
+  }>(null);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+    <div>
+      <h1>Finance Tracker</h1>
+
+      <input
+        type="file"
+        accept=".csv"
+        onChange={(e) => {
+          if (e.target.files) {
+            setFile(e.target.files[0]);
+          }
+        }}
+      />
+
+      <button
+        disabled={!file || loading}
+        onClick={() => {
+          setLoading(true);
+
+          // simulação de chamada à API
+          setTimeout(() => {
+            setResult({
+              income: 3500,
+              expense: -1200,
+              balance: 2300,
+            });
+            setLoading(false);
+          }, 1500);
+        }}
+      >
+        {loading ? "Processando..." : "Processar"}
+      </button>
+
+      {file && (
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+          Arquivo selecionado: <strong>{file.name}</strong>
         </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      )}
+
+      {result && (
+        <div>
+          <h2>Resumo financeiro</h2>
+          <p>Receitas: {result.income}</p>
+          <p>Despesas: {result.expense}</p>
+          <p>Saldo final: {result.balance}</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
