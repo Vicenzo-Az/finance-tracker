@@ -26,17 +26,34 @@ function App() {
       <button
         disabled={!file || loading}
         onClick={() => {
+          if (!file) return;
+
+          const formData = new FormData();
+          formData.append("file", file);
+
           setLoading(true);
 
-          // simulação de chamada à API
-          setTimeout(() => {
-            setResult({
-              income: 3500,
-              expense: -1200,
-              balance: 2300,
+          fetch("http://127.0.0.1:8000/upload", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Erro na requisição");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.warn("Resposta do backend:", data);
+              setResult(data);
+            })
+            .catch((error) => {
+              console.warn(error);
+              alert("Erro ao processar o arquivo");
+            })
+            .finally(() => {
+              setLoading(false);
             });
-            setLoading(false);
-          }, 1500);
         }}
       >
         {loading ? "Processando..." : "Processar"}
