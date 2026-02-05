@@ -3,11 +3,13 @@ import { useState } from "react";
 function App() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<null | {
-    income: number;
-    expense: number;
+  const [result, setResult] = useState<{
+    summary: {
+      income: number;
+      expense: number;
+    };
     balance: number;
-  }>(null);
+  } | null>(null);
 
   return (
     <div>
@@ -68,8 +70,8 @@ function App() {
       {result && (
         <div>
           <h2>Resumo financeiro</h2>
-          <p>Receitas: {result.income}</p>
-          <p>Despesas: {result.expense}</p>
+          <p>Receitas: {result.summary.income}</p>
+          <p>Despesas: {result.summary.expense}</p>
           <p>Saldo final: {result.balance}</p>
         </div>
       )}
