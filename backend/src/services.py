@@ -5,9 +5,7 @@ from src.cleaning import convert_to_datetime, limpar_amount
 from src.processing import transaction_type
 
 
-def load_and_process_data(path: str) -> pd.DataFrame:
-    df = pd.read_csv(path)
-
+def load_and_process_data(df: pd.DataFrame) -> pd.DataFrame:
     validate_columns(df)
     df = convert_to_datetime(df, "date")
     df = limpar_amount(df, "amount")
