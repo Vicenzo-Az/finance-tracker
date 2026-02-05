@@ -30,7 +30,7 @@ def upload_csv(file: UploadFile = File(...)):
 
     df = load_and_process_data(df)
 
-    summary = resumo_financeiro(df).to_dict()
+    summary = resumo_financeiro(df)
     balance = round(saldo_final(df), 2)
 
     return {
