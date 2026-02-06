@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.cleaning import convert_to_datetime, limpar_amount
+from src.pipelines.cleaning import convert_to_datetime, limpar_amount
 
 
 def test_convert_to_datetime_remove_datas_invalidas():

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.services.processing import resumo_financeiro, saldo_final
+from src.pipelines.summary import resumo_financeiro, saldo_final
 
 
 def test_resumo_financeiro():

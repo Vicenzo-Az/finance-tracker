@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from src.validation import validate_columns
+from src.pipelines.validation import validate_columns
 
 
 def test_validate_columns_missing():
