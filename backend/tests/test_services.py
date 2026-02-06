@@ -2,7 +2,7 @@
 import pandas as pd
 import pytest
 
-from src.services import load_and_process_data
+from src.services.processing import load_and_process_data
 
 
 def test_load_and_process_data_receives_dataframe():
