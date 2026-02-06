@@ -7,9 +7,9 @@ from src.services import load_and_process_data
 
 def test_load_and_process_data_receives_dataframe():
     df = pd.DataFrame({
-        "date": ["2024-01-01"],
-        "amount": [100.0],
-        "description": ["income"]
+        "Data": ["2024-01-01"],
+        "Valor": [100.0],
+        "Descrição": ["income"]
     })
 
     result = load_and_process_data(df)

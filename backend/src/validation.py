@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def validate_columns(df: pd.DataFrame) -> None:
-    REQUIRED_COLUMNS = {"date", "description", "amount"}
+    REQUIRED_COLUMNS = {"Data", "Descrição", "Valor"}  # Modelo NuBank
 
     missing = REQUIRED_COLUMNS - set(df.columns)
 

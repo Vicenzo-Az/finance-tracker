@@ -3,7 +3,7 @@ import pandas as pd
 
 def resumo_financeiro(df: pd.DataFrame) -> dict:
     resumo = (
-        df.groupby("transaction_type")["amount"]
+        df.groupby("transaction_type")["Valor"]
         .sum()
         .to_dict()
     )
@@ -11,4 +11,4 @@ def resumo_financeiro(df: pd.DataFrame) -> dict:
 
 
 def saldo_final(df: pd.DataFrame) -> float:
-    return df["amount"].sum()
+    return df["Valor"].sum()
