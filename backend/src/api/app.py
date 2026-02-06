@@ -1,43 +1,29 @@
-from fastapi import FastAPI, UploadFile, File
-from src.api.middlewares.cors import setup_cors
-import pandas as pd
-from io import BytesIO
-from src.services.processing import (
-    load_and_process_data,
-    resumo_financeiro,
-    saldo_final
-)
+from fastapi import FastAPI
+from src.api.routes.upload import router as upload_router
+from src.core.cors import setup_cors
 
 
-app = FastAPI(title="Finance Tracker API")
+def create_app() -> FastAPI:
+    app = FastAPI()
 
-setup_cors(app)
+    setup_cors(app)
 
+    app.include_router(upload_router)
 
-@app.get("/summary")
-def get_summary():
-    df = load_and_process_data("data/data.csv")
-    resumo = resumo_financeiro(df)
-    return resumo.to_dict(orient="records")
+    return app
 
 
-@app.get("/balance")
-def get_balance():
-    df = load_and_process_data("data/data.csv")
-    return {"balance": round(saldo_final(df), 2)}
+# setup_cors(app)
 
 
-@app.post("/upload")
-def upload_csv(file: UploadFile = File(...)):
-    conteudo = file.file.read()
-    df = pd.read_csv(BytesIO(conteudo))
+# @app.get("/summary")
+# def get_summary():
+#     df = load_and_process_data("data/data.csv")
+#     resumo = resumo_financeiro(df)
+#     return resumo.to_dict(orient="records")
 
-    df = load_and_process_data(df)
 
-    summary = resumo_financeiro(df)
-    balance = round(saldo_final(df), 2)
-
-    return {
-        "summary": summary,
-        "balance": balance
-    }
+# @app.get("/balance")
+# def get_balance():
+#     df = load_and_process_data("data/data.csv")
+#     return {"balance": round(saldo_final(df), 2)}
