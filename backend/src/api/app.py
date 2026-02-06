@@ -2,8 +2,12 @@ from fastapi import FastAPI, UploadFile, File
 from src.api.middlewares.cors import setup_cors
 import pandas as pd
 from io import BytesIO
-from src.services import load_and_process_data
-from src.summary import resumo_financeiro, saldo_final
+from src.services.processing import (
+    load_and_process_data,
+    resumo_financeiro,
+    saldo_final
+)
+
 
 app = FastAPI(title="Finance Tracker API")
 
