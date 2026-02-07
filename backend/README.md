@@ -1,160 +1,176 @@
-# Backend – Finance Tracker
+# Finance Tracker — Backend
 
-Backend do projeto **Finance Tracker**, responsável pelo processamento, validação e análise de dados financeiros a partir de arquivos CSV, expondo os resultados por meio de uma API REST.
+Backend do **Finance Tracker**, uma API construída com **FastAPI** para processamento e análise de extratos financeiros enviados via CSV.
 
----
-
-## 🧠 Visão Geral
-
-Este backend recebe dados financeiros estruturados (CSV), realiza uma **pipeline de tratamento de dados** e disponibiliza análises como:
-
-- classificação de transações
-- resumo financeiro
-- saldo final
-
-O foco do projeto é **qualidade de dados**, organização de código e boas práticas de backend.
+O sistema recebe um arquivo CSV, valida e processa os dados e retorna um **resumo financeiro** contendo receitas, despesas e saldo final.
 
 ---
 
-## 🛠 Tecnologias Utilizadas
+## 🚀 Tecnologias
 
-- **Python**
-- **Pandas** – processamento e limpeza de dados
-- **FastAPI** – API REST
-- **Pytest** – testes automatizados
-- **Uvicorn** – servidor ASGI
+- Python 3.13
+- FastAPI
+- Pandas
+- Pydantic
+- Pytest
+- Uvicorn
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
 ```text
 backend/
-│
 ├── src/
-│   ├── api/            # Endpoints FastAPI
-│   ├── validation/     # Validações de dados
-│   ├── processing/     # Limpeza e transformação
-│   ├── summary/        # Funções de análise
+│   ├── api/
+│   │   ├── routes/
+│   │   │   └── upload.py
+│   │   └── app.py
+│   │
+│   ├── pipelines/
+│   │   ├── cleaning.py
+│   │   ├── processing.py
+│   │   ├── summary.py
+│   │   └── validation.py
+│   │
+│   ├── schemas/
+│   │   ├── finance.py
+│   │   └── error.py
+│   │
+│   ├── services/
+│   │   └── processing.py
+│   │
 │   └── main.py
 │
-├── tests/              # Testes automatizados
-├── data/               # CSV de exemplo
+├── tests/
+│   ├── test_services.py
+│   └── test_pipelines.py
+│
 ├── requirements.txt
 └── README.md
 ```
 
----
+### Organização
 
-## 🔄 Pipeline de Processamento
-
-A pipeline de dados segue as seguintes etapas:
-
-1. **Validação de colunas obrigatórias**
-2. **Conversão e validação de datas**
-3. **Limpeza da coluna de valores (`amount`)**
-4. **Classificação das transações**
-   - `income` → valores ≥ 0
-   - `expense` → valores < 0
-5. **Geração de resumos e saldo final**
-
-Cada etapa é isolada em funções reutilizáveis.
+- **api/**: camada HTTP (rotas, middlewares, app)
+- **pipelines/**: regras de negócio e processamento de dados
+- **services/**: orquestração dos pipelines
+- **schemas/**: contratos da API (Pydantic)
+- **tests/**: testes unitários e de integração
 
 ---
 
-## 🚀 Endpoints Disponíveis
+## 🔁 Fluxo de Processamento
 
-### `GET /summary`
+1. Upload do CSV via endpoint `/upload`
+2. Validação das colunas obrigatórias
+3. Limpeza e conversão de dados
+4. Classificação das transações (income / expense)
+5. Geração do resumo financeiro
+6. Retorno do resultado para o frontend
 
-Retorna o resumo financeiro por tipo de transação.
+---
 
-**Resposta:**
+## 📡 Endpoint
+
+### `POST /upload`
+
+Recebe um arquivo CSV e retorna o resumo financeiro.
+
+#### Request
+
+- **Content-Type:** `multipart/form-data`
+- **Body:**
+  - `file`: arquivo `.csv`
+
+#### Response — 200 OK
 
 ```json
 {
-  "income": 3500.0,
-  "expense": -1200.0
+  "summary": {
+    "income": 6900.75,
+    "expense": -480.8
+  },
+  "balance": 6419.95
+}
+```
+
+#### Response — 400 Bad Request
+
+```json
+{
+  "detail": "CSV inválido. Colunas obrigatórias ausentes: {'Valor'}"
 }
 ```
 
 ---
 
-### `GET /balance`
+## 🧾 Validações
 
-Retorna o saldo final calculado a partir das transações.
-
-**Resposta:**
-
-```json
-{
-  "balance": 2300.0
-}
-```
+- CSV deve conter colunas obrigatórias (modelo atual: NuBank)
+- Valores são convertidos para numérico
+- Transações são classificadas automaticamente
+- Erros de domínio retornam **HTTP 400**
+- Erros de schema são tratados automaticamente pelo FastAPI (**422**)
 
 ---
 
-## ▶️ Como Executar o Backend
+## 🧪 Testes
 
-### 1️⃣ Criar e ativar o ambiente virtual
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-### 2️⃣ Instalar dependências
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3️⃣ Rodar a API
-
-```bash
-uvicorn src.api.app:app --reload
-```
-
-A API estará disponível em:
-
-```md
-[http://127.0.0.1:8000](http://127.0.0.1:8000)
-```
-
-Swagger:
-
-```md
-[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-```
-
----
-
-## 🧪 Testes Automatizados
-
-Para rodar os testes:
+Execute todos os testes com:
 
 ```bash
 pytest
 ```
 
-Os testes cobrem:
+Cobertura inclui:
 
 - validação de dados
-- limpeza de colunas
-- classificação de transações
-- geração de resumos
+- pipelines de processamento
+- cálculo de resumo e saldo
 
 ---
 
-## 🔮 Próximos Passos
+## ▶️ Executando o Projeto
 
-- Upload de CSV via frontend
-- Persistência de dados
-- Autenticação de usuários
-- Novas análises financeiras
-- Integração com frontend em React + TypeScript
+### Criar ambiente virtual
+
+```bash
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+```
+
+### Instalar dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### Rodar o servidor
+
+```bash
+uvicorn src.api.app:app --reload
+```
+
+Acesse:
+
+- API: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- Swagger: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
 ## 📌 Observações
 
-Este backend foi desenvolvido com foco em **aprendizado**, **clareza de código** e **boas práticas**, sendo facilmente extensível para novas funcionalidades.
+- O backend foi estruturado seguindo boas práticas de mercado
+- Pipelines são independentes da camada HTTP
+- Pronto para futuras extensões:
+  - autenticação
+  - persistência em banco
+  - novos tipos de análise
+  - visualização completa do DataFrame processado
+
+---
+
+## 📄 Licença
+
+Projeto educacional / portfólio.
