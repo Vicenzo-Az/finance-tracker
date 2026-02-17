@@ -14,15 +14,15 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
+        <div className="bg-card p-6 rounded-lg border border-border">
           Card 1
         </div>
 
-        <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
+        <div className="bg-card p-6 rounded-lg border border-border">
           Card 2
         </div>
 
-        <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800">
+        <div className="bg-card p-6 rounded-lg border border-border">
           Card 3
         </div>
       </div>

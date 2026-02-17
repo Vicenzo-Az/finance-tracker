@@ -4,7 +4,7 @@ export function Sidebar() {
   const baseStyle = "block px-4 py-2 rounded-md text-sm transition-colors";
 
   return (
-    <aside className="w-64 border-r border-zinc-800 bg-zinc-950 p-6">
+    <aside className="w-64 border-r border-border bg-background p-6">
       <h1 className="text-lg font-semibold mb-8">Finance Tracker</h1>
 
       <nav className="space-y-2">
@@ -14,7 +14,7 @@ export function Sidebar() {
             `${baseStyle} ${
               isActive
                 ? "bg-emerald-600/10 text-emerald-400"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "text-muted-foreground hover:text-white hover:bg-accent"
             }`
           }
         >
@@ -27,7 +27,7 @@ export function Sidebar() {
             `${baseStyle} ${
               isActive
                 ? "bg-emerald-600/10 text-emerald-400"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "text-muted-foreground hover:text-white hover:bg-accent"
             }`
           }
         >
@@ -40,7 +40,7 @@ export function Sidebar() {
             `${baseStyle} ${
               isActive
                 ? "bg-emerald-600/10 text-emerald-400"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "text-muted-foreground hover:text-white hover:bg-accent"
             }`
           }
         >
@@ -53,7 +53,7 @@ export function Sidebar() {
             `${baseStyle} ${
               isActive
                 ? "bg-emerald-600/10 text-emerald-400"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                : "text-muted-foreground hover:text-white hover:bg-accent"
             }`
           }
         >

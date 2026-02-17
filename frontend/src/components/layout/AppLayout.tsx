@@ -8,7 +8,7 @@ type Props = {
 
 export function AppLayout({ children }: Props) {
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
 
       <div className="flex flex-col flex-1">
