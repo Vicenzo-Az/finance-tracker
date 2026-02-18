@@ -9,7 +9,7 @@ export function Topbar() {
 
       <button
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="px-3 py-1 rounded-md border border-zinc-700 text-sm"
+        className="px-3 py-1 rounded-md border border-zinc-700 text-sm hover:bg-accent transition-colors"
       >
         {theme === "dark" ? "Light Mode" : "Dark Mode"}
       </button>
