@@ -7,10 +7,13 @@ export function Sidebar() {
 
   return (
     <aside
-      className="h-screen w-64
-    bg-emerald-900 text-emerald-50
-    dark:bg-emerald-950
-    border-r border-emerald-800/50 p-6"
+      className="
+      h-screen w-64
+      bg-gradient-to-b from-emerald-900 to-emerald-950
+      text-emerald-50
+      border-r border-emerald-800/40
+      p-6
+    "
     >
       <h1 className="text-lg font-semibold tracking-tight mb-8">
         Finance Tracker

@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export function Topbar() {
@@ -5,14 +7,19 @@ export function Topbar() {
 
   return (
     <header className="h-16 border-b border-border flex items-center justify-between px-8">
-      <h2 className="text-xl font-semibold">Dashboard</h2>
+      <h2 className="text-xl font-semibold">Welcome, User!</h2>
 
-      <button
+      <Button
+        variant="outline"
+        size="icon"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="px-3 py-1 rounded-md border border-zinc-700 text-sm hover:bg-accent transition-colors"
       >
-        {theme === "dark" ? "Light Mode" : "Dark Mode"}
-      </button>
+        {theme === "dark" ? (
+          <Sun className="h-4 w-4" />
+        ) : (
+          <Moon className="h-4 w-4" />
+        )}
+      </Button>
     </header>
   );
 }
