@@ -1,4 +1,5 @@
 import { StatCard } from "@/components/dashboard/StatCard";
+import { TransactionItem } from "@/components/dashboard/TransactionItem";
 import { mockTransactions } from "@/data/mockTransactions";
 
 const income = mockTransactions
@@ -26,15 +27,13 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div>
-        <h3 className="text-2xl font-semibold tracking-tight leading-none mb-6">
-          Outros Dados
-        </h3>
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Recent Transactions</h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard title="Card 1" value="$0.00" />
-          <StatCard title="Card 2" value="$0.00" />
-          <StatCard title="Card 3" value="$0.00" />
+        <div className="space-y-3">
+          {mockTransactions.slice(0, 5).map((transaction) => (
+            <TransactionItem key={transaction.id} transaction={transaction} />
+          ))}
         </div>
       </div>
     </div>
