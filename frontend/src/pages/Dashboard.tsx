@@ -1,4 +1,15 @@
 import { StatCard } from "@/components/dashboard/StatCard";
+import { mockTransactions } from "@/data/mockTransactions";
+
+const income = mockTransactions
+  .filter((t) => t.type === "income")
+  .reduce((acc, t) => acc + t.amount, 0);
+
+const expenses = mockTransactions
+  .filter((t) => t.type === "expense")
+  .reduce((acc, t) => acc + t.amount, 0);
+
+const balance = income - expenses;
 
 export default function Dashboard() {
   return (
@@ -9,9 +20,9 @@ export default function Dashboard() {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard title="Total Balance" value="$6,419.95" />
-          <StatCard title="Income" value="$6,900.75" />
-          <StatCard title="Expenses" value="$-480.80" />
+          <StatCard title="Total Balance" value={`$${balance.toFixed(2)}`} />
+          <StatCard title="Income" value={`$${income.toFixed(2)}`} />
+          <StatCard title="Expenses" value={`$${expenses.toFixed(2)}`} />
         </div>
       </div>
 
