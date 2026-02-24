@@ -1,3 +1,4 @@
+import { IncomeExpenseChart } from "@/components/dashboard/IncomeExpenseChart";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { TransactionItem } from "@/components/dashboard/TransactionItem";
 import { mockTransactions } from "@/data/mockTransactions";
@@ -26,6 +27,8 @@ export default function Dashboard() {
           <StatCard title="Expenses" value={`$${expenses.toFixed(2)}`} />
         </div>
       </div>
+
+      <IncomeExpenseChart income={income} expenses={expenses} />
 
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Recent Transactions</h3>
