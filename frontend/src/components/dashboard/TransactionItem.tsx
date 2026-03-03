@@ -1,16 +1,16 @@
-import type { Transaction } from "@/data/mockTransactions";
+import type { Transaction } from "@/types";
 
-type Props = {
+interface TransactionItemProps {
   transaction: Transaction;
-};
+}
 
-export function TransactionItem({ transaction }: Props) {
+export function TransactionItem({ transaction }: TransactionItemProps) {
   const isIncome = transaction.type === "income";
 
   return (
     <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card">
       <div>
-        <p className="font-medium">{transaction.title}</p>
+        <p className="font-medium">{transaction.description}</p>
         <p className="text-sm text-muted-foreground">
           {transaction.category} • {transaction.date}
         </p>

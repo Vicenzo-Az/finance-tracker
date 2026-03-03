@@ -1,4 +1,4 @@
-import { mockTransactions } from "@/data/mockTransactions";
+import { useTransactions } from "@/context/TransactionContext";
 import { useState } from "react";
 
 import {
@@ -31,30 +31,28 @@ import {
 } from "@/components/ui/select";
 
 export default function Transactions() {
-  const [transactions, setTransactions] = useState(mockTransactions);
+  const { transactions, addTransaction, removeTransaction, updateTransaction } =
+    useTransactions();
 
-  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<"income" | "expense">("income");
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
 
   function handleAddTransaction() {
-    if (!title || !amount || !category || !date) return;
+    if (!description || !amount || !category || !date) return;
 
-    const newTransaction = {
-      id: crypto.randomUUID(),
-      title,
+    addTransaction({
+      description,
       amount: Number(amount),
       type,
       category,
       date,
-    };
-
-    setTransactions((prev) => [...prev, newTransaction]);
+    });
 
     // Resetar campos
-    setTitle("");
+    setDescription("");
     setAmount("");
     setCategory("");
     setDate("");
@@ -80,9 +78,9 @@ export default function Transactions() {
 
             <div className="space-y-4 mt-4">
               <Input
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
 
               <Input
@@ -132,10 +130,11 @@ export default function Transactions() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
+              <TableHead>Description</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Date</TableHead>
               <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -143,7 +142,7 @@ export default function Transactions() {
             {transactions.map((transaction) => (
               <TableRow key={transaction.id}>
                 <TableCell className="font-medium">
-                  {transaction.title}
+                  {transaction.description}
                 </TableCell>
 
                 <TableCell>{transaction.category}</TableCell>
@@ -159,6 +158,28 @@ export default function Transactions() {
                 >
                   {transaction.type === "income" ? "+" : "-"}$
                   {transaction.amount.toFixed(2)}
+                </TableCell>
+
+                <TableCell className="text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      updateTransaction(transaction.id, transaction)
+                    }
+                  >
+                    Edit
+                  </Button>
+
+                  <span className="mx-3" />
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => removeTransaction(transaction.id)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

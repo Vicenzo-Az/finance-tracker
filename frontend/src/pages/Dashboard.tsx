@@ -1,19 +1,21 @@
 import { IncomeExpenseChart } from "@/components/dashboard/IncomeExpenseChart";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { TransactionItem } from "@/components/dashboard/TransactionItem";
-import { mockTransactions } from "@/data/mockTransactions";
-
-const income = mockTransactions
-  .filter((t) => t.type === "income")
-  .reduce((acc, t) => acc + t.amount, 0);
-
-const expenses = mockTransactions
-  .filter((t) => t.type === "expense")
-  .reduce((acc, t) => acc + t.amount, 0);
-
-const balance = income - expenses;
+import { useTransactions } from "@/context/TransactionContext";
 
 export default function Dashboard() {
+  const { transactions } = useTransactions();
+
+  const income = transactions
+    .filter((t) => t.type === "income")
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const expenses = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const balance = income - expenses;
+
   return (
     <div className="space-y-12">
       <div>
@@ -34,7 +36,7 @@ export default function Dashboard() {
         <h3 className="text-lg font-medium">Recent Transactions</h3>
 
         <div className="space-y-3">
-          {mockTransactions.slice(0, 5).map((transaction) => (
+          {transactions.slice(0, 5).map((transaction) => (
             <TransactionItem key={transaction.id} transaction={transaction} />
           ))}
         </div>
