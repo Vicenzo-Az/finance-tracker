@@ -15,8 +15,8 @@ type Props = {
 
 export function IncomeExpenseChart({ income, expenses }: Props) {
   const data = [
-    { name: "Income", value: income },
-    { name: "Expenses", value: expenses },
+    { name: "Income", value: income, fill: "#10b981" },
+    { name: "Expenses", value: expenses, fill: "#af2525" },
   ];
 
   return (
@@ -38,7 +38,7 @@ export function IncomeExpenseChart({ income, expenses }: Props) {
             }}
             labelStyle={{ color: "#fff", fontWeight: "bold" }}
           />
-          <Bar dataKey="value" fill="#10b981" radius={[6, 6, 0, 0]} />
+          <Bar dataKey="value" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
