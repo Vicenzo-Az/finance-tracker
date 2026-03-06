@@ -1,3 +1,4 @@
+import { useTheme } from "next-themes";
 import {
   Bar,
   BarChart,
@@ -13,7 +14,44 @@ type Props = {
   expenses: number;
 };
 
+// ------------------------------------------------------
+interface CustomCursorProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  payload?: Array<{ payload: { name: string } }>;
+}
+
+// Custom cursor that changes color based on the bar being hovered
+const CustomCursor = (props: CustomCursorProps) => {
+  const { x, y, width, height, payload } = props;
+
+  if (!payload || !payload[0]) return null;
+
+  // Get color based on the data name
+  const isIncome = payload[0].payload.name === "Income";
+  const fillColor = isIncome
+    ? "rgba(16, 185, 129, 0.1)"
+    : "rgba(175, 37, 37, 0.1)";
+
+  return (
+    <rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill={fillColor}
+      stroke="none"
+    />
+  );
+};
+// ------------------------------------------------------
+
 export function IncomeExpenseChart({ income, expenses }: Props) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const data = [
     { name: "Income", value: income, fill: "#10b981" },
     { name: "Expenses", value: expenses, fill: "#af2525" },
@@ -29,14 +67,19 @@ export function IncomeExpenseChart({ income, expenses }: Props) {
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip
-            cursor={{ fill: "rgba(16, 185, 129, 0.1)" }}
+            cursor={<CustomCursor />}
             contentStyle={{
-              backgroundColor: "#1f2937",
-              border: "1px solid #374151",
+              backgroundColor: isDark ? "#1f2937" : "#ffffff",
+              border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
               borderRadius: "8px",
-              color: "#10b981",
             }}
-            labelStyle={{ color: "#fff", fontWeight: "bold" }}
+            itemStyle={{
+              color: isDark ? "#f3f4f6" : "#1f2937",
+            }}
+            labelStyle={{
+              color: isDark ? "#f3f4f6" : "#1f2937",
+              fontWeight: "bold",
+            }}
           />
           <Bar dataKey="value" radius={[6, 6, 0, 0]} />
         </BarChart>
