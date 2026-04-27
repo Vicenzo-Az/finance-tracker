@@ -33,7 +33,7 @@ import type { Transaction } from "@/types";
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString + "T00:00:00"); // Add time to avoid timezone issues
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString("pt-BR", {
     // Posteriormente, considerar internacionalização
     year: "numeric",
     month: "short",
@@ -215,24 +215,24 @@ export default function Transactions() {
     <div className="space-y-8">
       {/* Header + botão */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Transactions</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Transações</h1>
 
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" className="ml-2">
-              Add Transaction
+              Adicionar Transação
             </Button>
           </DialogTrigger>
 
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>New Transaction</DialogTitle>
+              <DialogTitle>Nova Transação</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4 mt-4">
               <div>
                 <Input
-                  placeholder="Description"
+                  placeholder="Descrição"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className={errors.description ? "border-red-500" : ""}
@@ -247,7 +247,7 @@ export default function Transactions() {
               <div>
                 <Input
                   type="number"
-                  placeholder="Amount"
+                  placeholder="Valor"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   className={errors.amount ? "border-red-500" : ""}
@@ -264,16 +264,16 @@ export default function Transactions() {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Type" />
+                  <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="income">Income</SelectItem>
-                  <SelectItem value="expense">Expense</SelectItem>
+                  <SelectItem value="income">Receita</SelectItem>
+                  <SelectItem value="expense">Despesa</SelectItem>
                 </SelectContent>
               </Select>
 
               <Input
-                placeholder="Category"
+                placeholder="Categoria"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               />
@@ -281,7 +281,7 @@ export default function Transactions() {
               <div>
                 <Input
                   type={dateInputType}
-                  placeholder="Select date"
+                  placeholder="Selecionar data"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   onFocus={() => setDateInputType("date")}
@@ -298,7 +298,7 @@ export default function Transactions() {
               </div>
 
               <Button variant="outline" onClick={handleAddTransaction}>
-                Save
+                Salvar
               </Button>
             </div>
           </DialogContent>
@@ -309,13 +309,13 @@ export default function Transactions() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Transaction</DialogTitle>
+            <DialogTitle>Editar Transação</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
             <div>
               <Input
-                placeholder="Description"
+                placeholder="Descrição"
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 className={editErrors.description ? "border-red-500" : ""}
@@ -331,7 +331,7 @@ export default function Transactions() {
             <div>
               <Input
                 type="number"
-                placeholder="Amount"
+                placeholder="Valor"
                 value={editAmount}
                 onChange={(e) => setEditAmount(e.target.value)}
                 className={editErrors.amount ? "border-red-500" : ""}
@@ -348,16 +348,16 @@ export default function Transactions() {
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Type" />
+                <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="income">Income</SelectItem>
-                <SelectItem value="expense">Expense</SelectItem>
+                <SelectItem value="income">Receita</SelectItem>
+                <SelectItem value="expense">Despesa</SelectItem>
               </SelectContent>
             </Select>
 
             <Input
-              placeholder="Category (optional)"
+              placeholder="Categoria (opcional)"
               value={editCategory}
               onChange={(e) => setEditCategory(e.target.value)}
             />
@@ -365,7 +365,7 @@ export default function Transactions() {
             <div>
               <Input
                 type={editDateInputType}
-                placeholder="Select date"
+                placeholder="Selecionar data"
                 value={editDate}
                 onChange={(e) => setEditDate(e.target.value)}
                 onFocus={() => setEditDateInputType("date")}
@@ -382,7 +382,7 @@ export default function Transactions() {
             </div>
 
             <Button variant="outline" onClick={handleSaveEdit}>
-              Save Changes
+              Salvar Alterações
             </Button>
           </div>
         </DialogContent>
@@ -393,11 +393,11 @@ export default function Transactions() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Descrição</TableHead>
+              <TableHead>Categoria</TableHead>
+              <TableHead className="text-right">Valor</TableHead>
+              <TableHead className="text-center">Ações</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -429,7 +429,7 @@ export default function Transactions() {
                     size="sm"
                     onClick={() => handleEditClick(transaction)}
                   >
-                    Edit
+                    Editar
                   </Button>
 
                   <span className="mx-3" />
@@ -439,7 +439,7 @@ export default function Transactions() {
                     size="sm"
                     onClick={() => removeTransaction(transaction.id)}
                   >
-                    Delete
+                    Deletar
                   </Button>
                 </TableCell>
               </TableRow>

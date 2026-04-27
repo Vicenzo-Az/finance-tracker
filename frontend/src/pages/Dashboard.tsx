@@ -26,13 +26,13 @@ export default function Dashboard() {
     <div className="space-y-12">
       <div>
         <h3 className="text-2xl font-semibold tracking-tight leading-none mb-6">
-          Overview
+          Visão Geral
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard title="Total Balance" value={`$${balance.toFixed(2)}`} />
-          <StatCard title="Income" value={`$${income.toFixed(2)}`} />
-          <StatCard title="Expenses" value={`$${expenses.toFixed(2)}`} />
+          <StatCard title="Saldo Total" value={`$${balance.toFixed(2)}`} />
+          <StatCard title="Renda" value={`$${income.toFixed(2)}`} />
+          <StatCard title="Despesas" value={`$${expenses.toFixed(2)}`} />
         </div>
       </div>
 
@@ -40,10 +40,12 @@ export default function Dashboard() {
         <Card className="p-12 text-center border-2 border-dashed">
           <div className="max-w-md mx-auto space-y-6">
             <div className="space-y-2">
-              <h3 className="text-xl font-semibold">No transactions yet</h3>
+              <h3 className="text-xl font-semibold">
+                Nenhuma transação adicionada ainda
+              </h3>
               <p className="text-muted-foreground text-sm">
-                Start tracking your finances by adding your first transaction or
-                importing data from a CSV file.
+                Comece a rastrear suas finanças adicionando sua primeira
+                transação ou importando dados de um arquivo CSV.
               </p>
             </div>
 
@@ -54,7 +56,7 @@ export default function Dashboard() {
                 className="gap-2"
               >
                 <PlusCircle size={18} />
-                Add Transaction
+                Adicionar Transação
               </Button>
 
               <Button
@@ -63,14 +65,15 @@ export default function Dashboard() {
                 className="gap-2"
               >
                 <FileUp size={18} />
-                Upload CSV
+                Fazer Upload de CSV
               </Button>
             </div>
 
             <div className="pt-4 border-t">
               <p className="text-xs text-muted-foreground">
-                Tip: You can add income and expenses manually, or upload a CSV
-                with your transaction history to get started quickly.
+                Dica: Você pode adicionar receitas e despesas manualmente ou
+                fazer upload de um CSV com seu histórico de transações para
+                começar rapidamente.
               </p>
             </div>
           </div>
@@ -80,7 +83,7 @@ export default function Dashboard() {
           <IncomeExpenseChart income={income} expenses={expenses} />
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Recent Transactions</h3>
+            <h3 className="text-lg font-medium">Transações Recentes</h3>
 
             <div className="space-y-3">
               {transactions.slice(0, 5).map((transaction) => (

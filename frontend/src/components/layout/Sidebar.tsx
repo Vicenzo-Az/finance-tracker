@@ -45,7 +45,7 @@ export function Sidebar() {
           }
         >
           <CreditCard size={18} />
-          Transactions
+          Transações
         </NavLink>
 
         <NavLink
@@ -59,7 +59,7 @@ export function Sidebar() {
           }
         >
           <User size={18} />
-          Profile
+          Perfil
         </NavLink>
 
         <NavLink
@@ -73,7 +73,7 @@ export function Sidebar() {
           }
         >
           <Settings size={18} />
-          Settings
+          Configurações
         </NavLink>
       </nav>
     </aside>

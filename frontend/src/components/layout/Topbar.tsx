@@ -7,7 +7,7 @@ export function Topbar() {
 
   return (
     <header className="h-16 border-b border-border flex items-center justify-between px-8">
-      <h2 className="text-xl font-semibold">Welcome, User!</h2>
+      <h2 className="text-xl font-semibold">Bem-vindo, nomeUsuário!</h2>
 
       <Button
         variant="outline"
