@@ -1,4 +1,4 @@
-import { useTransactions } from "@/context/TransactionContext";
+import { useTransactions } from "@/context";
 import { useMemo, useState } from "react";
 
 import {

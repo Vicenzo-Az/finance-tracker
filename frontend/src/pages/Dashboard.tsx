@@ -3,7 +3,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { TransactionItem } from "@/components/dashboard/TransactionItem";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useTransactions } from "@/context/TransactionContext";
+import { useTransactions } from "@/context";
 import { FileUp, PlusCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
