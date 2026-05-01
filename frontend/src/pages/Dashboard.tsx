@@ -90,7 +90,7 @@ export default function Dashboard() {
                 <TransactionItem
                   key={transaction.id}
                   transaction={transaction}
-                  // TODO: order by date
+                  // TODO: order by date and group by month
                 />
               ))}
             </div>
