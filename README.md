@@ -1,121 +1,83 @@
 # Finance Tracker
 
-Aplicação **fullstack** para análise de extratos financeiros a partir de arquivos CSV.
+Aplicação **fullstack** para gestão financeira com um backend FastAPI e uma interface React.
 
-O projeto permite que o usuário envie um CSV pelo frontend e receba um **resumo financeiro automático**, contendo:
+O projeto combina dois fluxos principais:
 
-- receitas
-- despesas
-- saldo final
-
-Arquitetura pensada para **extensão futura**, mantendo separação clara entre frontend e backend.
+- gerenciamento manual de transações no frontend
+- processamento de extratos CSV e cálculo de resumo financeiro no backend
 
 ---
 
-## 🧱 Estrutura do Projeto
+## Estrutura
 
 ```text
 finance-tracker/
 ├── backend/
 │   ├── src/
 │   ├── tests/
-│   ├── requirements.txt
+│   ├── alembic/
 │   └── README.md
-│
 ├── frontend/
 │   ├── src/
-│   ├── index.html
-│   ├── package.json
+│   ├── public/
 │   └── README.md
-│
 └── README.md
 ```
 
-- **backend/** → API FastAPI (processamento e análise)
-- **frontend/** → Interface React (upload e visualização)
-- **README.md** → visão geral do projeto (este arquivo)
-
 ---
 
-## ⚙️ Tecnologias
+## Tecnologias
 
 ### Backend
 
 - Python 3.13
 - FastAPI
+- SQLAlchemy
 - Pandas
 - Pydantic
+- Alembic
 - Pytest
 
 ### Frontend
 
-- React + TypeScript
+- React 19
+- TypeScript
 - Vite
-- Fetch API
-- HTML / CSS
+- Axios
+- React Router
+- Recharts
+- Tailwind CSS
 
 ---
 
-## 🔁 Fluxo da Aplicação
+## Como Funciona
 
-1. Usuário seleciona um arquivo CSV no frontend
-2. Frontend envia o arquivo para a API (`POST /upload`)
-3. Backend valida e processa os dados
-4. Backend retorna:
-   - resumo financeiro
-   - saldo final
-
-5. Frontend exibe os resultados
+1. O backend expõe uma API para CRUD de transações e importação de CSV
+2. O frontend carrega as transações da API e apresenta o dashboard
+3. O usuário pode criar, editar e excluir transações pela interface
+4. O endpoint de upload processa extratos CSV e devolve resumo e saldo
 
 ---
 
-## 📡 API (Resumo)
+## Como Executar
 
-### `POST /upload`
-
-Recebe um CSV e retorna o resumo financeiro.
-
-Exemplo de resposta:
-
-```json
-{
-  "summary": {
-    "income": 6900.75,
-    "expense": -480.8
-  },
-  "balance": 6419.95
-}
-```
-
-Documentação completa disponível via Swagger:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
----
-
-## ▶️ Como Executar
-
-### 1️⃣ Backend
+### Backend
 
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn src.api.app:app --reload
 ```
 
-Backend disponível em:
+Crie o arquivo `.env` com a variável `DATABASE_URL`, aplique as migrações se necessário e inicie a API com:
 
-```text
-http://127.0.0.1:8000
+```bash
+uvicorn src.main:app --reload
 ```
 
----
-
-### 2️⃣ Frontend
+### Frontend
 
 ```bash
 cd frontend
@@ -123,17 +85,31 @@ npm install
 npm run dev
 ```
 
-Frontend disponível em:
-
-```text
-http://localhost:5173
-```
+Se quiser apontar para outra API, configure `VITE_API_URL` no frontend.
 
 ---
 
-## 🧪 Testes
+## APIs Principais
 
-### Backend - Pytest
+### Backend
+
+- `POST /upload` - processa um CSV e retorna resumo financeiro
+- `GET /transactions` - lista transações
+- `GET /transactions/{transaction_id}` - busca uma transação
+- `POST /transactions` - cria uma transação
+- `PUT /transactions/{transaction_id}` - atualiza uma transação
+- `DELETE /transactions/{transaction_id}` - remove uma transação
+
+### Frontend
+
+- `/` - dashboard
+- `/transactions` - gerenciamento de transações
+- `/profile` - perfil
+- `/settings` - configurações
+
+---
+
+## Testes
 
 ```bash
 cd backend
@@ -142,41 +118,7 @@ pytest
 
 ---
 
-## 🧩 Decisões de Arquitetura
+## Observações
 
-- Monorepo para facilitar desenvolvimento local
-- Backend desacoplado do frontend
-- Pipelines de processamento independentes da API
-- Validações separadas por responsabilidade
-- API preparada para futuras extensões:
-  - autenticação
-  - persistência em banco
-  - novas análises financeiras
-  - visualização completa do DataFrame processado
-
----
-
-## 🚧 Roadmap (Futuro)
-
-- Autenticação de usuário
-- Histórico de uploads
-- Visualização detalhada das transações
-- Suporte a múltiplos modelos de CSV
-- Deploy (Docker / Cloud)
-
----
-
-## 📄 Licença
-
-Projeto educacional / portfólio.
-
----
-
-### ⭐ Observação Final
-
-Este projeto foi desenvolvido com foco em:
-
-- boas práticas
-- organização de código
-- clareza arquitetural
-- escalabilidade
+- O monorepo mantém frontend e backend desacoplados, mas prontos para integração local
+- A documentação detalhada de cada app está nos READMEs internos

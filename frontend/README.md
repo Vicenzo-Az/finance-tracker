@@ -1,73 +1,112 @@
-# React + TypeScript + Vite
+# Finance Tracker - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface em **React + TypeScript + Vite** para acompanhar transações financeiras e consumir a API do backend.
 
-Currently, two official plugins are available:
+O app atual oferece:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- dashboard com saldo, renda, despesas e gráfico
+- listagem, criação, edição e remoção de transações
+- páginas de perfil e configurações
+- layout responsivo com sidebar e topbar
+- tema com `next-themes`
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tecnologias
 
-## Expanding the ESLint configuration
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Axios
+- Recharts
+- Tailwind CSS
+- shadcn/ui e Radix UI
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Estrutura
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+frontend/
+├── src/
+│   ├── components/
+│   ├── context/
+│   ├── hooks/
+│   ├── lib/
+│   ├── pages/
+│   ├── services/
+│   └── types/
+├── public/
+├── index.html
+├── package.json
+└── README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Páginas
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `/` - dashboard com visão geral e transações recentes
+- `/transactions` - gestão manual de transações
+- `/profile` - perfil do usuário
+- `/settings` - preferências e ajustes da aplicação
+
+---
+
+## Integração com a API
+
+O frontend usa a URL definida em `VITE_API_URL`.
+
+Se a variável não for informada, o padrão é:
+
+```text
+http://localhost:8000
 ```
+
+Os dados de transações são buscados e persistidos via endpoints do backend, então a API precisa estar em execução antes de abrir a interface.
+
+---
+
+## Como Executar
+
+### 1. Instalar dependências
+
+```bash
+npm install
+```
+
+### 2. Configurar a API, se necessário
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+### 3. Iniciar o frontend
+
+```bash
+npm run dev
+```
+
+O app costuma ficar disponível em:
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Scripts
+
+- `npm run dev` - executa o servidor de desenvolvimento
+- `npm run build` - gera a build de produção
+- `npm run lint` - executa o ESLint
+- `npm run preview` - serve a build localmente
+
+---
+
+## Observações
+
+- O layout usa um provedor de contexto para transações e outro para tema
+- A aplicação está pronta para evoluir para upload de CSV no frontend no futuro
+- O dashboard calcula saldo a partir das transações carregadas da API
