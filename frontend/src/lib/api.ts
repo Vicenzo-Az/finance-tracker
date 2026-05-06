@@ -5,6 +5,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // envia cookies httpOnly automaticamente em toda requisição
 });
 
 export default api;
