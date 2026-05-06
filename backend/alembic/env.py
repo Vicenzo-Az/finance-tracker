@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import src.models.transaction  # noqa: F401
+import src.models.user  # noqa: F401
 
 config = context.config
 
