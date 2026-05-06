@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Float, String
-from sqlalchemy.orm import Mapped
+from sqlalchemy import Column, Float, ForeignKey, String
+from sqlalchemy.orm import Mapped, relationship
 
 from src.core.database import Base
 
@@ -14,3 +14,7 @@ class Transaction(Base):
     category: Mapped[str] = Column(String, nullable=False, default="")
     # ISO 8601: "2025-01-02"
     date: Mapped[str] = Column(String, nullable=False)
+    user_id: Mapped[str] = Column(
+        String, ForeignKey("users.id"), nullable=False)
+
+    user = relationship("User", back_populates="transactions")
