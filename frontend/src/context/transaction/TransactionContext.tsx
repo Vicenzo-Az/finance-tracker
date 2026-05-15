@@ -1,3 +1,4 @@
+import { useUser } from "@/context/user/useUser";
 import {
   createTransaction as apiCreate,
   deleteTransaction as apiDelete,
@@ -18,6 +19,7 @@ interface TransactionProviderProps {
 }
 
 export function TransactionProvider({ children }: TransactionProviderProps) {
+  const { user } = useUser();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,8 +38,13 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
   }, []);
 
   useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+    if (user) {
+      fetchTransactions();
+    } else {
+      setTransactions([]);
+      setIsLoading(false);
+    }
+  }, [user, fetchTransactions]);
 
   const addTransaction = async (input: CreateTransactionInput) => {
     try {
