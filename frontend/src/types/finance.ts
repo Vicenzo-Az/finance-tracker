@@ -32,3 +32,11 @@ export interface UploadResponse {
 export interface ApiError {
   detail: string;
 }
+
+// ─── Usuário ──────────────────────────────────────────────────────────────────
+
+export interface UserResponse {
+  id: string;
+  email: string;
+  name: string;
+}
