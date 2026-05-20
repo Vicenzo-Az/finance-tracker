@@ -6,17 +6,20 @@ import pandas as pd
 from src.core.database import get_db
 from src.core.dependencies import get_current_user
 from src.models.transaction import Transaction as TransactionModel
+from src.models.account import Account as AccountModel
 from src.models.category import Category as CategoryModel
 from src.models.user import User
+from src.services.balance import get_account_balance
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
 
 def _transactions_to_df(transactions: list) -> pd.DataFrame:
-    """Converte lista de transações ORM para DataFrame."""
     if not transactions:
-        return pd.DataFrame(columns=["id", "description", "amount", "type", "date", "category_id", "account_id"])
-
+        return pd.DataFrame(
+            columns=["id", "description", "amount", "type", "date",
+                     "category_id", "account_id", "transfer_id", "transfer_direction"]
+        )
     data = [
         {
             "id": t.id,
@@ -26,14 +29,12 @@ def _transactions_to_df(transactions: list) -> pd.DataFrame:
             "date": pd.to_datetime(t.date),
             "category_id": t.category_id,
             "account_id": t.account_id,
+            "transfer_id": t.transfer_id,
+            "transfer_direction": t.transfer_direction,
         }
         for t in transactions
     ]
-    df = pd.DataFrame(data)
-    df["signed_amount"] = df.apply(
-        lambda r: r["amount"] if r["type"] == "income" else -r["amount"], axis=1
-    )
-    return df
+    return pd.DataFrame(data)
 
 
 @router.get("/summary")
@@ -41,7 +42,6 @@ def get_summary(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Resumo geral: total de receitas, despesas, saldo e patrimônio."""
     transactions = (
         db.query(TransactionModel)
         .filter(TransactionModel.user_id == current_user.id)
@@ -49,17 +49,26 @@ def get_summary(
     )
     df = _transactions_to_df(transactions)
 
-    if df.empty:
-        return {"income": 0, "expense": 0, "balance": 0, "transaction_count": 0}
+    real = df[df["type"] != "transfer"] if not df.empty else df
 
-    income = round(float(df[df["type"] == "income"]["amount"].sum()), 2)
-    expense = round(float(df[df["type"] == "expense"]["amount"].sum()), 2)
+    income = round(float(real[real["type"] == "income"]
+                   ["amount"].sum()), 2) if not real.empty else 0.0
+    expense = round(float(real[real["type"] == "expense"]
+                    ["amount"].sum()), 2) if not real.empty else 0.0
+
+    accounts = (
+        db.query(AccountModel)
+        .filter(AccountModel.user_id == current_user.id)
+        .all()
+    )
+    net_worth = round(sum(get_account_balance(a, db) for a in accounts), 2)
 
     return {
         "income": income,
         "expense": expense,
         "balance": round(income - expense, 2),
-        "transaction_count": len(df),
+        "net_worth": net_worth,
+        "transaction_count": len(real),
     }
 
 
@@ -67,12 +76,14 @@ def get_summary(
 def get_monthly(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-    year: Optional[int] = Query(default=None, description="Filtrar por ano"),
+    year: Optional[int] = Query(default=None),
 ):
-    """Receitas e despesas agrupadas por mês."""
     transactions = (
         db.query(TransactionModel)
-        .filter(TransactionModel.user_id == current_user.id)
+        .filter(
+            TransactionModel.user_id == current_user.id,
+            TransactionModel.type != "transfer",
+        )
         .all()
     )
     df = _transactions_to_df(transactions)
@@ -84,12 +95,7 @@ def get_monthly(
         df = df[df["date"].dt.year == year]
 
     df["month"] = df["date"].dt.to_period("M").astype(str)
-
-    monthly = (
-        df.groupby(["month", "type"])["amount"]
-        .sum()
-        .reset_index()
-    )
+    monthly = df.groupby(["month", "type"])["amount"].sum().reset_index()
 
     result: dict = {}
     for _, row in monthly.iterrows():
@@ -110,13 +116,14 @@ def get_monthly(
 def get_by_category(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
-    type: Optional[str] = Query(
-        default=None, description="'income' ou 'expense'"),
+    type: Optional[str] = Query(default=None),
 ):
-    """Total por categoria."""
     transactions = (
         db.query(TransactionModel)
-        .filter(TransactionModel.user_id == current_user.id)
+        .filter(
+            TransactionModel.user_id == current_user.id,
+            TransactionModel.type != "transfer",
+        )
         .all()
     )
     df = _transactions_to_df(transactions)
@@ -127,27 +134,26 @@ def get_by_category(
     if type:
         df = df[df["type"] == type]
 
-    # Busca nomes das categorias
     category_ids = df["category_id"].dropna().unique().tolist()
     categories = (
         db.query(CategoryModel)
         .filter(CategoryModel.id.in_(category_ids))
         .all()
     ) if category_ids else []
-    cat_map = {c.id: {"name": c.name, "color": c.color, "icon": c.icon}
-               for c in categories}
+    cat_map = {
+        c.id: {"name": c.name, "color": c.color, "icon": c.icon}
+        for c in categories
+    }
 
-    by_cat = (
-        df.groupby("category_id")["amount"]
-        .sum()
-        .reset_index()
-    )
+    by_cat = df.groupby("category_id")["amount"].sum().reset_index()
 
     result = []
     for _, row in by_cat.iterrows():
         cat_id = row["category_id"]
         cat_info = cat_map.get(
-            cat_id, {"name": "Sem categoria", "color": "#94a3b8", "icon": "tag"})
+            cat_id, {"name": "Sem categoria",
+                     "color": "#94a3b8", "icon": "tag"}
+        )
         result.append({
             "category_id": cat_id,
             "category_name": cat_info["name"],
@@ -164,10 +170,12 @@ def get_trends(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Comparativo mês atual vs mês anterior."""
     transactions = (
         db.query(TransactionModel)
-        .filter(TransactionModel.user_id == current_user.id)
+        .filter(
+            TransactionModel.user_id == current_user.id,
+            TransactionModel.type != "transfer",
+        )
         .all()
     )
     df = _transactions_to_df(transactions)
@@ -193,13 +201,13 @@ def get_trends(
             float(frame[frame["type"] == "expense"]["amount"].sum()), 2)
         return {"income": income, "expense": expense, "balance": round(income - expense, 2)}
 
-    current = summarize(current_month)
-    previous = summarize(previous_month)
-
     def variation(curr: float, prev: float) -> float | None:
         if prev == 0:
             return None
         return round(((curr - prev) / prev) * 100, 1)
+
+    current = summarize(current_month)
+    previous = summarize(previous_month)
 
     return {
         "current_month": current,

@@ -5,8 +5,8 @@ from uuid import uuid4
 from src.core.database import get_db
 from src.core.dependencies import get_current_user
 from src.models.account import Account as AccountModel
-from src.models.transaction import Transaction as TransactionModel
 from src.models.user import User
+from src.services.balance import get_account_balance
 from src.schemas.account import (
     Account,
     AccountWithBalance,
@@ -15,20 +15,6 @@ from src.schemas.account import (
 )
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
-
-
-def _calculate_balance(account: AccountModel, db: Session) -> float:
-    """Calcula saldo atual: saldo_inicial + receitas - despesas."""
-    transactions = (
-        db.query(TransactionModel)
-        .filter(TransactionModel.account_id == account.id)
-        .all()
-    )
-    movement = sum(
-        t.amount if t.type == "income" else -t.amount
-        for t in transactions
-    )
-    return round(account.initial_balance + movement, 2)
 
 
 @router.get("/", response_model=list[AccountWithBalance])
@@ -44,7 +30,7 @@ def list_accounts(
     return [
         AccountWithBalance(
             **Account.model_validate(a).model_dump(),
-            current_balance=_calculate_balance(a, db),
+            current_balance=get_account_balance(a, db),
         )
         for a in accounts
     ]
@@ -91,7 +77,7 @@ def update_account(
     db.refresh(account)
     return AccountWithBalance(
         **Account.model_validate(account).model_dump(),
-        current_balance=_calculate_balance(account, db),
+        current_balance=get_account_balance(account, db),
     )
 
 

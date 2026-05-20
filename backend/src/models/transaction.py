@@ -10,20 +10,18 @@ class Transaction(Base):
     id: Mapped[str] = Column(String, primary_key=True)
     description: Mapped[str] = Column(String, nullable=False)
     amount: Mapped[float] = Column(Float, nullable=False)
-    # "income" | "expense"
+    # "income" | "expense" | "transfer"
     type: Mapped[str] = Column(String, nullable=False)
-    # ISO 8601: "2025-01-02"
     date: Mapped[str] = Column(String, nullable=False)
     user_id: Mapped[str] = Column(
         String, ForeignKey("users.id"), nullable=False)
-
-    # Agora FK para tabelas dedicadas (nullable para não quebrar dados existentes)
     category_id: Mapped[str | None] = Column(
-        String, ForeignKey("categories.id"), nullable=True
-    )
+        String, ForeignKey("categories.id"), nullable=True)
     account_id: Mapped[str | None] = Column(
-        String, ForeignKey("accounts.id"), nullable=True
-    )
+        String, ForeignKey("accounts.id"), nullable=True)
+    transfer_id: Mapped[str | None] = Column(String, nullable=True)
+    transfer_direction: Mapped[str | None] = Column(
+        String, nullable=True)  # "out" | "in"
 
     user = relationship("User", back_populates="transactions")
     category = relationship("Category", back_populates="transactions")
