@@ -1,26 +1,33 @@
 from src.core.database import Base
 from src.core.config import settings
 from logging.config import fileConfig
-from sqlalchemy import create_engine, pool
+from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 from dotenv import load_dotenv
 load_dotenv()
 
-import src.models.transaction  # noqa: F401
-import src.models.user  # noqa: F401
+
+# Importa todos os models para registrar no metadata
+import src.models.user          # noqa: F401
+import src.models.transaction   # noqa: F401
+import src.models.category      # noqa: F401
+import src.models.account       # noqa: F401
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+config.set_main_option("sqlalchemy.url", settings.database_url)
+
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
+    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=settings.database_url,
+        url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -30,7 +37,11 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    connectable = create_engine(settings.database_url, poolclass=pool.NullPool)
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section, {}),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+    )
     with connectable.connect() as connection:
         context.configure(
             connection=connection,
