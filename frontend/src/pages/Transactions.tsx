@@ -443,65 +443,90 @@ export default function Transactions() {
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-3 flex-wrap">
-        <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os tipos</SelectItem>
-            <SelectItem value="income">Receitas</SelectItem>
-            <SelectItem value="expense">Despesas</SelectItem>
-            <SelectItem value="transfer">Transferências</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={filterAccount} onValueChange={setFilterAccount}>
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder="Conta" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas as contas</SelectItem>
-            {accounts.map((a) => (
-              <SelectItem key={a.id} value={a.id}>
-                {a.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={filterCategory} onValueChange={setFilterCategory}>
-          <SelectTrigger className="w-44">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas as categorias</SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="flex items-center gap-2 border border-border rounded-md px-3 h-10">
-          <Calendar size={14} className="text-muted-foreground shrink-0" />
-          <input
-            type="date"
-            value={filterDateFrom}
-            onChange={(e) => setFilterDateFrom(e.target.value)}
-            max={todayISO}
-            className="text-sm bg-transparent outline-none w-32"
-            placeholder="De"
-          />
+      <div className="space-y-3">
+        {/* Linha 1 — filtros de tipo, conta e categoria */}
+        <div className="flex gap-3 flex-wrap">
+          <Select value={filterType} onValueChange={setFilterType}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os tipos</SelectItem>
+              <SelectItem value="income">Receitas</SelectItem>
+              <SelectItem value="expense">Despesas</SelectItem>
+              <SelectItem value="transfer">Transferências</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filterAccount} onValueChange={setFilterAccount}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Conta" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as contas</SelectItem>
+              {accounts.map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as categorias</SelectItem>
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <div className="flex items-center gap-2 border border-border rounded-md px-3 h-10">
-          <Calendar size={14} className="text-muted-foreground shrink-0" />
-          <input
-            type="date"
-            value={filterDateTo}
-            onChange={(e) => setFilterDateTo(e.target.value)}
-            max={todayISO}
-            className="text-sm bg-transparent outline-none w-32"
-            placeholder="Até"
-          />
+
+        {/* Linha 2 — filtro por período */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-sm text-muted-foreground font-medium flex items-center gap-1.5">
+            <Calendar size={14} />
+            Período:
+          </span>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-muted-foreground">De</label>
+            <div className="flex items-center border border-border rounded-md px-3 h-9">
+              <input
+                type="date"
+                value={filterDateFrom}
+                onChange={(e) => setFilterDateFrom(e.target.value)}
+                max={filterDateTo || todayISO}
+                className="text-sm bg-transparent outline-none w-32"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs text-muted-foreground">Até</label>
+            <div className="flex items-center border border-border rounded-md px-3 h-9">
+              <input
+                type="date"
+                value={filterDateTo}
+                onChange={(e) => setFilterDateTo(e.target.value)}
+                min={filterDateFrom || undefined}
+                max={todayISO}
+                className="text-sm bg-transparent outline-none w-32"
+              />
+            </div>
+          </div>
+          {(filterDateFrom || filterDateTo) && (
+            <button
+              onClick={() => {
+                setFilterDateFrom("");
+                setFilterDateTo("");
+              }}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+            >
+              Limpar período
+            </button>
+          )}
         </div>
       </div>
 
