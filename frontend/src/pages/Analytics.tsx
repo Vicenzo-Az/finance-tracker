@@ -1,89 +1,72 @@
 import { CategoryChart } from "@/components/dashboard/CategoryChart";
 import { MonthlyChart } from "@/components/dashboard/MonthlyChart";
-import { StatCard } from "@/components/dashboard/StatCard";
-import { TrendsCard } from "@/components/dashboard/TrendsCard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
+  compareMonths,
   getByCategory,
   getMonthly,
+  getRecurringAverage,
   getSummary,
-  getTrends,
+  type CompareMonthsData,
+  type RecurringAverageData,
 } from "@/services/analyticsService";
-import type {
-  AnalyticsSummary,
-  CategoryData,
-  MonthlyData,
-  TrendsData,
-} from "@/types";
-import { Loader2 } from "lucide-react";
+import type { AnalyticsSummary, CategoryData, MonthlyData } from "@/types";
+import {
+  Loader2,
+  Minus,
+  RefreshCw,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
-const currentYear = new Date().getFullYear();
-const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) => currentYear - i);
+function formatMonth(value: string): string {
+  const [year, month] = value.split("-");
+  const date = new Date(Number(year), Number(month) - 1);
+  return date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+}
 
-function CategoryRanking({
-  data,
-  title,
-  total,
-}: {
-  data: CategoryData[];
-  title: string;
-  total: number;
-}) {
-  if (data.length === 0) {
-    return (
-      <div className="rounded-xl border border-border bg-card p-6">
-        <h3 className="text-lg font-medium mb-4">{title}</h3>
-        <p className="text-sm text-muted-foreground">Nenhum dado disponível.</p>
-      </div>
-    );
-  }
-
+function VariationBadge({ value }: { value: number | null }) {
+  if (value === null)
+    return <span className="text-xs text-muted-foreground font-medium">—</span>;
+  const isPositive = value > 0;
+  const isZero = value === 0;
   return (
-    <div className="rounded-xl border border-border bg-card p-6">
-      <h3 className="text-lg font-medium mb-6">{title}</h3>
-      <div className="space-y-3">
-        {data.map((item, index) => {
-          const pct = total > 0 ? (item.total / total) * 100 : 0;
-          return (
-            <div key={item.category_id ?? index}>
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: item.category_color }}
-                  />
-                  <span className="text-sm font-medium">
-                    {item.category_name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground">
-                    {pct.toFixed(1)}%
-                  </span>
-                  <span className="text-sm font-semibold">
-                    R$ {item.total.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-              <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${pct}%`,
-                    backgroundColor: item.category_color,
-                  }}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <span
+      className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
+        isZero
+          ? "bg-muted text-muted-foreground"
+          : isPositive
+            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+            : "bg-red-500/10 text-red-600 dark:text-red-400"
+      }`}
+    >
+      {isZero ? (
+        <Minus size={12} />
+      ) : isPositive ? (
+        <TrendingUp size={12} />
+      ) : (
+        <TrendingDown size={12} />
+      )}
+      {Math.abs(value)}%
+    </span>
   );
 }
 
 export default function Analytics() {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = `${currentYear}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
+  const prevMonth = new Date(new Date().setMonth(new Date().getMonth() - 1));
+  const prevMonthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, "0")}`;
+
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [compareA, setCompareA] = useState(currentMonth);
+  const [compareB, setCompareB] = useState(prevMonthStr);
+  const [compareData, setCompareData] = useState<CompareMonthsData | null>(
+    null,
+  );
+  const [isLoadingCompare, setIsLoadingCompare] = useState(false);
 
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [monthly, setMonthly] = useState<MonthlyData[]>([]);
@@ -91,27 +74,25 @@ export default function Analytics() {
     [],
   );
   const [incomeByCategory, setIncomeByCategory] = useState<CategoryData[]>([]);
-  const [trends, setTrends] = useState<TrendsData | null>(null);
+  const [recurring, setRecurring] = useState<RecurringAverageData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       setIsLoading(true);
       try {
-        const [s, m, exp, inc, t] = await Promise.all([
+        const [s, m, ec, ic, r] = await Promise.all([
           getSummary(),
           getMonthly(selectedYear),
           getByCategory("expense"),
           getByCategory("income"),
-          getTrends(),
+          getRecurringAverage(),
         ]);
         setSummary(s);
         setMonthly(m);
-        setExpenseByCategory(exp);
-        setIncomeByCategory(inc);
-        setTrends(t);
-      } catch {
-        // silencia erros
+        setExpenseByCategory(ec);
+        setIncomeByCategory(ic);
+        setRecurring(r);
       } finally {
         setIsLoading(false);
       }
@@ -119,8 +100,21 @@ export default function Analytics() {
     load();
   }, [selectedYear]);
 
-  const totalExpenses = expenseByCategory.reduce((acc, c) => acc + c.total, 0);
-  const totalIncome = incomeByCategory.reduce((acc, c) => acc + c.total, 0);
+  async function handleCompare() {
+    if (!compareA || !compareB) return;
+    setIsLoadingCompare(true);
+    try {
+      const data = await compareMonths(compareA, compareB);
+      setCompareData(data);
+    } finally {
+      setIsLoadingCompare(false);
+    }
+  }
+
+  const years = Array.from(
+    { length: currentYear - 2023 + 1 },
+    (_, i) => currentYear - i,
+  );
 
   if (isLoading) {
     return (
@@ -132,128 +126,356 @@ export default function Analytics() {
 
   return (
     <div className="space-y-10">
-      {/* Header com seletor de ano */}
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Análises</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Visão detalhada das suas finanças
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="text-sm text-muted-foreground">Ano:</label>
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="text-sm border border-border rounded-md px-3 py-1.5 bg-background outline-none focus:border-emerald-500 transition-colors"
-          >
-            {YEAR_OPTIONS.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
+        <h1 className="text-2xl font-semibold tracking-tight">Análises</h1>
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+          className="text-sm border border-border rounded-md px-3 h-9 bg-background outline-none"
+        >
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Resumo geral */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          {
+            label: "Patrimônio Total",
+            value: summary?.net_worth ?? 0,
+            color: "text-emerald-500",
+          },
+          {
+            label: "Total Receitas",
+            value: summary?.income ?? 0,
+            color: "text-emerald-400",
+          },
+          {
+            label: "Total Despesas",
+            value: summary?.expense ?? 0,
+            color: "text-red-400",
+          },
+          {
+            label: "Saldo Líquido",
+            value: summary?.balance ?? 0,
+            color:
+              (summary?.balance ?? 0) >= 0 ? "text-blue-400" : "text-red-400",
+          },
+        ].map((item) => (
+          <Card key={item.label} className="relative overflow-hidden">
+            <div className="absolute top-0 left-0 h-1 w-full bg-emerald-500/40" />
+            <CardContent className="p-5">
+              <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
+              <p className={`text-xl font-bold ${item.color}`}>
+                R$ {item.value.toFixed(2)}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Evolução mensal */}
+      {monthly.length > 0 ? (
+        <MonthlyChart data={monthly} />
+      ) : (
+        <Card className="p-8 text-center text-muted-foreground text-sm">
+          Sem dados mensais para {selectedYear}
+        </Card>
+      )}
+
+      {/* Distribuição por categoria */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4">
+          Distribuição por Categoria
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {expenseByCategory.length > 0 ? (
+            <CategoryChart
+              data={expenseByCategory}
+              title="Despesas por Categoria"
+            />
+          ) : (
+            <Card className="p-8 text-center text-muted-foreground text-sm">
+              Sem despesas registradas
+            </Card>
+          )}
+          {incomeByCategory.length > 0 ? (
+            <CategoryChart
+              data={incomeByCategory}
+              title="Receitas por Categoria"
+            />
+          ) : (
+            <Card className="p-8 text-center text-muted-foreground text-sm">
+              Sem receitas registradas
+            </Card>
+          )}
         </div>
       </div>
 
-      {/* Seção 1 — Resumo geral */}
-      <section className="space-y-4">
-        <h2 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
-          Resumo geral
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Patrimônio Total"
-            value={`R$ ${(summary?.net_worth ?? 0).toFixed(2)}`}
-            variant="highlight"
-          />
-          <StatCard
-            title="Receitas"
-            value={`R$ ${(summary?.income ?? 0).toFixed(2)}`}
-            variant="income"
-          />
-          <StatCard
-            title="Despesas"
-            value={`R$ ${(summary?.expense ?? 0).toFixed(2)}`}
-            variant="expense"
-          />
-          <StatCard
-            title="Saldo"
-            value={`R$ ${(summary?.balance ?? 0).toFixed(2)}`}
-            variant="balance"
-          />
+      {/* Ranking de despesas */}
+      {expenseByCategory.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold mb-4">Ranking de Despesas</h2>
+          <Card>
+            <CardContent className="p-0">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left px-6 py-3 text-muted-foreground font-medium">
+                      #
+                    </th>
+                    <th className="text-left px-6 py-3 text-muted-foreground font-medium">
+                      Categoria
+                    </th>
+                    <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                      Total
+                    </th>
+                    <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                      % do total
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {expenseByCategory.map((cat, index) => {
+                    const totalExpense = expenseByCategory.reduce(
+                      (acc, c) => acc + c.total,
+                      0,
+                    );
+                    const pct =
+                      totalExpense > 0
+                        ? ((cat.total / totalExpense) * 100).toFixed(1)
+                        : "0";
+                    return (
+                      <tr
+                        key={cat.category_id}
+                        className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
+                      >
+                        <td className="px-6 py-3 text-muted-foreground">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-3">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-3 h-3 rounded-full shrink-0"
+                              style={{ backgroundColor: cat.category_color }}
+                            />
+                            {cat.category_name}
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 text-right font-medium text-red-400">
+                          R$ {cat.total.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-3 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-red-400"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="text-muted-foreground w-10 text-right">
+                              {pct}%
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
         </div>
-      </section>
+      )}
 
-      {/* Seção 2 — Evolução mensal */}
-      <section className="space-y-4">
-        <h2 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
-          Evolução mensal — {selectedYear}
-        </h2>
-        {monthly.length > 0 ? (
-          <MonthlyChart data={monthly} />
+      {/* Despesas recorrentes */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4">Despesas Recorrentes</h2>
+        {!recurring || recurring.by_category.length === 0 ? (
+          <Card className="p-8 text-center text-muted-foreground text-sm">
+            Nenhuma despesa marcada como recorrente ainda.
+          </Card>
         ) : (
-          <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground text-sm">
-            Nenhuma transação em {selectedYear}.
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {[
+                {
+                  label: "Média mensal total",
+                  value: `R$ ${recurring.average_monthly.toFixed(2)}`,
+                  color: "text-red-400",
+                },
+                {
+                  label: "Total registrado",
+                  value: `R$ ${recurring.total_recurring.toFixed(2)}`,
+                  color: "",
+                },
+                {
+                  label: "Meses com recorrentes",
+                  value: String(recurring.n_months),
+                  color: "",
+                },
+              ].map((item) => (
+                <Card key={item.label}>
+                  <CardContent className="p-5">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {item.label}
+                    </p>
+                    <p className={`text-xl font-bold ${item.color}`}>
+                      {item.value}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <Card>
+              <CardContent className="p-0">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left px-6 py-3 text-muted-foreground font-medium">
+                        Categoria
+                      </th>
+                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                        Total
+                      </th>
+                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                        Média/mês
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recurring.by_category.map((cat) => (
+                      <tr
+                        key={cat.category_id}
+                        className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
+                      >
+                        <td className="px-6 py-3">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-3 h-3 rounded-full shrink-0"
+                              style={{ backgroundColor: cat.category_color }}
+                            />
+                            {cat.category_name}
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 text-right font-medium text-red-400">
+                          R$ {cat.total.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-3 text-right text-muted-foreground">
+                          R$ {cat.monthly_average.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
           </div>
         )}
-      </section>
+      </div>
 
-      {/* Seção 3 — Despesas por categoria */}
-      <section className="space-y-4">
-        <h2 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
-          Despesas por categoria
-        </h2>
-        {expenseByCategory.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CategoryChart data={expenseByCategory} />
-            <CategoryRanking
-              data={expenseByCategory}
-              title="Ranking de despesas"
-              total={totalExpenses}
-            />
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground text-sm">
-            Nenhuma despesa categorizada.
-          </div>
-        )}
-      </section>
+      {/* Comparativo entre meses */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4">Comparar Meses</h2>
+        <Card>
+          <CardContent className="p-6 space-y-6">
+            <div className="flex items-end gap-3 flex-wrap">
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground font-medium">
+                  Mês A
+                </label>
+                <input
+                  type="month"
+                  value={compareA}
+                  onChange={(e) => setCompareA(e.target.value)}
+                  className="text-sm border border-border rounded-md px-3 h-9 bg-background outline-none block"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground font-medium">
+                  Mês B
+                </label>
+                <input
+                  type="month"
+                  value={compareB}
+                  onChange={(e) => setCompareB(e.target.value)}
+                  className="text-sm border border-border rounded-md px-3 h-9 bg-background outline-none block"
+                />
+              </div>
+              <Button
+                variant="outline"
+                className="gap-2 h-9"
+                onClick={handleCompare}
+                disabled={isLoadingCompare}
+              >
+                {isLoadingCompare ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <RefreshCw size={14} />
+                )}
+                Comparar
+              </Button>
+            </div>
 
-      {/* Seção 4 — Comparativo mensal */}
-      <section className="space-y-4">
-        <h2 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
-          Comparativo mensal
-        </h2>
-        {trends ? (
-          <TrendsCard trends={trends} />
-        ) : (
-          <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground text-sm">
-            Dados insuficientes para comparativo.
-          </div>
-        )}
-      </section>
-
-      {/* Seção 5 — Receitas por categoria */}
-      <section className="space-y-4">
-        <h2 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">
-          Receitas por categoria
-        </h2>
-        {incomeByCategory.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CategoryChart data={incomeByCategory} />
-            <CategoryRanking
-              data={incomeByCategory}
-              title="Ranking de receitas"
-              total={totalIncome}
-            />
-          </div>
-        ) : (
-          <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground text-sm">
-            Nenhuma receita categorizada.
-          </div>
-        )}
-      </section>
+            {compareData && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {[
+                  {
+                    label: "Receitas",
+                    key: "income" as const,
+                    color: "text-emerald-500",
+                  },
+                  {
+                    label: "Despesas",
+                    key: "expense" as const,
+                    color: "text-red-400",
+                  },
+                  {
+                    label: "Saldo",
+                    key: "balance" as const,
+                    color: "text-blue-400",
+                  },
+                ].map(({ label, key, color }) => (
+                  <div key={key} className="space-y-3">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {label}
+                    </p>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-0.5 capitalize">
+                          {formatMonth(compareA)}
+                        </p>
+                        <p className={`text-lg font-bold ${color}`}>
+                          R$ {compareData.month_a[key].toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-muted-foreground mb-0.5 capitalize">
+                          {formatMonth(compareB)}
+                        </p>
+                        <p className={`text-lg font-bold ${color}`}>
+                          R$ {compareData.month_b[key].toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <VariationBadge value={compareData.variation[key]} />
+                      <span className="text-xs text-muted-foreground">
+                        vs mês B
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

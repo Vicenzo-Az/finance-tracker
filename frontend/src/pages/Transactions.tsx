@@ -81,6 +81,7 @@ export default function Transactions() {
   const [categoryId, setCategoryId] = useState<string>("");
   const [accountId, setAccountId] = useState<string>("");
   const [date, setDate] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [errors, setErrors] = useState({
     description: "",
@@ -97,6 +98,7 @@ export default function Transactions() {
   const [editCategoryId, setEditCategoryId] = useState<string>("");
   const [editAccountId, setEditAccountId] = useState<string>("");
   const [editDate, setEditDate] = useState("");
+  const [editIsRecurring, setEditIsRecurring] = useState(false);
   const [editErrors, setEditErrors] = useState({
     description: "",
     amount: "",
@@ -185,6 +187,7 @@ export default function Transactions() {
       date,
       category_id: categoryId || null,
       account_id: accountId || null,
+      is_recurring: isRecurring,
     });
     setDescription("");
     setAmount("");
@@ -192,6 +195,7 @@ export default function Transactions() {
     setAccountId("");
     setDate("");
     setAddOpen(false);
+    setIsRecurring(false);
   }
 
   function handleEditClick(t: Transaction) {
@@ -204,6 +208,7 @@ export default function Transactions() {
     setEditAccountId(t.account_id ?? "");
     setEditDate(t.date);
     setIsEditOpen(true);
+    setEditIsRecurring(t.is_recurring ?? false);
   }
 
   function handleSaveEdit() {
@@ -218,6 +223,7 @@ export default function Transactions() {
       date: editDate,
       category_id: editCategoryId || null,
       account_id: editAccountId || null,
+      is_recurring: editIsRecurring,
     });
     setIsEditOpen(false);
     setEditingId(null);
@@ -429,6 +435,21 @@ export default function Transactions() {
                     <p className="text-sm text-red-500 mt-1">{errors.date}</p>
                   )}
                 </div>
+                <div className="flex items-center gap-3 py-1">
+                  <input
+                    type="checkbox"
+                    id="is_recurring"
+                    checked={isRecurring}
+                    onChange={(e) => setIsRecurring(e.target.checked)}
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="is_recurring"
+                    className="text-sm cursor-pointer select-none"
+                  >
+                    Despesa recorrente
+                  </label>
+                </div>
                 <Button
                   variant="outline"
                   className="w-full"
@@ -613,6 +634,21 @@ export default function Transactions() {
               {editErrors.date && (
                 <p className="text-sm text-red-500 mt-1">{editErrors.date}</p>
               )}
+            </div>
+            <div className="flex items-center gap-3 py-1">
+              <input
+                type="checkbox"
+                id="edit_is_recurring"
+                checked={editIsRecurring}
+                onChange={(e) => setEditIsRecurring(e.target.checked)}
+                className="w-4 h-4 accent-emerald-500 cursor-pointer"
+              />
+              <label
+                htmlFor="edit_is_recurring"
+                className="text-sm cursor-pointer select-none"
+              >
+                Despesa recorrente
+              </label>
             </div>
             <Button
               variant="outline"

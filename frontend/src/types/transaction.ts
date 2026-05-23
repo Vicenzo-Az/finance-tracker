@@ -11,6 +11,7 @@ export interface Transaction {
   account_id: string | null;
   transfer_id: string | null;
   transfer_direction: "in" | "out" | null;
+  is_recurring: boolean;
 }
 
 export type CreateTransactionInput = {
@@ -20,6 +21,7 @@ export type CreateTransactionInput = {
   date: string;
   category_id?: string | null;
   account_id?: string | null;
+  is_recurring?: boolean;
 };
 
 export type UpdateTransactionInput = Partial<CreateTransactionInput>;

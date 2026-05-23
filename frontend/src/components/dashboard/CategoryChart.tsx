@@ -11,9 +11,13 @@ import {
 
 interface Props {
   data: CategoryData[];
+  title?: string;
 }
 
-export function CategoryChart({ data }: Props) {
+export function CategoryChart({
+  data,
+  title = "Despesas por Categoria",
+}: Props) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -25,7 +29,7 @@ export function CategoryChart({ data }: Props) {
 
   return (
     <div className="w-full rounded-xl border border-border bg-card p-6">
-      <h3 className="text-lg font-medium mb-6">Despesas por Categoria</h3>
+      <h3 className="text-lg font-medium mb-6">{title}</h3>
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
