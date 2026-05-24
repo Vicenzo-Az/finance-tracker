@@ -103,6 +103,9 @@ def update_me(
                 status_code=400, detail="Senha atual incorreta")
         current_user.hashed_password = hash_password(input.new_password)
 
+    if input.avatar_url is not None:
+        current_user.avatar_url = input.avatar_url
+
     db.commit()
     db.refresh(current_user)
     return current_user

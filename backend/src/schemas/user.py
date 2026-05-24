@@ -21,6 +21,7 @@ class UserResponse(BaseModel):
     id: str
     email: str
     name: str
+    avatar_url: str | None = None
 
     model_config = {"from_attributes": True}
 
@@ -30,3 +31,4 @@ class UpdateUserInput(BaseModel):
     email: EmailStr | None = None
     current_password: str | None = None
     new_password: str | None = None
+    avatar_url: str | None = None  # base64 data URL
