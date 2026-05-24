@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useUser } from "@/context";
 import api from "@/lib/api";
 import type { UserResponse } from "@/types";
-import { CheckCircle, Loader2, Lock, Mail, User } from "lucide-react";
+import { Camera, CheckCircle, Loader2, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 
 export default function Profile() {
@@ -24,6 +24,13 @@ export default function Profile() {
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+
+  // Avatar
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(
+    user?.avatar_url ?? null,
+  );
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
 
   async function handleSaveInfo() {
     if (!name.trim()) {
@@ -50,6 +57,44 @@ export default function Profile() {
     } finally {
       setIsSavingInfo(false);
     }
+  }
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Valida tamanho — máximo 500KB
+    if (file.size > 500 * 1024) {
+      setAvatarError("Imagem muito grande. Máximo 500KB.");
+      return;
+    }
+
+    // Valida tipo
+    if (!file.type.startsWith("image/")) {
+      setAvatarError("Selecione uma imagem válida.");
+      return;
+    }
+
+    setAvatarError("");
+    setIsUploadingAvatar(true);
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result as string;
+      setAvatarPreview(base64);
+      try {
+        const { data } = await api.put<UserResponse>("/auth/me", {
+          avatar_url: base64,
+        });
+        setUser(data);
+      } catch {
+        setAvatarError("Erro ao salvar avatar.");
+        setAvatarPreview(user?.avatar_url ?? null);
+      } finally {
+        setIsUploadingAvatar(false);
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   async function handleSavePassword() {
@@ -108,13 +153,51 @@ export default function Profile() {
 
       {/* Avatar / identidade */}
       <Card>
-        <CardContent className="p-6 flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0">
-            <User size={28} className="text-emerald-500" />
+        <CardContent className="p-6 flex items-center gap-5">
+          <div className="relative shrink-0">
+            <div className="w-20 h-20 rounded-full overflow-hidden bg-emerald-500/15 flex items-center justify-center">
+              {avatarPreview ? (
+                <img
+                  src={avatarPreview}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={32} className="text-emerald-500" />
+              )}
+            </div>
+            <label
+              htmlFor="avatar-upload"
+              className="
+          absolute -bottom-1 -right-1 w-7 h-7 rounded-full
+          bg-emerald-600 hover:bg-emerald-500
+          flex items-center justify-center cursor-pointer
+          transition-colors border-2 border-background
+        "
+            >
+              {isUploadingAvatar ? (
+                <Loader2 size={12} className="animate-spin text-white" />
+              ) : (
+                <Camera size={12} className="text-white" />
+              )}
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
           </div>
           <div>
             <p className="font-semibold text-lg">{user?.name}</p>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
+            {avatarError && (
+              <p className="text-xs text-red-500 mt-1">{avatarError}</p>
+            )}
+            <p className="text-xs text-muted-foreground mt-1">
+              Máximo 500KB · JPG, PNG, WebP
+            </p>
           </div>
         </CardContent>
       </Card>

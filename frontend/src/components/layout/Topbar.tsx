@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/context";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Moon, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useNavigate } from "react-router-dom";
 
@@ -14,17 +14,55 @@ export function Topbar() {
     navigate("/landing");
   }
 
-  return (
-    <header className="h-16 border-b border-border flex items-center justify-between px-8">
-      <h2 className="text-xl font-semibold">
-        Bem-vindo{user?.name ? `, ${user.name}` : ""}!
-      </h2>
+  const firstName = user?.name?.split(" ")[0] ?? "Usuário";
 
+  return (
+    <header className="h-16 border-b border-border flex items-center justify-between px-8 bg-background/80 backdrop-blur-sm">
+      {/* Saudação + avatar */}
+      <button
+        onClick={() => navigate("/profile")}
+        className="flex items-center gap-3 group"
+      >
+        {/* Avatar */}
+        <div
+          className="
+          w-9 h-9 rounded-full overflow-hidden shrink-0
+          ring-2 ring-emerald-500/30 group-hover:ring-emerald-500/70
+          transition-all duration-200
+        "
+        >
+          {user?.avatar_url ? (
+            <img
+              src={user.avatar_url}
+              alt="Avatar"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-emerald-500/15 flex items-center justify-center">
+              <User size={16} className="text-emerald-500" />
+            </div>
+          )}
+        </div>
+
+        {/* Nome */}
+        <div className="text-left">
+          <p className="text-xs text-muted-foreground leading-none mb-1.5">
+            Bem-vindo de volta
+          </p>
+          <p className="text-base font-semibold leading-none group-hover:text-emerald-500 transition-colors">
+            {firstName}
+          </p>
+        </div>
+      </button>
+
+      {/* Ações */}
       <div className="flex items-center gap-2">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
+          className="text-muted-foreground hover:text-foreground"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          title={theme === "dark" ? "Modo claro" : "Modo escuro"}
         >
           {theme === "dark" ? (
             <Sun className="h-4 w-4" />
@@ -33,9 +71,12 @@ export function Topbar() {
           )}
         </Button>
 
+        <div className="w-px h-5 bg-border" />
+
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
+          className="text-muted-foreground hover:text-red-500 transition-colors"
           onClick={handleLogout}
           title="Sair"
         >
