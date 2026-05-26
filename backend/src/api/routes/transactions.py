@@ -1,3 +1,5 @@
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -59,21 +61,62 @@ def get_transaction(
     return transaction
 
 
-@router.post("/", response_model=Transaction, status_code=201)
+@router.post("/", response_model=list[Transaction], status_code=201)
 def create_transaction(
     input: CreateTransactionInput,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    transaction = TransactionModel(
-        id=str(uuid4()),
-        user_id=current_user.id,
-        **input.model_dump(),
-    )
-    db.add(transaction)
+    # Transação simples (sem parcelamento)
+    if input.installments <= 1:
+        transaction = TransactionModel(
+            id=str(uuid4()),
+            user_id=current_user.id,
+            description=input.description,
+            amount=input.amount,
+            type=input.type,
+            date=input.date,
+            category_id=input.category_id,
+            account_id=input.account_id,
+            is_recurring=input.is_recurring,
+            is_paid=input.is_paid,
+        )
+        db.add(transaction)
+        db.commit()
+        db.refresh(transaction)
+        return [transaction]
+
+    # Transação parcelada
+    installment_group_id = str(uuid4())
+    base_date = datetime.strptime(input.date, "%Y-%m-%d")
+    installment_amount = round(input.amount / input.installments, 2)
+    transactions = []
+
+    for i in range(input.installments):
+        installment_date = base_date + relativedelta(months=i)
+        t = TransactionModel(
+            id=str(uuid4()),
+            user_id=current_user.id,
+            description=input.description,
+            amount=installment_amount,
+            type=input.type,
+            date=installment_date.strftime("%Y-%m-%d"),
+            category_id=input.category_id,
+            account_id=input.account_id,
+            is_recurring=False,
+            is_paid=i == 0,  # só a primeira parcela começa como paga
+            installment_group_id=installment_group_id,
+            installment_number=i + 1,
+            installment_total=input.installments,
+        )
+        db.add(t)
+        transactions.append(t)
+
     db.commit()
-    db.refresh(transaction)
-    return transaction
+    for t in transactions:
+        db.refresh(t)
+
+    return transactions
 
 
 @router.post("/transfer", response_model=list[Transaction], status_code=201)
@@ -173,6 +216,11 @@ def delete_transaction(
     if transaction.transfer_id:
         db.query(TransactionModel).filter(
             TransactionModel.transfer_id == transaction.transfer_id
+        ).delete()
+    elif transaction.installment_group_id:
+        db.query(TransactionModel).filter(
+            TransactionModel.installment_group_id == transaction.installment_group_id,
+            TransactionModel.user_id == current_user.id,
         ).delete()
     else:
         db.delete(transaction)
