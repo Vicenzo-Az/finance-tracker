@@ -149,7 +149,7 @@ function AccountForm({
           Nome da conta
         </label>
         <Input
-          placeholder="Ex: Conta corrente, Nubank..."
+          placeholder="Ex: Conta corrente, crédito, etc..."
           value={name}
           onChange={(e) => setName(e.target.value)}
         />

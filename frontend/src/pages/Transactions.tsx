@@ -112,7 +112,7 @@ export default function Transactions() {
   const [transferFrom, setTransferFrom] = useState("");
   const [transferTo, setTransferTo] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
-  const [transferDate, setTransferDate] = useState("");
+  const [transferDate, setTransferDate] = useState(todayISO);
   const [transferDescription, setTransferDescription] = useState(
     "Transferência entre contas",
   );
