@@ -12,6 +12,10 @@ export interface Transaction {
   transfer_id: string | null;
   transfer_direction: "in" | "out" | null;
   is_recurring: boolean;
+  is_paid: boolean;
+  installment_group_id: string | null;
+  installment_number: number | null;
+  installment_total: number | null;
 }
 
 export type CreateTransactionInput = {

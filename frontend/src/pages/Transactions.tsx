@@ -1,7 +1,10 @@
 import { useTransactions } from "@/context";
 import { getAccounts } from "@/services/accountService";
 import { getCategories } from "@/services/categoryService";
-import { createTransfer } from "@/services/transactionService";
+import {
+  createTransfer,
+  deleteSingleTransaction,
+} from "@/services/transactionService";
 import type { Account, Category, Transaction } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 
@@ -67,6 +70,9 @@ export default function Transactions() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const todayISO = useMemo(() => new Date().toISOString().split("T")[0], []);
+
+  // Botão delete
+  const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null);
 
   // Filtros
   const [filterType, setFilterType] = useState<string>("all");
@@ -773,7 +779,7 @@ export default function Transactions() {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => removeTransaction(t.id)}
+                          onClick={() => setDeleteTarget(t)}
                         >
                           {t.type === "transfer" ? "Cancelar" : "Deletar"}
                         </Button>
@@ -786,6 +792,89 @@ export default function Transactions() {
           ))
         )}
       </div>
+
+      {/* Dialog de confirmação de deleção */}
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {deleteTarget?.installment_group_id
+                ? "Deletar parcela"
+                : deleteTarget?.type === "transfer"
+                  ? "Cancelar transferência"
+                  : "Deletar transação"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <p className="text-sm text-muted-foreground">
+              {deleteTarget?.installment_group_id
+                ? `Parcela ${deleteTarget.installment_number}/${deleteTarget.installment_total} — R$ ${deleteTarget.amount.toFixed(2)}`
+                : deleteTarget?.type === "transfer"
+                  ? "Isso cancelará os dois lados da transferência."
+                  : `"${deleteTarget?.description}" — R$ ${deleteTarget?.amount.toFixed(2)}`}
+            </p>
+
+            {deleteTarget?.installment_group_id && (
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant="destructive"
+                  onClick={async () => {
+                    if (deleteTarget) {
+                      await deleteSingleTransaction(deleteTarget.id);
+                      setDeleteTarget(null);
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  Deletar só esta parcela
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-red-500/40 text-red-500 hover:bg-red-500/10"
+                  onClick={() => {
+                    if (deleteTarget) {
+                      removeTransaction(deleteTarget.id); // usa o endpoint existente que deleta o grupo
+                      setDeleteTarget(null);
+                    }
+                  }}
+                >
+                  Deletar todas as parcelas restantes
+                </Button>
+                <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
+                  Cancelar
+                </Button>
+              </div>
+            )}
+
+            {!deleteTarget?.installment_group_id && (
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  className="flex-1"
+                  onClick={() => setDeleteTarget(null)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    if (deleteTarget) {
+                      removeTransaction(deleteTarget.id);
+                      setDeleteTarget(null);
+                    }
+                  }}
+                >
+                  Confirmar
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

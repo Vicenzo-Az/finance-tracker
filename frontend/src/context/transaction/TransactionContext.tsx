@@ -82,6 +82,10 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
   const clearTransactions = () => setTransactions([]);
 
+  const removeSingleFromState = (id: string) => {
+    setTransactions((prev) => prev.filter((t) => t.id !== id));
+  };
+
   return (
     <TransactionContext.Provider
       value={{
@@ -92,6 +96,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         removeTransaction,
         updateTransaction,
         clearTransactions,
+        removeSingleFromState,
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 import type {
-    CreateTransactionInput,
-    Transaction,
-    UpdateTransactionInput,
+  CreateTransactionInput,
+  Transaction,
+  UpdateTransactionInput,
 } from "@/types";
 
 export interface TransactionContextType {
@@ -15,4 +15,5 @@ export interface TransactionContextType {
     transaction: UpdateTransactionInput,
   ) => Promise<void>;
   clearTransactions: () => void;
+  removeSingleFromState: (id: string) => void;
 }

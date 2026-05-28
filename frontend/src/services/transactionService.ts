@@ -50,3 +50,7 @@ export async function createTransfer(
   );
   return data;
 }
+
+export async function deleteSingleTransaction(id: string): Promise<void> {
+  await api.delete(`/transactions/${id}/single`);
+}
