@@ -87,3 +87,24 @@ export async function compareMonths(
   );
   return data;
 }
+
+export interface FutureCommitmentsData {
+  total_pending: number;
+  by_month: { month: string; total: number }[];
+  by_group: {
+    installment_group_id: string;
+    description: string;
+    installment_total: number;
+    remaining_installments: number;
+    remaining_total: number;
+    installment_amount: number;
+    next_due: string;
+  }[];
+}
+
+export async function getFutureCommitments(): Promise<FutureCommitmentsData> {
+  const { data } = await api.get<FutureCommitmentsData>(
+    "/analytics/future-commitments",
+  );
+  return data;
+}

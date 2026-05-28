@@ -5,10 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   compareMonths,
   getByCategory,
+  getFutureCommitments,
   getMonthly,
   getRecurringAverage,
   getSummary,
   type CompareMonthsData,
+  type FutureCommitmentsData,
   type RecurringAverageData,
 } from "@/services/analyticsService";
 import type { AnalyticsSummary, CategoryData, MonthlyData } from "@/types";
@@ -76,23 +78,27 @@ export default function Analytics() {
   const [incomeByCategory, setIncomeByCategory] = useState<CategoryData[]>([]);
   const [recurring, setRecurring] = useState<RecurringAverageData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [futureCommitments, setFutureCommitments] =
+    useState<FutureCommitmentsData | null>(null);
 
   useEffect(() => {
     async function load() {
       setIsLoading(true);
       try {
-        const [s, m, ec, ic, r] = await Promise.all([
+        const [s, m, ec, ic, r, fc] = await Promise.all([
           getSummary(),
           getMonthly(selectedYear),
           getByCategory("expense"),
           getByCategory("income"),
           getRecurringAverage(),
+          getFutureCommitments(),
         ]);
         setSummary(s);
         setMonthly(m);
         setExpenseByCategory(ec);
         setIncomeByCategory(ic);
         setRecurring(r);
+        setFutureCommitments(fc);
       } finally {
         setIsLoading(false);
       }
@@ -368,6 +374,99 @@ export default function Analytics() {
                         </td>
                         <td className="px-6 py-3 text-right text-muted-foreground">
                           R$ {cat.monthly_average.toFixed(2)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
+
+      {/* Compromissos futuros */}
+      <div>
+        <h2 className="text-lg font-semibold mb-4">Compromissos Futuros</h2>
+        {!futureCommitments || futureCommitments.total_pending === 0 ? (
+          <Card className="p-8 text-center text-muted-foreground text-sm">
+            Nenhuma parcela pendente.
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Card>
+                <CardContent className="p-5">
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Total pendente
+                  </p>
+                  <p className="text-xl font-bold text-red-400">
+                    R$ {futureCommitments.total_pending.toFixed(2)}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-5">
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Compras parceladas ativas
+                  </p>
+                  <p className="text-xl font-bold">
+                    {futureCommitments.by_group.length}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Por compra */}
+            <Card>
+              <CardContent className="p-0">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left px-6 py-3 text-muted-foreground font-medium">
+                        Descrição
+                      </th>
+                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                        Parcelas restantes
+                      </th>
+                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                        Valor/parcela
+                      </th>
+                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                        Total restante
+                      </th>
+                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
+                        Próximo venc.
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {futureCommitments.by_group.map((group) => (
+                      <tr
+                        key={group.installment_group_id}
+                        className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
+                      >
+                        <td className="px-6 py-3 font-medium">
+                          {group.description}
+                        </td>
+                        <td className="px-6 py-3 text-right text-muted-foreground">
+                          {group.remaining_installments}/
+                          {group.installment_total}
+                        </td>
+                        <td className="px-6 py-3 text-right">
+                          R$ {group.installment_amount.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-3 text-right font-medium text-red-400">
+                          R$ {group.remaining_total.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-3 text-right text-muted-foreground">
+                          {new Date(
+                            group.next_due + "T00:00:00",
+                          ).toLocaleDateString("pt-BR", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
                         </td>
                       </tr>
                     ))}
