@@ -18,7 +18,9 @@ def _transactions_to_df(transactions: list) -> pd.DataFrame:
     if not transactions:
         return pd.DataFrame(
             columns=["id", "description", "amount", "type", "date",
-                     "category_id", "account_id", "transfer_id", "transfer_direction"]
+                     "category_id", "account_id", "transfer_id",
+                     "transfer_direction", "installment_group_id",
+                     "installment_number", "installment_total"]
         )
     data = [
         {
@@ -31,6 +33,9 @@ def _transactions_to_df(transactions: list) -> pd.DataFrame:
             "account_id": t.account_id,
             "transfer_id": t.transfer_id,
             "transfer_direction": t.transfer_direction,
+            "installment_group_id": t.installment_group_id,
+            "installment_number": t.installment_number,
+            "installment_total": t.installment_total,
         }
         for t in transactions
     ]
