@@ -3,16 +3,12 @@ from src.models.transaction import Transaction as TransactionModel
 
 
 def get_account_balance(account, db: Session) -> float:
-    """
-    Saldo atual = initial_balance
-                + income
-                - expense
-                + transfer in
-                - transfer out
-    """
     transactions = (
         db.query(TransactionModel)
-        .filter(TransactionModel.account_id == account.id)
+        .filter(
+            TransactionModel.account_id == account.id,
+            TransactionModel.is_paid == True,  # noqa: E712
+        )
         .all()
     )
     movement = 0.0
