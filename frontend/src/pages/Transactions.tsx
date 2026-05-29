@@ -110,6 +110,10 @@ export default function Transactions() {
   const [editAccountId, setEditAccountId] = useState<string>("");
   const [editDate, setEditDate] = useState("");
   const [editIsRecurring, setEditIsRecurring] = useState(false);
+  const [editIsPaid, setEditIsPaid] = useState(true);
+  const [editApplyToAll, setEditApplyToAll] = useState(false);
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
   const [editErrors, setEditErrors] = useState({
     description: "",
     amount: "",
@@ -213,7 +217,8 @@ export default function Transactions() {
   }
 
   function handleEditClick(t: Transaction) {
-    if (t.type === "transfer") return; // transferências não são editáveis individualmente
+    if (t.type === "transfer") return;
+    setEditingTransaction(t);
     setEditingId(t.id);
     setEditDescription(t.description);
     setEditAmount(t.amount.toString());
@@ -221,16 +226,25 @@ export default function Transactions() {
     setEditCategoryId(t.category_id ?? "");
     setEditAccountId(t.account_id ?? "");
     setEditDate(t.date);
-    setIsEditOpen(true);
     setEditIsRecurring(t.is_recurring ?? false);
+    setEditIsPaid(t.is_paid ?? true);
+    setEditApplyToAll(false);
+    setIsEditOpen(true);
   }
 
-  function handleSaveEdit() {
+  async function handleSaveEdit() {
     if (!editingId) return;
     const e = validate(editDescription, editAmount, editDate);
+
+    // Remove validação de data futura para parcelas
+    if (editingTransaction?.installment_group_id) {
+      e.date = "";
+    }
+
     setEditErrors(e);
     if (Object.values(e).some((v) => v)) return;
-    updateTransaction(editingId, {
+
+    const payload = {
       description: editDescription.trim(),
       amount: Number(editAmount),
       type: editType,
@@ -238,9 +252,30 @@ export default function Transactions() {
       category_id: editCategoryId || null,
       account_id: editAccountId || null,
       is_recurring: editIsRecurring,
-    });
+      is_paid: editIsPaid,
+    };
+
+    if (editApplyToAll && editingTransaction?.installment_group_id) {
+      // Atualiza todas as parcelas restantes (não pagas) do grupo
+      const remainingInstallments = transactions.filter(
+        (t) =>
+          t.installment_group_id === editingTransaction.installment_group_id &&
+          !t.is_paid &&
+          t.id !== editingId,
+      );
+      await Promise.all([
+        updateTransaction(editingId, payload),
+        ...remainingInstallments.map((t) =>
+          updateTransaction(t.id, { amount: Number(editAmount) }),
+        ),
+      ]);
+    } else {
+      updateTransaction(editingId, payload);
+    }
+
     setIsEditOpen(false);
     setEditingId(null);
+    setEditingTransaction(null);
   }
 
   async function handleTransfer() {
@@ -607,7 +642,11 @@ export default function Transactions() {
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar Transação</DialogTitle>
+            <DialogTitle>
+              {editingTransaction?.installment_group_id
+                ? `Editar Parcela ${editingTransaction.installment_number}/${editingTransaction.installment_total}`
+                : "Editar Transação"}
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div>
@@ -635,22 +674,44 @@ export default function Transactions() {
               {editErrors.amount && (
                 <p className="text-sm text-red-500 mt-1">{editErrors.amount}</p>
               )}
+              {editingTransaction?.installment_group_id && (
+                <div className="flex items-center gap-3 mt-2">
+                  <input
+                    type="checkbox"
+                    id="edit_apply_to_all"
+                    checked={editApplyToAll}
+                    onChange={(e) => setEditApplyToAll(e.target.checked)}
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="edit_apply_to_all"
+                    className="text-xs text-muted-foreground cursor-pointer select-none"
+                  >
+                    Aplicar valor a todas as parcelas restantes
+                  </label>
+                </div>
+              )}
             </div>
-            <Select
-              value={editType}
-              onValueChange={(v) => {
-                setEditType(v as "income" | "expense");
-                setEditCategoryId("");
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="income">Receita</SelectItem>
-                <SelectItem value="expense">Despesa</SelectItem>
-              </SelectContent>
-            </Select>
+
+            {/* Tipo — oculto para parcelas */}
+            {!editingTransaction?.installment_group_id && (
+              <Select
+                value={editType}
+                onValueChange={(v) => {
+                  setEditType(v as "income" | "expense");
+                  setEditCategoryId("");
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="income">Receita</SelectItem>
+                  <SelectItem value="expense">Despesa</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+
             <Select value={editCategoryId} onValueChange={setEditCategoryId}>
               <SelectTrigger>
                 <SelectValue placeholder="Categoria (opcional)" />
@@ -663,6 +724,7 @@ export default function Transactions() {
                 ))}
               </SelectContent>
             </Select>
+
             <Select value={editAccountId} onValueChange={setEditAccountId}>
               <SelectTrigger>
                 <SelectValue placeholder="Conta (opcional)" />
@@ -675,33 +737,63 @@ export default function Transactions() {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Data — sem restrição de data futura para parcelas */}
             <div>
               <Input
                 type="date"
                 value={editDate}
                 onChange={(e) => setEditDate(e.target.value)}
-                max={todayISO}
+                max={
+                  editingTransaction?.installment_group_id
+                    ? undefined
+                    : todayISO
+                }
                 className={editErrors.date ? "border-red-500" : ""}
               />
               {editErrors.date && (
                 <p className="text-sm text-red-500 mt-1">{editErrors.date}</p>
               )}
             </div>
-            <div className="flex items-center gap-3 py-1">
-              <input
-                type="checkbox"
-                id="edit_is_recurring"
-                checked={editIsRecurring}
-                onChange={(e) => setEditIsRecurring(e.target.checked)}
-                className="w-4 h-4 accent-emerald-500 cursor-pointer"
-              />
-              <label
-                htmlFor="edit_is_recurring"
-                className="text-sm cursor-pointer select-none"
-              >
-                Despesa recorrente
-              </label>
-            </div>
+
+            {/* is_paid — só para parcelas */}
+            {editingTransaction?.installment_group_id && (
+              <div className="flex items-center gap-3 py-1">
+                <input
+                  type="checkbox"
+                  id="edit_is_paid"
+                  checked={editIsPaid}
+                  onChange={(e) => setEditIsPaid(e.target.checked)}
+                  className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="edit_is_paid"
+                  className="text-sm cursor-pointer select-none"
+                >
+                  Parcela paga
+                </label>
+              </div>
+            )}
+
+            {/* Recorrente — só para transações normais */}
+            {!editingTransaction?.installment_group_id && (
+              <div className="flex items-center gap-3 py-1">
+                <input
+                  type="checkbox"
+                  id="edit_is_recurring"
+                  checked={editIsRecurring}
+                  onChange={(e) => setEditIsRecurring(e.target.checked)}
+                  className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="edit_is_recurring"
+                  className="text-sm cursor-pointer select-none"
+                >
+                  Despesa recorrente
+                </label>
+              </div>
+            )}
+
             <Button
               variant="outline"
               className="w-full"
