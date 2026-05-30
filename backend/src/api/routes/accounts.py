@@ -86,6 +86,7 @@ def update_account(
 def delete_account(
     account_id: str,
     force: bool = Query(default=False),
+    delete_transactions: bool = Query(default=False),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -96,16 +97,20 @@ def delete_account(
     if not account:
         raise HTTPException(status_code=404, detail="Conta não encontrada")
 
-    # Verifica se há transações vinculadas
     transaction_count = db.query(TransactionModel).filter(
         TransactionModel.account_id == account_id
     ).count()
 
-    if transaction_count > 0 and not force:
+    if transaction_count > 0 and not force and not delete_transactions:
         raise HTTPException(
             status_code=409,
-            detail=f"Esta conta possui {transaction_count} transação(ões) vinculada(s). Use force=true para deletar mesmo assim."
+            detail=f"Esta conta possui {transaction_count} transação(ões) vinculada(s)."
         )
+
+    if delete_transactions:
+        db.query(TransactionModel).filter(
+            TransactionModel.account_id == account_id
+        ).delete()
 
     db.delete(account)
     db.commit()
