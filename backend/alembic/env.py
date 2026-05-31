@@ -13,6 +13,7 @@ import src.models.user          # noqa: F401
 import src.models.transaction   # noqa: F401
 import src.models.category      # noqa: F401
 import src.models.account       # noqa: F401
+import src.models.description_hint  # noqa: F401
 
 config = context.config
 

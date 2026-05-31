@@ -10,12 +10,33 @@ from src.core.dependencies import get_current_user
 from src.models.transaction import Transaction as TransactionModel
 from src.models.account import Account as AccountModel
 from src.models.user import User
+from src.models.description_hint import DescriptionHint
 from src.schemas.transaction import (
     Transaction,
     CreateTransactionInput,
     UpdateTransactionInput,
     TransferInput,
 )
+
+
+def _save_hint(db: Session, user_id: str, description: str, category_id: str) -> None:
+    """Atualiza ou cria o par descrição → categoria para autocomplete."""
+    description = description.strip().lower()
+    hint = db.query(DescriptionHint).filter(
+        DescriptionHint.user_id == user_id,
+        DescriptionHint.description == description,
+    ).first()
+    if hint:
+        hint.category_id = category_id
+    else:
+        from uuid import uuid4
+        db.add(DescriptionHint(
+            id=str(uuid4()),
+            description=description,
+            category_id=category_id,
+            user_id=user_id,
+        ))
+
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
 
@@ -103,6 +124,9 @@ def create_transaction(
             is_paid=input.is_paid,
         )
         db.add(transaction)
+        if input.category_id:
+            _save_hint(db, current_user.id,
+                       input.description, input.category_id)
         db.commit()
         db.refresh(transaction)
         return [transaction]
@@ -215,7 +239,9 @@ def update_transaction(
 
     for field, value in input.model_dump(exclude_none=True).items():
         setattr(transaction, field, value)
-
+    if input.category_id:
+        _save_hint(db, current_user.id,
+                   transaction.description, input.category_id)
     db.commit()
     db.refresh(transaction)
     return transaction

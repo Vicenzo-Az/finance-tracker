@@ -16,5 +16,6 @@ class User(Base):
     transactions = relationship("Transaction", back_populates="user")
     accounts = relationship("Account", back_populates="user")
     categories = relationship("Category", back_populates="user")
+    description_hints = relationship("DescriptionHint", back_populates="user")
 
     avatar_url: Mapped[str | None] = Column(String, nullable=True)
