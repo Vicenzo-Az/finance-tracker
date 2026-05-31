@@ -311,7 +311,7 @@ export default function Transactions() {
       setTransferFrom("");
       setTransferTo("");
       setTransferAmount("");
-      setTransferDate("");
+      setTransferDate(todayISO);
       setTransferDescription("Transferência entre contas");
     } catch {
       setTransferError("Erro ao realizar transferência");
