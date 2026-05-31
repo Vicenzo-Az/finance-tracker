@@ -1,23 +1,19 @@
-# Finance Tracker - Backend
+# Valore — Backend
 
-API do **Finance Tracker** construída com **FastAPI** para dois fluxos principais:
-
-- importação e processamento de extratos CSV
-- CRUD de transações persistidas em banco
-
-O backend recebe arquivos CSV, valida e limpa os dados, classifica as transações como income ou expense e devolve um resumo financeiro com o saldo final.
+API REST do **Valore** construída com **FastAPI** e **Python 3.13**.
 
 ---
 
 ## Tecnologias
 
 - Python 3.13
-- FastAPI
-- SQLAlchemy
-- Pandas
-- Pydantic
-- Alembic
-- Pytest
+- FastAPI 0.128
+- SQLAlchemy 2.0 + Alembic
+- PostgreSQL + psycopg2
+- Pandas 3.0
+- Pydantic v2 + pydantic-settings
+- python-jose (JWT)
+- bcrypt
 - Uvicorn
 
 ---
@@ -30,13 +26,34 @@ backend/
 │   ├── api/
 │   │   ├── app.py
 │   │   └── routes/
+│   │       ├── auth.py
 │   │       ├── transactions.py
+│   │       ├── accounts.py
+│   │       ├── categories.py
+│   │       ├── analytics.py
 │   │       └── upload.py
 │   ├── core/
+│   │   ├── config.py
+│   │   ├── cors.py
+│   │   ├── database.py
+│   │   ├── dependencies.py
+│   │   └── security.py
 │   ├── models/
-│   ├── pipelines/
+│   │   ├── user.py
+│   │   ├── account.py
+│   │   ├── transaction.py
+│   │   └── category.py
 │   ├── schemas/
+│   │   ├── user.py
+│   │   ├── account.py
+│   │   ├── transaction.py
+│   │   ├── category.py
+│   │   ├── finance.py
+│   │   └── error.py
 │   ├── services/
+│   │   ├── balance.py
+│   │   └── processing.py
+│   ├── pipelines/
 │   └── main.py
 ├── alembic/
 ├── tests/
@@ -46,112 +63,111 @@ backend/
 
 ---
 
-## Fluxo de Dados CSV
+## Variáveis de Ambiente
 
-1. Upload do arquivo via `POST /upload`
-2. Validação das colunas obrigatórias
-3. Conversão da coluna de data para formato datetime
-4. Limpeza da coluna de valores
-5. Classificação automática por sinal do valor
-6. Geração do resumo e do saldo final
-
-O modelo atual de CSV espera as colunas `Data`, `Descrição` e `Valor`.
-
-Transações com valor maior ou igual a zero são classificadas como `income`; valores negativos são classificados como `expense`.
-
----
-
-## Endpoints
-
-### `POST /upload`
-
-Recebe um arquivo CSV em `multipart/form-data` e retorna o resumo financeiro processado.
-
-Exemplo de resposta:
-
-```json
-{
-  "summary": {
-    "income": 6900.75,
-    "expense": -480.8
-  },
-  "balance": 6419.95
-}
-```
-
-Se o arquivo for inválido ou não atender ao modelo esperado, o backend retorna erro `400`.
-
-### `GET /transactions`
-
-Lista todas as transações salvas no banco.
-
-### `GET /transactions/{transaction_id}`
-
-Busca uma transação específica pelo ID.
-
-### `POST /transactions`
-
-Cria uma nova transação.
-
-### `PUT /transactions/{transaction_id}`
-
-Atualiza uma transação existente.
-
-### `DELETE /transactions/{transaction_id}`
-
-Remove uma transação.
-
----
-
-## Configuração
-
-O backend lê a variável `DATABASE_URL` a partir de um arquivo `.env`.
-
-Exemplo:
+Crie o arquivo `.env` na raiz de `backend/`:
 
 ```env
-DATABASE_URL=sqlite:///./finance.db
-```
+DATABASE_URL=postgresql://postgres:senha@localhost:5432/valore
+SECRET_KEY=sua_chave_secreta_longa
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-Se você usar migrações, aplique-as antes de iniciar a aplicação.
+# Produção
+ENVIRONMENT=production
+FRONTEND_URL=https://valore-finance.vercel.app
+```
 
 ---
 
 ## Como Executar
 
-### 1. Criar e ativar o ambiente virtual
-
 ```bash
 python -m venv venv
-venv\Scripts\activate
-```
-
-### 2. Instalar dependências
-
-```bash
+venv\Scripts\activate        # Windows
+source venv/bin/activate     # Linux/Mac
 pip install -r requirements.txt
-```
-
-### 3. Configurar o banco
-
-Crie o arquivo `.env` na pasta `backend/` com a variável `DATABASE_URL` apontando para o seu banco.
-
-### 4. Rodar as migrações, se necessário
-
-```bash
 alembic upgrade head
-```
-
-### 5. Iniciar a API
-
-```bash
 uvicorn src.main:app --reload
 ```
 
-A documentação interativa fica disponível em:
+Documentação interativa disponível em:
 
 - Swagger: <http://127.0.0.1:8000/docs>
-- OpenAPI: <http://127.0.0.1:8000/redoc>
+- ReDoc: <http://127.0.0.1:8000/redoc>
+
+---
+
+## Endpoints
+
+### Autenticação
+
+| Método | Rota             | Descrição                    |
+| ------ | ---------------- | ---------------------------- |
+| POST   | `/auth/register` | Cria nova conta              |
+| POST   | `/auth/login`    | Login — seta cookie httpOnly |
+| POST   | `/auth/logout`   | Logout — apaga cookie        |
+| GET    | `/auth/me`       | Retorna usuário autenticado  |
+| PUT    | `/auth/me`       | Atualiza perfil e senha      |
+
+### Contas
+
+| Método | Rota             | Descrição                                     |
+| ------ | ---------------- | --------------------------------------------- |
+| GET    | `/accounts/`     | Lista contas com saldo calculado              |
+| POST   | `/accounts/`     | Cria conta (débito ou crédito)                |
+| PUT    | `/accounts/{id}` | Atualiza conta                                |
+| DELETE | `/accounts/{id}` | Remove conta (`force`, `delete_transactions`) |
+
+### Transações
+
+| Método | Rota                        | Descrição                                           |
+| ------ | --------------------------- | --------------------------------------------------- |
+| GET    | `/transactions/`            | Lista com filtros (conta, categoria, tipo, período) |
+| POST   | `/transactions/`            | Cria transação (simples ou parcelada)               |
+| PUT    | `/transactions/{id}`        | Atualiza transação                                  |
+| DELETE | `/transactions/{id}`        | Remove transação ou grupo                           |
+| DELETE | `/transactions/{id}/single` | Remove só esta parcela                              |
+| POST   | `/transactions/transfer`    | Cria transferência entre contas                     |
+
+### Categorias
+
+| Método | Rota               | Descrição                                |
+| ------ | ------------------ | ---------------------------------------- |
+| GET    | `/categories/`     | Lista categorias do sistema + do usuário |
+| POST   | `/categories/`     | Cria categoria personalizada             |
+| PUT    | `/categories/{id}` | Atualiza categoria do usuário            |
+| DELETE | `/categories/{id}` | Remove categoria do usuário              |
+
+### Analytics
+
+| Método | Rota                            | Descrição                            |
+| ------ | ------------------------------- | ------------------------------------ |
+| GET    | `/analytics/summary`            | Resumo geral (regime de caixa)       |
+| GET    | `/analytics/monthly`            | Receitas/despesas por mês            |
+| GET    | `/analytics/by-category`        | Totais por categoria                 |
+| GET    | `/analytics/trends`             | Comparativo mês atual vs anterior    |
+| GET    | `/analytics/recurring-average`  | Média mensal de despesas recorrentes |
+| GET    | `/analytics/compare-months`     | Compara dois meses específicos       |
+| GET    | `/analytics/future-commitments` | Parcelas pendentes agrupadas         |
+
+---
+
+## Autenticação
+
+JWT armazenado em cookie `httpOnly`. Em produção: `secure=True`, `samesite="none"` (necessário para frontend e backend em domínios distintos com proxy Vercel).
+
+O hash de senhas usa **bcrypt** diretamente (sem passlib).
+
+---
+
+## Banco de Dados
+
+PostgreSQL com SQLAlchemy 2.0 (ORM declarativo) e Alembic para migrações.
+
+Principais tabelas: `users`, `accounts`, `transactions`, `categories`.
+
+Saldo de conta calculado dinamicamente em `services/balance.py` considerando apenas transações com `is_paid=True`.
 
 ---
 
@@ -160,13 +176,3 @@ A documentação interativa fica disponível em:
 ```bash
 pytest
 ```
-
-Os testes cobrem validação, limpeza, processamento e cálculo do resumo financeiro.
-
----
-
-## Observações
-
-- A camada HTTP está separada dos pipelines de negócio
-- O CORS já está configurado para o consumo pelo frontend
-- O backend pode evoluir para autenticação, histórico de uploads e novas análises

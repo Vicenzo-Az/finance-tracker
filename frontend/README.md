@@ -1,27 +1,21 @@
-# Finance Tracker - Frontend
+# Valore — Frontend
 
-Interface em **React + TypeScript + Vite** para acompanhar transações financeiras e consumir a API do backend.
-
-O app atual oferece:
-
-- dashboard com saldo, renda, despesas e gráfico
-- listagem, criação, edição e remoção de transações
-- páginas de perfil e configurações
-- layout responsivo com sidebar e topbar
-- tema com `next-themes`
+Interface do **Valore** construída com **React 19 + TypeScript + Vite**.
 
 ---
 
 ## Tecnologias
 
-- React 19
-- TypeScript
-- Vite
-- React Router
+- React 19 + TypeScript
+- Vite 7
+- React Router v6
 - Axios
 - Recharts
 - Tailwind CSS
-- shadcn/ui e Radix UI
+- shadcn/ui + Radix UI
+- Framer Motion
+- next-themes
+- lucide-react
 
 ---
 
@@ -31,82 +25,136 @@ O app atual oferece:
 frontend/
 ├── src/
 │   ├── components/
+│   │   ├── dashboard/
+│   │   │   ├── CategoryChart.tsx
+│   │   │   ├── IncomeExpenseChart.tsx
+│   │   │   ├── MonthlyChart.tsx
+│   │   │   ├── StatCard.tsx
+│   │   │   ├── TransactionItem.tsx
+│   │   │   └── TrendsCard.tsx
+│   │   ├── layout/
+│   │   │   ├── AppLayout.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── Topbar.tsx
+│   │   └── ui/
 │   ├── context/
-│   ├── hooks/
+│   │   ├── transaction/
+│   │   │   ├── TransactionContext.tsx
+│   │   │   ├── transactionInstance.ts
+│   │   │   ├── types.ts
+│   │   │   └── useTransactions.ts
+│   │   ├── user/
+│   │   │   ├── UserContext.tsx
+│   │   │   ├── userInstance.ts
+│   │   │   ├── types.ts
+│   │   │   └── useUser.ts
+│   │   └── index.ts
 │   ├── lib/
+│   │   └── api.ts
 │   ├── pages/
+│   │   ├── Accounts.tsx
+│   │   ├── Analytics.tsx
+│   │   ├── Dashboard.tsx
+│   │   ├── Landing.tsx
+│   │   ├── Login.tsx
+│   │   ├── Profile.tsx
+│   │   ├── Register.tsx
+│   │   ├── Settings.tsx
+│   │   └── Transactions.tsx
 │   ├── services/
-│   └── types/
+│   │   ├── accountService.ts
+│   │   ├── analyticsService.ts
+│   │   ├── categoryService.ts
+│   │   └── transactionService.ts
+│   ├── types/
+│   │   ├── finance.ts
+│   │   ├── transaction.ts
+│   │   └── index.ts
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
 ├── public/
+├── vercel.json
 ├── index.html
-├── package.json
-└── README.md
+└── package.json
 ```
 
 ---
 
 ## Páginas
 
-- `/` - dashboard com visão geral e transações recentes
-- `/transactions` - gestão manual de transações
-- `/profile` - perfil do usuário
-- `/settings` - preferências e ajustes da aplicação
+| Rota            | Descrição                                         |
+| --------------- | ------------------------------------------------- |
+| `/landing`      | Landing page pública                              |
+| `/login`        | Login                                             |
+| `/register`     | Cadastro                                          |
+| `/`             | Dashboard com visão geral e gráficos              |
+| `/accounts`     | Contas financeiras (débito e crédito)             |
+| `/transactions` | Listagem, criação, edição e deleção de transações |
+| `/analytics`    | Análises detalhadas com comparativos              |
+| `/profile`      | Edição de perfil e senha                          |
+| `/settings`     | Tema e preferências                               |
 
 ---
 
-## Integração com a API
+## Arquitetura
 
-O frontend usa a URL definida em `VITE_API_URL`.
+**API client** — instância Axios em `lib/api.ts` com `baseURL="/api"` (proxy Vercel para o backend Heroku) e `withCredentials: true` para envio automático do cookie de autenticação.
 
-Se a variável não for informada, o padrão é:
+**Contextos** — `UserProvider` verifica sessão via `GET /auth/me` ao carregar a aplicação. `TransactionProvider` carrega transações do usuário autenticado e expõe funções de CRUD, incluindo operações em grupo (parcelas, transferências).
 
-```text
-http://localhost:8000
-```
-
-Os dados de transações são buscados e persistidos via endpoints do backend, então a API precisa estar em execução antes de abrir a interface.
+**Rotas protegidas** — `ProtectedRoute` redireciona para `/landing` se não autenticado. `PublicRoute` redireciona para `/` se já autenticado.
 
 ---
 
 ## Como Executar
 
-### 1. Instalar dependências
-
 ```bash
 npm install
-```
-
-### 2. Configurar a API, se necessário
-
-```env
-VITE_API_URL=http://localhost:8000
-```
-
-### 3. Iniciar o frontend
-
-```bash
 npm run dev
 ```
 
-O app costuma ficar disponível em:
+O app fica disponível em <http://localhost:5173>.
 
-```text
-http://localhost:5173
+Em desenvolvimento, o Axios aponta para `http://localhost:8000` via variável de ambiente. Crie `.env.local` se necessário:
+
+```env
+VITE_API_URL=http://localhost:8000
 ```
 
 ---
 
 ## Scripts
 
-- `npm run dev` - executa o servidor de desenvolvimento
-- `npm run build` - gera a build de produção
-- `npm run lint` - executa o ESLint
-- `npm run preview` - serve a build localmente
+| Comando           | Descrição                   |
+| ----------------- | --------------------------- |
+| `npm run dev`     | Servidor de desenvolvimento |
+| `npm run build`   | Build de produção           |
+| `npm run lint`    | ESLint                      |
+| `npm run preview` | Serve a build localmente    |
 
 ---
 
-## Observações
+## Deploy
 
-- O layout usa um provedor de contexto para transações e outro para tema
-- A aplicação está pronta para evoluir para upload de CSV no frontend no futuro
-- O dashboard calcula saldo a partir das transações carregadas da API
+```bash
+vercel --prod
+```
+
+O `vercel.json` configura proxy para o backend e rewrites para o React Router:
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/api/:path+/",
+      "destination": "https://valore-api-...herokuapp.com/:path+/"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://valore-api-...herokuapp.com/:path*"
+    },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
+```

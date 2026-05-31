@@ -1,11 +1,15 @@
-# Finance Tracker
+# Valore — Domine suas finanças
 
-Aplicação **fullstack** para gestão financeira com um backend FastAPI e uma interface React.
+Aplicação **fullstack** de gestão financeira pessoal desenvolvida como Trabalho de Conclusão de Curso (TCC) no Curso Superior de Tecnologia em Sistemas para Internet — IFSul.
 
-O projeto combina dois fluxos principais:
+O sistema permite registrar receitas, despesas e transferências entre contas, categorizar gastos, acompanhar parcelas de compras no crédito e visualizar análises detalhadas do histórico financeiro.
 
-- gerenciamento manual de transações no frontend
-- processamento de extratos CSV e cálculo de resumo financeiro no backend
+---
+
+## Produção
+
+- **Frontend:** <https://valore-finance.vercel.app>
+- **Backend:** <https://valore-api-279d7c3cc379.herokuapp.com>
 
 ---
 
@@ -17,11 +21,15 @@ finance-tracker/
 │   ├── src/
 │   ├── tests/
 │   ├── alembic/
+│   ├── requirements.txt
 │   └── README.md
 ├── frontend/
 │   ├── src/
 │   ├── public/
+│   ├── vercel.json
 │   └── README.md
+├── Procfile
+├── requirements.txt
 └── README.md
 ```
 
@@ -33,47 +41,71 @@ finance-tracker/
 
 - Python 3.13
 - FastAPI
-- SQLAlchemy
+- SQLAlchemy + Alembic
+- PostgreSQL
 - Pandas
-- Pydantic
-- Alembic
-- Pytest
+- Pydantic v2
+- python-jose (JWT)
+- bcrypt
+- Uvicorn
 
 ### Frontend
 
-- React 19
-- TypeScript
+- React 19 + TypeScript
 - Vite
+- React Router v6
 - Axios
-- React Router
 - Recharts
-- Tailwind CSS
+- Tailwind CSS + shadcn/ui
+- Framer Motion
+- next-themes
 
 ---
 
-## Como Funciona
+## Funcionalidades
 
-1. O backend expõe uma API para CRUD de transações e importação de CSV
-2. O frontend carrega as transações da API e apresenta o dashboard
-3. O usuário pode criar, editar e excluir transações pela interface
-4. O endpoint de upload processa extratos CSV e devolve resumo e saldo
+- **Autenticação** — registro, login e logout com JWT em cookie `httpOnly`
+- **Contas financeiras** — contas de débito e crédito com saldo calculado automaticamente
+- **Transações** — CRUD completo com categorias, filtros por período, conta e categoria
+- **Transferências** — movimentação entre contas do mesmo usuário
+- **Parcelamento** — compras parceladas em contas de crédito com controle de parcelas pagas/pendentes
+- **Categorias** — categorias do sistema + personalizadas pelo usuário
+- **Análises** — dashboard com gráficos, evolução mensal, ranking de categorias, despesas recorrentes, compromissos futuros e comparativo entre meses
+- **Perfil** — edição de nome, e-mail, senha e avatar
 
 ---
 
-## Como Executar
+## Como Executar Localmente
+
+### Pré-requisitos
+
+- Python 3.13+
+- Node.js 18+
+- PostgreSQL
 
 ### Backend
 
 ```bash
 cd backend
 python -m venv venv
-venv\Scripts\activate
+venv\Scripts\activate        # Windows
+source venv/bin/activate     # Linux/Mac
 pip install -r requirements.txt
 ```
 
-Crie o arquivo `.env` com a variável `DATABASE_URL`, aplique as migrações se necessário e inicie a API com:
+Crie o arquivo `backend/.env`:
+
+```env
+DATABASE_URL=postgresql://postgres:senha@localhost:5432/valore
+SECRET_KEY=sua_chave_secreta
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+Aplique as migrações e inicie a API:
 
 ```bash
+alembic upgrade head
 uvicorn src.main:app --reload
 ```
 
@@ -85,27 +117,28 @@ npm install
 npm run dev
 ```
 
-Se quiser apontar para outra API, configure `VITE_API_URL` no frontend.
+---
+
+## Deploy
+
+- **Backend:** Heroku (`git push heroku main`)
+- **Frontend:** Vercel (`vercel --prod` dentro de `frontend/`)
+- **Banco:** Heroku Postgres (addon)
+
+Após o deploy do backend, rode as migrações:
+
+```bash
+heroku run "cd backend && alembic upgrade head" --app valore-api
+```
 
 ---
 
-## APIs Principais
+## Documentação da API
 
-### Backend
+Com o backend rodando localmente:
 
-- `POST /upload` - processa um CSV e retorna resumo financeiro
-- `GET /transactions` - lista transações
-- `GET /transactions/{transaction_id}` - busca uma transação
-- `POST /transactions` - cria uma transação
-- `PUT /transactions/{transaction_id}` - atualiza uma transação
-- `DELETE /transactions/{transaction_id}` - remove uma transação
-
-### Frontend
-
-- `/` - dashboard
-- `/transactions` - gerenciamento de transações
-- `/profile` - perfil
-- `/settings` - configurações
+- Swagger UI: <http://127.0.0.1:8000/docs>
+- ReDoc: <http://127.0.0.1:8000/redoc>
 
 ---
 
@@ -115,10 +148,3 @@ Se quiser apontar para outra API, configure `VITE_API_URL` no frontend.
 cd backend
 pytest
 ```
-
----
-
-## Observações
-
-- O monorepo mantém frontend e backend desacoplados, mas prontos para integração local
-- A documentação detalhada de cada app está nos READMEs internos
