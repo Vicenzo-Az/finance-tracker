@@ -30,7 +30,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowLeftRight, Calendar } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Calendar,
+  Check,
+  RefreshCw,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString + "T00:00:00");
@@ -370,56 +377,100 @@ export default function Transactions() {
               <DialogHeader>
                 <DialogTitle>Transferência entre contas</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <Select value={transferFrom} onValueChange={setTransferFrom}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Conta de origem" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accounts.map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.name} (R$ {a.current_balance.toFixed(2)})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={transferTo} onValueChange={setTransferTo}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Conta de destino" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accounts.map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.name} (R$ {a.current_balance.toFixed(2)})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  type="number"
-                  placeholder="Valor"
-                  value={transferAmount}
-                  onChange={(e) => setTransferAmount(e.target.value)}
-                />
-                <Input
-                  type="date"
-                  value={transferDate}
-                  onChange={(e) => setTransferDate(e.target.value)}
-                  max={todayISO}
-                />
-                <Input
-                  placeholder="Descrição (opcional)"
-                  value={transferDescription}
-                  onChange={(e) => setTransferDescription(e.target.value)}
-                />
+              <div className="space-y-4 mt-2">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Conta de origem
+                  </label>
+                  <Select value={transferFrom} onValueChange={setTransferFrom}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar conta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accounts.map((a) => (
+                        <SelectItem key={a.id} value={a.id}>
+                          {a.name} — R$ {a.current_balance.toFixed(2)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Conta de destino
+                  </label>
+                  <Select value={transferTo} onValueChange={setTransferTo}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar conta" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accounts.map((a) => (
+                        <SelectItem key={a.id} value={a.id}>
+                          {a.name} — R$ {a.current_balance.toFixed(2)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Valor
+                  </label>
+                  <div className="flex items-center border border-input rounded-xl overflow-hidden">
+                    <span className="px-3 py-2.5 text-sm font-medium text-muted-foreground border-r border-input bg-muted/40">
+                      R$
+                    </span>
+                    <input
+                      type="number"
+                      placeholder="0,00"
+                      value={transferAmount}
+                      onChange={(e) => setTransferAmount(e.target.value)}
+                      className="flex-1 px-3 py-2.5 text-sm bg-transparent outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Data
+                  </label>
+                  <div className="flex items-center border border-input rounded-xl overflow-hidden">
+                    <Calendar
+                      size={15}
+                      className="ml-3 text-muted-foreground shrink-0"
+                    />
+                    <input
+                      type="date"
+                      value={transferDate}
+                      onChange={(e) => setTransferDate(e.target.value)}
+                      max={todayISO}
+                      className="flex-1 px-3 py-2.5 text-sm bg-transparent outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Descrição (opcional)
+                  </label>
+                  <Input
+                    placeholder="Transferência entre contas"
+                    value={transferDescription}
+                    onChange={(e) => setTransferDescription(e.target.value)}
+                  />
+                </div>
+
                 {transferError && (
                   <p className="text-sm text-red-500">{transferError}</p>
                 )}
+
                 <Button
-                  variant="outline"
-                  className="w-full"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white gap-2"
                   onClick={handleTransfer}
                 >
+                  <ArrowLeftRight size={15} />
                   Confirmar transferência
                 </Button>
               </div>
@@ -435,99 +486,156 @@ export default function Transactions() {
               <DialogHeader>
                 <DialogTitle>Nova Transação</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4">
+              <div className="space-y-4 mt-2">
+                {/* Toggle tipo */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setType("income");
+                      setCategoryId("");
+                      categoryWasManuallySet.current = false;
+                    }}
+                    className={`py-2.5 rounded-xl text-sm font-medium border-2 transition-all flex items-center justify-center gap-2 ${
+                      type === "income"
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "border-border text-muted-foreground hover:border-emerald-500/40"
+                    }`}
+                  >
+                    <TrendingUp size={15} /> Receita
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setType("expense");
+                      setCategoryId("");
+                      categoryWasManuallySet.current = false;
+                    }}
+                    className={`py-2.5 rounded-xl text-sm font-medium border-2 transition-all flex items-center justify-center gap-2 ${
+                      type === "expense"
+                        ? "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400"
+                        : "border-border text-muted-foreground hover:border-red-500/40"
+                    }`}
+                  >
+                    <TrendingDown size={15} /> Despesa
+                  </button>
+                </div>
+
+                {/* Descrição */}
                 <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Descrição
+                  </label>
                   <Input
-                    placeholder="Descrição"
+                    placeholder="Ex: Supermercado, Salário..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className={errors.description ? "border-red-500" : ""}
                   />
                   {errors.description && (
-                    <p className="text-sm text-red-500 mt-1">
+                    <p className="text-xs text-red-500 mt-1">
                       {errors.description}
                     </p>
                   )}
                 </div>
+
+                {/* Valor */}
                 <div>
-                  <Input
-                    type="number"
-                    placeholder="Valor"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className={errors.amount ? "border-red-500" : ""}
-                  />
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Valor
+                  </label>
+                  <div
+                    className={`flex items-center border rounded-xl overflow-hidden ${errors.amount ? "border-red-500" : "border-input"}`}
+                  >
+                    <span className="px-3 py-2.5 text-sm font-medium text-muted-foreground border-r border-input bg-muted/40">
+                      R$
+                    </span>
+                    <input
+                      type="number"
+                      placeholder="0,00"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      className="flex-1 px-3 py-2.5 text-sm bg-transparent outline-none"
+                    />
+                  </div>
                   {errors.amount && (
-                    <p className="text-sm text-red-500 mt-1">{errors.amount}</p>
+                    <p className="text-xs text-red-500 mt-1">{errors.amount}</p>
                   )}
                 </div>
-                <Select
-                  value={type}
-                  onValueChange={(v) => {
-                    setType(v as "income" | "expense");
-                    setCategoryId("");
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="income">Receita</SelectItem>
-                    <SelectItem value="expense">Despesa</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={categoryId}
-                  onValueChange={(v) => {
-                    setCategoryId(v);
-                    categoryWasManuallySet.current = true;
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Categoria (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredCategories.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select
-                  value={accountId}
-                  onValueChange={(v) => {
-                    setAccountId(v);
-                    setInstallments(1);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Conta (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {accounts.map((a) => (
-                      <SelectItem key={a.id} value={a.id}>
-                        {a.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+                {/* Categoria + Conta */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                      Categoria
+                    </label>
+                    <Select
+                      value={categoryId}
+                      onValueChange={(v) => {
+                        setCategoryId(v);
+                        categoryWasManuallySet.current = true;
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Opcional" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filteredCategories.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="w-2.5 h-2.5 rounded-full shrink-0"
+                                style={{ backgroundColor: c.color }}
+                              />
+                              {c.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                      Conta
+                    </label>
+                    <Select
+                      value={accountId}
+                      onValueChange={(v) => {
+                        setAccountId(v);
+                        setInstallments(1);
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Opcional" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accounts.map((a) => (
+                          <SelectItem key={a.id} value={a.id}>
+                            {a.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Parcelas — conta de crédito */}
                 {isSelectedAccountCredit && (
                   <div>
-                    <label className="text-xs text-muted-foreground mb-1.5 block font-medium">
-                      Número de parcelas
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                      Parcelas
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 border border-input rounded-xl px-3 py-1">
                       <button
                         type="button"
                         onClick={() =>
                           setInstallments(Math.max(1, installments - 1))
                         }
-                        className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted transition-colors font-medium"
                       >
                         -
                       </button>
-                      <span className="flex-1 text-center font-semibold">
+                      <span className="flex-1 text-center text-sm font-medium">
                         {installments === 1
                           ? "À vista"
                           : `${installments}x de R$ ${(Number(amount) / installments).toFixed(2)}`}
@@ -537,26 +645,41 @@ export default function Transactions() {
                         onClick={() =>
                           setInstallments(Math.min(48, installments + 1))
                         }
-                        className="w-8 h-8 rounded-md border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted transition-colors font-medium"
                       >
                         +
                       </button>
                     </div>
                   </div>
                 )}
+
+                {/* Data */}
                 <div>
-                  <Input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    max={todayISO}
-                    className={errors.date ? "border-red-500" : ""}
-                  />
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                    Data
+                  </label>
+                  <div
+                    className={`flex items-center border rounded-xl overflow-hidden ${errors.date ? "border-red-500" : "border-input"}`}
+                  >
+                    <Calendar
+                      size={15}
+                      className="ml-3 text-muted-foreground shrink-0"
+                    />
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      max={todayISO}
+                      className="flex-1 px-3 py-2.5 text-sm bg-transparent outline-none"
+                    />
+                  </div>
                   {errors.date && (
-                    <p className="text-sm text-red-500 mt-1">{errors.date}</p>
+                    <p className="text-xs text-red-500 mt-1">{errors.date}</p>
                   )}
                 </div>
-                <div className="flex items-center gap-3 py-1">
+
+                {/* Recorrente */}
+                <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-input bg-muted/20">
                   <input
                     type="checkbox"
                     id="is_recurring"
@@ -566,17 +689,19 @@ export default function Transactions() {
                   />
                   <label
                     htmlFor="is_recurring"
-                    className="text-sm cursor-pointer select-none"
+                    className="text-sm cursor-pointer select-none flex items-center gap-1.5"
                   >
+                    <RefreshCw size={14} className="text-muted-foreground" />
                     Despesa recorrente
                   </label>
                 </div>
+
                 <Button
-                  variant="outline"
-                  className="w-full"
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white gap-2"
                   onClick={handleAdd}
                 >
-                  Salvar
+                  <Check size={15} />
+                  Salvar transação
                 </Button>
               </div>
             </DialogContent>
@@ -678,12 +803,16 @@ export default function Transactions() {
           <DialogHeader>
             <DialogTitle>
               {editingTransaction?.installment_group_id
-                ? `Editar Parcela ${editingTransaction.installment_number}/${editingTransaction.installment_total}`
+                ? `Parcela ${editingTransaction.installment_number}/${editingTransaction.installment_total}`
                 : "Editar Transação"}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 mt-4">
+          <div className="space-y-4 mt-2">
+            {/* Descrição */}
             <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                Descrição
+              </label>
               <Input
                 placeholder="Descrição"
                 value={editDescription}
@@ -692,108 +821,172 @@ export default function Transactions() {
                 autoFocus
               />
               {editErrors.description && (
-                <p className="text-sm text-red-500 mt-1">
+                <p className="text-xs text-red-500 mt-1">
                   {editErrors.description}
                 </p>
               )}
             </div>
+
+            {/* Valor */}
             <div>
-              <Input
-                type="number"
-                placeholder="Valor"
-                value={editAmount}
-                onChange={(e) => setEditAmount(e.target.value)}
-                className={editErrors.amount ? "border-red-500" : ""}
-              />
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                Valor
+              </label>
+              <div
+                className={`flex items-center border rounded-xl overflow-hidden ${editErrors.amount ? "border-red-500" : "border-input"}`}
+              >
+                <span className="px-3 py-2.5 text-sm font-medium text-muted-foreground border-r border-input bg-muted/40">
+                  R$
+                </span>
+                <input
+                  type="number"
+                  placeholder="0,00"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                  className="flex-1 px-3 py-2.5 text-sm bg-transparent outline-none"
+                />
+              </div>
               {editErrors.amount && (
-                <p className="text-sm text-red-500 mt-1">{editErrors.amount}</p>
+                <p className="text-xs text-red-500 mt-1">{editErrors.amount}</p>
+              )}
+              {editingTransaction?.installment_group_id && (
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="checkbox"
+                    id="edit_apply_to_all"
+                    checked={editApplyToAll}
+                    onChange={(e) => setEditApplyToAll(e.target.checked)}
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="edit_apply_to_all"
+                    className="text-xs text-muted-foreground cursor-pointer select-none"
+                  >
+                    Aplicar descrição, valor, categoria e conta a todas as
+                    parcelas restantes
+                  </label>
+                </div>
               )}
             </div>
 
-            {/* Tipo — oculto para parcelas */}
+            {/* Tipo — só para transações normais */}
             {!editingTransaction?.installment_group_id && (
-              <Select
-                value={editType}
-                onValueChange={(v) => {
-                  setEditType(v as "income" | "expense");
-                  setEditCategoryId("");
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="income">Receita</SelectItem>
-                  <SelectItem value="expense">Despesa</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-
-            <Select value={editCategoryId} onValueChange={setEditCategoryId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Categoria (opcional)" />
-              </SelectTrigger>
-              <SelectContent>
-                {editFilteredCategories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={editAccountId} onValueChange={setEditAccountId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Conta (opcional)" />
-              </SelectTrigger>
-              <SelectContent>
-                {accounts.map((a) => (
-                  <SelectItem key={a.id} value={a.id}>
-                    {a.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {editingTransaction?.installment_group_id && (
-              <div className="flex items-center gap-3 mt-2">
-                <input
-                  type="checkbox"
-                  id="edit_apply_to_all"
-                  checked={editApplyToAll}
-                  onChange={(e) => setEditApplyToAll(e.target.checked)}
-                  className="w-4 h-4 accent-emerald-500 cursor-pointer"
-                />
-                <label
-                  htmlFor="edit_apply_to_all"
-                  className="text-xs text-muted-foreground cursor-pointer select-none"
-                >
-                  Aplicar mudanças a todas as parcelas restantes
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                  Tipo
                 </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditType("income");
+                      setEditCategoryId("");
+                    }}
+                    className={`py-2.5 rounded-xl text-sm font-medium border-2 transition-all flex items-center justify-center gap-2 ${
+                      editType === "income"
+                        ? "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : "border-border text-muted-foreground hover:border-emerald-500/40"
+                    }`}
+                  >
+                    <TrendingUp size={15} /> Receita
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditType("expense");
+                      setEditCategoryId("");
+                    }}
+                    className={`py-2.5 rounded-xl text-sm font-medium border-2 transition-all flex items-center justify-center gap-2 ${
+                      editType === "expense"
+                        ? "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400"
+                        : "border-border text-muted-foreground hover:border-red-500/40"
+                    }`}
+                  >
+                    <TrendingDown size={15} /> Despesa
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* Data — sem restrição de data futura para parcelas */}
+            {/* Categoria + Conta */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                  Categoria
+                </label>
+                <Select
+                  value={editCategoryId}
+                  onValueChange={setEditCategoryId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Opcional" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {editFilteredCategories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: c.color }}
+                          />
+                          {c.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                  Conta
+                </label>
+                <Select value={editAccountId} onValueChange={setEditAccountId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Opcional" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accounts.map((a) => (
+                      <SelectItem key={a.id} value={a.id}>
+                        {a.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Data */}
             <div>
-              <Input
-                type="date"
-                value={editDate}
-                onChange={(e) => setEditDate(e.target.value)}
-                max={
-                  editingTransaction?.installment_group_id
-                    ? undefined
-                    : todayISO
-                }
-                className={editErrors.date ? "border-red-500" : ""}
-              />
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
+                Data
+              </label>
+              <div
+                className={`flex items-center border rounded-xl overflow-hidden ${editErrors.date ? "border-red-500" : "border-input"}`}
+              >
+                <Calendar
+                  size={15}
+                  className="ml-3 text-muted-foreground shrink-0"
+                />
+                <input
+                  type="date"
+                  value={editDate}
+                  onChange={(e) => setEditDate(e.target.value)}
+                  max={
+                    editingTransaction?.installment_group_id
+                      ? undefined
+                      : todayISO
+                  }
+                  className="flex-1 px-3 py-2.5 text-sm bg-transparent outline-none"
+                />
+              </div>
               {editErrors.date && (
-                <p className="text-sm text-red-500 mt-1">{editErrors.date}</p>
+                <p className="text-xs text-red-500 mt-1">{editErrors.date}</p>
               )}
             </div>
 
-            {/* is_paid — só para parcelas */}
+            {/* is_paid — só parcelas */}
             {editingTransaction?.installment_group_id && (
-              <div className="flex items-center gap-3 py-1">
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-input bg-muted/20">
                 <input
                   type="checkbox"
                   id="edit_is_paid"
@@ -810,9 +1003,9 @@ export default function Transactions() {
               </div>
             )}
 
-            {/* Recorrente — só para transações normais */}
+            {/* Recorrente — só transações normais */}
             {!editingTransaction?.installment_group_id && (
-              <div className="flex items-center gap-3 py-1">
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-input bg-muted/20">
                 <input
                   type="checkbox"
                   id="edit_is_recurring"
@@ -822,19 +1015,20 @@ export default function Transactions() {
                 />
                 <label
                   htmlFor="edit_is_recurring"
-                  className="text-sm cursor-pointer select-none"
+                  className="text-sm cursor-pointer select-none flex items-center gap-1.5"
                 >
+                  <RefreshCw size={14} className="text-muted-foreground" />
                   Despesa recorrente
                 </label>
               </div>
             )}
 
             <Button
-              variant="outline"
-              className="w-full"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white gap-2"
               onClick={handleSaveEdit}
             >
-              Salvar Alterações
+              <Check size={15} />
+              Salvar alterações
             </Button>
           </div>
         </DialogContent>
