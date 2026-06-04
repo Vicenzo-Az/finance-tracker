@@ -34,9 +34,13 @@ export function StatCard({
   return (
     <Card className="relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 dark:hover:shadow-black/50">
       <div className={`absolute top-0 left-0 h-2.5 w-full ${styles.bar}`} />
-      <CardContent className="p-6">
-        <p className="text-sm text-muted-foreground">{title}</p>
-        <h2 className={`text-2xl font-bold mt-2 ${styles.value}`}>{value}</h2>
+      <CardContent className="p-4 md:p-6">
+        <p className="text-xs text-muted-foreground">{title}</p>
+        <h2
+          className={`text-lg md:text-2xl font-bold mt-1 md:mt-2 ${styles.value}`}
+        >
+          {value}
+        </h2>
       </CardContent>
     </Card>
   );

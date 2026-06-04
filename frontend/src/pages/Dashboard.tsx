@@ -15,10 +15,11 @@ import {
   getTrends,
 } from "@/services/analyticsService";
 import type {
-  Account, AnalyticsSummary,
+  Account,
+  AnalyticsSummary,
   CategoryData,
   MonthlyData,
-  TrendsData
+  TrendsData,
 } from "@/types";
 import { Loader2, PlusCircle, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -89,7 +90,7 @@ export default function Dashboard() {
         </h1>
 
         {/* Cards de resumo */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           <StatCard
             title="Patrimônio Total"
             value={`R$ ${(summary?.net_worth ?? 0).toFixed(2)}`}
