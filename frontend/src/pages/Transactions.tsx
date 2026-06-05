@@ -364,7 +364,7 @@ export default function Transactions() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight">Transações</h1>
         <div className="flex gap-2">
           {/* Transferência */}
@@ -1047,7 +1047,7 @@ export default function Transactions() {
               className="rounded-xl border border-border bg-card overflow-hidden"
             >
               {/* Cabeçalho do mês */}
-              <div className="px-6 py-3 bg-muted/40 border-b border-border flex items-center justify-between">
+              <div className="px-4 md:px-6 py-3 bg-muted/40 border-b border-border flex items-center justify-between">
                 <span className="text-sm font-semibold capitalize">
                   {formatMonthHeader(monthKey)}
                 </span>
@@ -1057,144 +1057,126 @@ export default function Transactions() {
                 </span>
               </div>
 
-              <div
-                key={monthKey}
-                className="rounded-xl border border-border bg-card overflow-hidden"
-              >
-                {/* Cabeçalho do mês */}
-                <div className="px-4 md:px-6 py-3 bg-muted/40 border-b border-border flex items-center justify-between">
-                  <span className="text-sm font-semibold capitalize">
-                    {formatMonthHeader(monthKey)}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {monthTransactions.length} transação
-                    {monthTransactions.length !== 1 ? "s" : ""}
-                  </span>
-                </div>
-
-                {/* Desktop — tabela */}
-                <div className="hidden md:block">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Descrição</TableHead>
-                        <TableHead>Categoria</TableHead>
-                        <TableHead>Conta</TableHead>
-                        <TableHead className="text-right">Valor</TableHead>
-                        <TableHead className="text-center">Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {monthTransactions.map((t) => (
-                        <TableRow key={t.id}>
-                          <TableCell>{formatDate(t.date)}</TableCell>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              {t.type === "transfer" && (
-                                <ArrowLeftRight
-                                  size={14}
-                                  className="text-blue-400 shrink-0"
-                                />
-                              )}
-                              {t.description}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {getCategoryName(t.category_id)}
-                          </TableCell>
-                          <TableCell>{getAccountName(t.account_id)}</TableCell>
-                          <TableCell className={amountClass(t)}>
-                            {formatAmount(t)}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {t.type !== "transfer" && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditClick(t)}
-                              >
-                                Editar
-                              </Button>
+              {/* Desktop — tabela */}
+              <div className="hidden md:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Descrição</TableHead>
+                      <TableHead>Categoria</TableHead>
+                      <TableHead>Conta</TableHead>
+                      <TableHead className="text-right">Valor</TableHead>
+                      <TableHead className="text-center">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {monthTransactions.map((t) => (
+                      <TableRow key={t.id}>
+                        <TableCell>{formatDate(t.date)}</TableCell>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            {t.type === "transfer" && (
+                              <ArrowLeftRight
+                                size={14}
+                                className="text-blue-400 shrink-0"
+                              />
                             )}
-                            <span className="mx-1" />
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => setDeleteTarget(t)}
-                            >
-                              {t.type === "transfer" ? "Cancelar" : "Deletar"}
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* Mobile — cards */}
-                <div className="md:hidden divide-y divide-border">
-                  {monthTransactions.map((t) => (
-                    <div
-                      key={t.id}
-                      className="px-4 py-3 flex items-center justify-between gap-3"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          {t.type === "transfer" && (
-                            <ArrowLeftRight
-                              size={12}
-                              className="text-blue-400 shrink-0"
-                            />
-                          )}
-                          <p className="text-sm font-medium truncate">
                             {t.description}
-                          </p>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(t.date)}
-                          {getCategoryName(t.category_id) !== "—" &&
-                            ` · ${getCategoryName(t.category_id)}`}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span
-                          className={`text-sm font-semibold ${
-                            t.type === "transfer"
-                              ? t.transfer_direction === "out"
-                                ? "text-blue-400"
-                                : "text-blue-500"
-                              : t.type === "income"
-                                ? "text-emerald-500"
-                                : "text-red-500"
-                          }`}
-                        >
+                          </div>
+                        </TableCell>
+                        <TableCell>{getCategoryName(t.category_id)}</TableCell>
+                        <TableCell>{getAccountName(t.account_id)}</TableCell>
+                        <TableCell className={amountClass(t)}>
                           {formatAmount(t)}
-                        </span>
-                        <div className="flex gap-1">
+                        </TableCell>
+                        <TableCell className="text-center">
                           {t.type !== "transfer" && (
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
+                              variant="outline"
+                              size="sm"
                               onClick={() => handleEditClick(t)}
                             >
-                              <Pencil size={13} />
+                              Editar
                             </Button>
                           )}
+                          <span className="mx-1" />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeleteTarget(t)}
+                          >
+                            {t.type === "transfer" ? "Cancelar" : "Deletar"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Mobile — cards */}
+              <div className="md:hidden divide-y divide-border">
+                {monthTransactions.map((t) => (
+                  <div
+                    key={t.id}
+                    className="px-4 py-3 flex items-center justify-between gap-3"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        {t.type === "transfer" && (
+                          <ArrowLeftRight
+                            size={12}
+                            className="text-blue-400 shrink-0"
+                          />
+                        )}
+                        <p className="text-sm font-medium truncate">
+                          {t.description}
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDate(t.date)}
+                        {getCategoryName(t.category_id) !== "—" &&
+                          ` · ${getCategoryName(t.category_id)}`}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={`text-sm font-semibold ${
+                          t.type === "transfer"
+                            ? t.transfer_direction === "out"
+                              ? "text-blue-400"
+                              : "text-blue-500"
+                            : t.type === "income"
+                              ? "text-emerald-500"
+                              : "text-red-500"
+                        }`}
+                      >
+                        {formatAmount(t)}
+                      </span>
+                      <div className="flex gap-1">
+                        {t.type !== "transfer" && (
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-red-500"
-                            onClick={() => setDeleteTarget(t)}
+                            className="h-7 w-7"
+                            onClick={() => handleEditClick(t)}
                           >
-                            <Trash2 size={13} />
+                            <Pencil size={13} />
                           </Button>
-                        </div>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-red-500"
+                          onClick={() => setDeleteTarget(t)}
+                        >
+                          <Trash2 size={13} />
+                        </Button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))
