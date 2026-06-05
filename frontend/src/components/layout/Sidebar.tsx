@@ -29,12 +29,13 @@ export function Sidebar({ onClose }: Props) {
   return (
     <aside
       className="
-      h-full w-64
-      bg-gradient-to-b from-emerald-900 to-emerald-950
-      text-emerald-50
-      border-r border-emerald-800/40
-      p-6 flex flex-col
-    "
+  h-screen w-64
+  bg-gradient-to-b from-emerald-900 to-emerald-950
+  text-emerald-50
+  border-r border-emerald-800/40
+  p-6 flex flex-col
+  overflow-y-auto
+"
     >
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-lg font-semibold tracking-tight">Valore</h1>
