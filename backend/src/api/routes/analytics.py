@@ -325,6 +325,8 @@ def compare_months(
     df["month"] = df["date"].dt.to_period("M").astype(str)
 
     def summarize_month(month: str) -> dict:
+        if df.empty:
+            return {"month": month, "income": 0.0, "expense": 0.0, "balance": 0.0, "transaction_count": 0}
         frame = df[df["month"] == month]
         if frame.empty:
             return {"month": month, "income": 0.0, "expense": 0.0, "balance": 0.0, "transaction_count": 0}
