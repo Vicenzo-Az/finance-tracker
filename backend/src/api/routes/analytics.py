@@ -361,25 +361,31 @@ def compare_months(
     }
 
 
-@router.get("/future-commitments")
-def get_future_commitments(
+@router.get("/compare-months")
+def compare_months(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    month_a: str = Query(description="Mês A no formato YYYY-MM"),
+    month_b: str = Query(description="Mês B no formato YYYY-MM"),
 ):
-    """Parcelas pendentes agrupadas por mês."""
     transactions = (
         db.query(TransactionModel)
         .filter(
             TransactionModel.user_id == current_user.id,
-            TransactionModel.is_paid == False,  # noqa: E712
-            TransactionModel.type == "expense",
-            TransactionModel.installment_group_id != None,  # noqa: E711
+            TransactionModel.type != "transfer",
         )
         .all()
     )
 
+    # Retorno antecipado quando não há transações
+    def empty_month(m): return {"month": m, "income": 0.0,
+                                "expense": 0.0, "balance": 0.0, "transaction_count": 0}
     if not transactions:
-        return {"total_pending": 0.0, "by_month": [], "by_group": []}
+        return {
+            "month_a": empty_month(month_a),
+            "month_b": empty_month(month_b),
+            "variation": {"income": None, "expense": None, "balance": None},
+        }
 
     df = _transactions_to_df(transactions)
     df["month"] = df["date"].dt.to_period("M").astype(str)
