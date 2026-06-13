@@ -51,14 +51,18 @@ def clean_tables():
         db.close()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def client():
     return TestClient(app, raise_server_exceptions=True)
 
 
 @pytest.fixture
+def client2():
+    return TestClient(app, raise_server_exceptions=True)
+
+
+@pytest.fixture
 def auth_client(client):
-    """Client já autenticado com um usuário de teste."""
     client.post("/auth/register", json={
         "name": "Teste",
         "email": "teste@valore.com",
@@ -72,15 +76,14 @@ def auth_client(client):
 
 
 @pytest.fixture
-def auth_client2(client):
-    """Segundo usuário autenticado para testes de isolamento."""
-    client.post("/auth/register", json={
+def auth_client2(client2):
+    client2.post("/auth/register", json={
         "name": "Outro",
         "email": "outro@valore.com",
         "password": "senha123456",
     })
-    client.post("/auth/login", json={
+    client2.post("/auth/login", json={
         "email": "outro@valore.com",
         "password": "senha123456",
     })
-    return client
+    return client2
