@@ -1,58 +1,60 @@
+import { ValoreLogo, ValoreMark } from "@/components/brand/Logo";
 import { motion, useInView, type Variants } from "framer-motion";
 import {
   ArrowRight,
-  BarChart2,
-  Lock,
-  RefreshCw,
-  Shield,
-  Zap,
+  BarChart3,
+  CreditCard,
+  PiggyBank,
+  ShieldCheck,
+  Sparkles,
+  Wallet,
 } from "lucide-react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 0, y: 24 },
   visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, delay: i * 0.12, ease: "easeOut" },
+    transition: { duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
-const features = [
+const principles = [
   {
-    icon: BarChart2,
-    title: "Dashboards interativos",
-    desc: "Visualize receitas, despesas e saldo em tempo real com gráficos claros e responsivos.",
+    icon: Wallet,
+    title: "Contas, sem confusão",
+    desc: "Débito e crédito, separados com clareza. Cada centavo no lugar certo, sem planilhas paralelas.",
   },
   {
-    icon: RefreshCw,
-    title: "CRUD completo",
-    desc: "Adicione, edite e remova transações instantaneamente, com dados persistidos em nuvem.",
+    icon: CreditCard,
+    title: "Parcelas sob controle",
+    desc: "Compras parceladas calculadas automaticamente, com cada parcela no mês certo — sem surpresas na fatura.",
   },
   {
-    icon: Shield,
-    title: "Autenticação segura",
-    desc: "Seus dados protegidos com JWT em cookie httpOnly e senhas com hash bcrypt.",
+    icon: BarChart3,
+    title: "Análises que fazem sentido",
+    desc: "Evolução mensal, comparativos e compromissos futuros — números que ajudam a decidir, não que confundem.",
   },
   {
-    icon: Zap,
-    title: "Análises inteligentes",
-    desc: "Categorização automática de gastos e resumo mensal para entender seus padrões.",
+    icon: ShieldCheck,
+    title: "Seus dados, só seus",
+    desc: "Autenticação segura e isolamento total entre usuários. Ninguém além de você acessa suas finanças.",
   },
   {
-    icon: Lock,
-    title: "Privacidade total",
-    desc: "Cada usuário acessa apenas as suas transações. Zero exposição de dados de terceiros.",
+    icon: Sparkles,
+    title: "Categorização que aprende",
+    desc: "O Valore lembra como você categoriza cada gasto e sugere automaticamente da próxima vez.",
   },
   {
-    icon: ArrowRight,
-    title: "Simples de usar",
-    desc: "Interface limpa e intuitiva — sem curva de aprendizado, pronto para usar no dia a dia.",
+    icon: PiggyBank,
+    title: "Patrimônio real",
+    desc: "Saldo de hoje e compromissos de amanhã, separados com transparência — sem números inflados.",
   },
 ];
 
-function FeatureCard({
+function PrincipleCard({
   icon: Icon,
   title,
   desc,
@@ -73,22 +75,21 @@ function FeatureCard({
       variants={fadeUp}
       initial="hidden"
       animate={inView ? "visible" : "hidden"}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
       className="
-        rounded-2xl border border-white/10
-        bg-white/5 backdrop-blur-md
-        p-6 flex flex-col gap-4
-        hover:border-emerald-500/40
-        hover:bg-white/8
+        rounded-2xl border border-white/[0.06]
+        bg-white/[0.02] hover:bg-white/[0.04]
+        p-7 flex flex-col gap-4
         transition-colors duration-300
       "
     >
-      <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
-        <Icon size={20} className="text-emerald-400" />
+      <div className="w-10 h-10 rounded-xl bg-[#4C8A6A]/12 flex items-center justify-center">
+        <Icon size={18} className="text-[#7DB99A]" strokeWidth={1.75} />
       </div>
       <div>
-        <h3 className="font-semibold text-white/90 mb-1">{title}</h3>
-        <p className="text-sm text-white/55 leading-relaxed">{desc}</p>
+        <h3 className="font-display font-semibold text-white/92 mb-1.5 text-[15px]">
+          {title}
+        </h3>
+        <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
       </div>
     </motion.div>
   );
@@ -101,34 +102,22 @@ export default function Landing() {
     <div
       className="min-h-screen text-white overflow-x-hidden"
       style={{
-        background:
-          "radial-gradient(ellipse 80% 60% at 50% -10%, #064e3b33 0%, transparent 70%), linear-gradient(180deg, #020f08 0%, #030d09 60%, #020a06 100%)",
+        background: "#090B0A",
+        fontFamily: "Inter, sans-serif",
       }}
     >
-      {/* Grid overlay */}
-      <div
-        className="fixed inset-0 pointer-events-none"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-      />
-
       {/* Navbar */}
       <motion.nav
-        initial={{ opacity: 0, y: -16 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative z-10 flex items-center justify-between px-8 py-5 max-w-6xl mx-auto"
+        className="relative z-10 flex items-center justify-between px-6 md:px-8 py-5 max-w-6xl mx-auto"
       >
-        <span className="text-lg font-semibold tracking-tight text-emerald-300">
-          Valore
-        </span>
-        <div className="flex items-center gap-3">
+        <ValoreLogo size={24} className="text-[#7DB99A]" />
+        <div className="flex items-center gap-2">
           <button
             onClick={() => navigate("/login")}
-            className="px-4 py-2 text-sm text-white/70 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
           >
             Entrar
           </button>
@@ -136,8 +125,8 @@ export default function Landing() {
             onClick={() => navigate("/register")}
             className="
               px-4 py-2 text-sm font-medium rounded-lg
-              bg-emerald-500 hover:bg-emerald-400
-              text-slate-950
+              bg-[#4C8A6A] hover:bg-[#5A9C78]
+              text-[#090B0A]
               transition-colors duration-200
             "
           >
@@ -147,7 +136,7 @@ export default function Landing() {
       </motion.nav>
 
       {/* Hero */}
-      <section className="relative z-10 max-w-6xl mx-auto px-8 pt-24 pb-32 text-center">
+      <section className="relative z-10 max-w-5xl mx-auto px-6 md:px-8 pt-20 md:pt-28 pb-24 md:pb-32 text-center">
         <motion.div
           custom={0}
           variants={fadeUp}
@@ -155,11 +144,11 @@ export default function Landing() {
           animate="visible"
           className="
             inline-flex items-center gap-2 px-3 py-1.5 mb-8
-            rounded-full border border-emerald-500/30
-            bg-emerald-500/10 text-emerald-300 text-xs font-medium
+            rounded-full border border-[#4C8A6A]/25
+            bg-[#4C8A6A]/8 text-[#8FC4A6] text-xs font-medium
           "
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#7DB99A]" />
           Domine suas finanças
         </motion.div>
 
@@ -168,19 +157,10 @@ export default function Landing() {
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight mb-6"
-          style={{ fontFamily: "'Georgia', serif" }}
+          className="font-display text-4xl md:text-6xl font-bold leading-[1.12] tracking-tight mb-6"
         >
-          Suas finanças,{" "}
-          <span
-            className="text-transparent bg-clip-text"
-            style={{
-              backgroundImage:
-                "linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)",
-            }}
-          >
-            sob controle.
-          </span>
+          Organização financeira{" "}
+          <span className="text-[#8FC4A6]">com calma.</span>
         </motion.h1>
 
         <motion.p
@@ -188,10 +168,10 @@ export default function Landing() {
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="text-lg text-white/55 max-w-xl mx-auto mb-10 leading-relaxed"
+          className="text-base md:text-lg text-white/55 max-w-lg mx-auto mb-10 leading-relaxed"
         >
-          Registre receitas e despesas, visualize categorias e acompanhe seu
-          histórico financeiro em dashboards interativos — tudo em um só lugar.
+          Contas, parcelas e análises em um só lugar — sem planilhas, sem
+          ansiedade. Apenas clareza sobre para onde seu dinheiro vai.
         </motion.p>
 
         <motion.div
@@ -206,9 +186,8 @@ export default function Landing() {
             className="
               group flex items-center gap-2
               px-6 py-3 rounded-xl text-sm font-semibold
-              bg-emerald-500 hover:bg-emerald-400
-              text-slate-950 transition-all duration-200
-              hover:shadow-[0_0_32px_rgba(52,211,153,0.25)]
+              bg-[#4C8A6A] hover:bg-[#5A9C78]
+              text-[#090B0A] transition-all duration-200
             "
           >
             Começar gratuitamente
@@ -221,95 +200,67 @@ export default function Landing() {
             onClick={() => navigate("/login")}
             className="
               px-6 py-3 rounded-xl text-sm font-medium
-              border border-white/15 hover:border-white/30
-              text-white/70 hover:text-white
+              border border-white/10 hover:border-white/20
+              text-white/65 hover:text-white
               transition-all duration-200
             "
           >
             Já tenho conta
           </button>
         </motion.div>
-
-        {/* Decorative glow */}
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-          style={{
-            width: 600,
-            height: 400,
-            background:
-              "radial-gradient(ellipse, rgba(16,185,129,0.07) 0%, transparent 70%)",
-          }}
-        />
       </section>
 
-      {/* Mock dashboard preview */}
+      {/* Dashboard preview */}
       <motion.section
-        initial={{ opacity: 0, y: 48 }}
+        initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 max-w-5xl mx-auto px-8 mb-32"
+        className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 mb-28 md:mb-36"
       >
-        <div
-          className="rounded-2xl border border-white/10 overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-          }}
-        >
+        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-hidden">
           {/* Fake topbar */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/8">
-            <span className="w-3 h-3 rounded-full bg-red-400/60" />
-            <span className="w-3 h-3 rounded-full bg-yellow-400/60" />
-            <span className="w-3 h-3 rounded-full bg-emerald-400/60" />
-            <span className="ml-4 text-xs text-white/25 font-mono">
-              finance-tracker.app/dashboard
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]">
+            <ValoreMark size={14} className="text-white/30" />
+            <span className="text-xs text-white/25 font-mono">
+              valore-finance.vercel.app
             </span>
           </div>
 
-          {/* Fake dashboard content */}
-          <div className="p-6 grid grid-cols-3 gap-4">
+          <div className="p-5 md:p-7 grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               {
-                label: "Saldo total",
-                value: "R$ 8.420,00",
-                color: "text-emerald-400",
+                label: "Patrimônio",
+                value: "R$ 24.830",
+                color: "text-[#8FC4A6]",
               },
-              {
-                label: "Receitas",
-                value: "R$ 12.500,00",
-                color: "text-emerald-300",
-              },
-              {
-                label: "Despesas",
-                value: "R$ 4.080,00",
-                color: "text-red-400",
-              },
+              { label: "Receitas", value: "R$ 8.450", color: "text-[#8FC4A6]" },
+              { label: "Despesas", value: "R$ 3.120", color: "text-[#D98B7E]" },
+              { label: "Saldo", value: "R$ 5.330", color: "text-[#7FAFC9]" },
             ].map((card) => (
               <div
                 key={card.label}
-                className="rounded-xl border border-white/8 bg-white/5 p-4"
+                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
               >
-                <p className="text-xs text-white/40 mb-1">{card.label}</p>
-                <p className={`text-xl font-bold ${card.color}`}>
+                <p className="text-xs text-white/35 mb-1">{card.label}</p>
+                <p className={`text-base md:text-lg font-bold ${card.color}`}>
                   {card.value}
                 </p>
               </div>
             ))}
           </div>
 
-          {/* Fake bar chart */}
-          <div className="px-6 pb-6">
-            <div className="rounded-xl border border-white/8 bg-white/5 p-4 h-32 flex items-end gap-2">
-              {[40, 65, 50, 80, 55, 90, 70, 45, 85, 60, 75, 95].map((h, i) => (
+          <div className="px-5 md:px-7 pb-5 md:pb-7">
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 h-28 md:h-32 flex items-end gap-1.5">
+              {[35, 55, 45, 70, 50, 80, 62, 40, 75, 55, 68, 88].map((h, i) => (
                 <motion.div
                   key={i}
                   initial={{ scaleY: 0 }}
                   whileInView={{ scaleY: 1 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.04 }}
+                  transition={{ duration: 0.4, delay: i * 0.035 }}
                   style={{ height: `${h}%`, originY: 1 }}
-                  className="flex-1 rounded-t-sm bg-emerald-500/50"
+                  className="flex-1 rounded-t-sm bg-[#4C8A6A]/45"
                 />
               ))}
             </div>
@@ -317,62 +268,55 @@ export default function Landing() {
         </div>
       </motion.section>
 
-      {/* Features */}
-      <section className="relative z-10 max-w-6xl mx-auto px-8 pb-32">
+      {/* Princípios / features */}
+      <section className="relative z-10 max-w-5xl mx-auto px-6 md:px-8 pb-28 md:pb-36">
         <motion.div
           custom={0}
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
-          className="text-center mb-16"
+          className="text-center mb-14"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
-            Tudo que você precisa
+          <h2 className="font-display text-2xl md:text-3xl font-bold mb-3 tracking-tight">
+            Construído para tranquilidade, não para pressa
           </h2>
-          <p className="text-white/50 max-w-md mx-auto">
-            Um sistema completo para controle financeiro pessoal, do registro ao
-            relatório.
+          <p className="text-white/45 max-w-md mx-auto text-sm md:text-base">
+            Cada parte do Valore existe para reduzir ruído — não para adicionar
+            mais um painel para checar.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map((f, i) => (
-            <FeatureCard key={f.title} {...f} index={i} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {principles.map((f, i) => (
+            <PrincipleCard key={f.title} {...f} index={i} />
           ))}
         </div>
       </section>
 
       {/* CTA final */}
       <motion.section
-        initial={{ opacity: 0, y: 32 }}
+        initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 max-w-6xl mx-auto px-8 pb-24 text-center"
+        className="relative z-10 max-w-5xl mx-auto px-6 md:px-8 pb-24 text-center"
       >
-        <div
-          className="rounded-3xl border border-emerald-500/20 p-16"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 100% at 50% 100%, rgba(16,185,129,0.08) 0%, transparent 70%), rgba(255,255,255,0.03)",
-          }}
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
-            Pronto para começar?
+        <div className="rounded-3xl border border-[#4C8A6A]/15 bg-[#4C8A6A]/[0.04] p-12 md:p-16">
+          <h2 className="font-display text-2xl md:text-3xl font-bold mb-4 tracking-tight">
+            Comece a organizar hoje
           </h2>
-          <p className="text-white/50 mb-8 max-w-sm mx-auto">
-            Crie sua conta gratuitamente e tenha controle total das suas
-            finanças.
+          <p className="text-white/50 mb-8 max-w-sm mx-auto text-sm md:text-base">
+            Sem cartão de crédito, sem complicação. Crie sua conta e veja suas
+            finanças com outros olhos.
           </p>
           <button
             onClick={() => navigate("/register")}
             className="
               group inline-flex items-center gap-2
-              px-8 py-3.5 rounded-xl font-semibold text-sm
-              bg-emerald-500 hover:bg-emerald-400
-              text-slate-950 transition-all duration-200
-              hover:shadow-[0_0_40px_rgba(52,211,153,0.3)]
+              px-7 py-3.5 rounded-xl font-semibold text-sm
+              bg-[#4C8A6A] hover:bg-[#5A9C78]
+              text-[#090B0A] transition-all duration-200
             "
           >
             Criar conta grátis
@@ -385,7 +329,7 @@ export default function Landing() {
       </motion.section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-white/8 py-8 text-center">
+      <footer className="relative z-10 border-t border-white/[0.06] py-8 text-center">
         <p className="text-xs text-white/25">
           © 2026 Valore · Desenvolvido como TCC — CSTSI / IFSul
         </p>
