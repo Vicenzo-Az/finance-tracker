@@ -1,108 +1,67 @@
 import { ValoreLogo, ValoreMark } from "@/components/brand/Logo";
-import { motion, useInView, type Variants } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import {
   ArrowRight,
-  BarChart3,
+  CalendarClock,
   CreditCard,
-  PiggyBank,
-  ShieldCheck,
-  Sparkles,
+  EyeOff,
+  Lock,
+  ShieldOff,
   Wallet,
 } from "lucide-react";
-import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
-const principles = [
+const steps = [
   {
-    icon: Wallet,
-    title: "Contas, sem confusão",
-    desc: "Débito e crédito, separados com clareza. Cada centavo no lugar certo, sem planilhas paralelas.",
+    number: "01",
+    title: "Registre",
+    desc: "Receitas, despesas e transferências em segundos. Categorias se sugerem sozinhas com o tempo.",
   },
   {
-    icon: CreditCard,
-    title: "Parcelas sob controle",
-    desc: "Compras parceladas calculadas automaticamente, com cada parcela no mês certo — sem surpresas na fatura.",
+    number: "02",
+    title: "Entenda",
+    desc: "Veja para onde seu dinheiro vai mês a mês, por categoria, por conta — sem precisar somar nada na mão.",
   },
   {
-    icon: BarChart3,
-    title: "Análises que fazem sentido",
-    desc: "Evolução mensal, comparativos e compromissos futuros — números que ajudam a decidir, não que confundem.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Seus dados, só seus",
-    desc: "Autenticação segura e isolamento total entre usuários. Ninguém além de você acessa suas finanças.",
-  },
-  {
-    icon: Sparkles,
-    title: "Categorização que aprende",
-    desc: "O Valore lembra como você categoriza cada gasto e sugere automaticamente da próxima vez.",
-  },
-  {
-    icon: PiggyBank,
-    title: "Patrimônio real",
-    desc: "Saldo de hoje e compromissos de amanhã, separados com transparência — sem números inflados.",
+    number: "03",
+    title: "Planeje",
+    desc: "Compromissos futuros e parcelas já calculados, para decidir com o que está por vir — não só com o que já passou.",
   },
 ];
 
-function PrincipleCard({
-  icon: Icon,
-  title,
-  desc,
-  index,
-}: {
-  icon: React.ElementType;
-  title: string;
-  desc: string;
-  index: number;
-}) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+const honestPoints = [
+  "Sem anúncios.",
+  "Sem venda de dados.",
+  "Sem sincronização bancária obrigatória.",
+];
 
-  return (
-    <motion.div
-      ref={ref}
-      custom={index % 3}
-      variants={fadeUp}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
-      className="
-        rounded-2xl border border-white/[0.06]
-        bg-white/[0.02] hover:bg-white/[0.04]
-        p-7 flex flex-col gap-4
-        transition-colors duration-300
-      "
-    >
-      <div className="w-10 h-10 rounded-xl bg-[#4C8A6A]/12 flex items-center justify-center">
-        <Icon size={18} className="text-[#7DB99A]" strokeWidth={1.75} />
-      </div>
-      <div>
-        <h3 className="font-display font-semibold text-white/92 mb-1.5 text-[15px]">
-          {title}
-        </h3>
-        <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
-      </div>
-    </motion.div>
-  );
-}
+const installments = [
+  { n: 1, paid: true },
+  { n: 2, paid: true },
+  { n: 3, paid: false },
+  { n: 4, paid: false },
+  { n: 5, paid: false },
+  { n: 6, paid: false },
+];
 
 export default function Landing() {
   const navigate = useNavigate();
 
   return (
     <div
-      className="min-h-screen text-white overflow-x-hidden"
+      className="min-h-screen text-[#F2F4F0] overflow-x-hidden"
       style={{
-        background: "#090B0A",
+        background:
+          "radial-gradient(60% 50% at 18% 0%, rgba(76,138,106,0.10) 0%, transparent 70%), radial-gradient(50% 40% at 88% 12%, rgba(199,163,90,0.06) 0%, transparent 70%), #090B0A",
         fontFamily: "Inter, sans-serif",
       }}
     >
@@ -111,24 +70,19 @@ export default function Landing() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative z-10 flex items-center justify-between px-6 md:px-8 py-5 max-w-6xl mx-auto"
+        className="relative z-10 flex items-center justify-between px-6 md:px-8 py-5 max-w-5xl mx-auto"
       >
         <ValoreLogo size={24} className="text-[#7DB99A]" />
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate("/login")}
-            className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm text-white/55 hover:text-white transition-colors"
           >
             Entrar
           </button>
           <button
             onClick={() => navigate("/register")}
-            className="
-              px-4 py-2 text-sm font-medium rounded-lg
-              bg-[#4C8A6A] hover:bg-[#5A9C78]
-              text-[#090B0A]
-              transition-colors duration-200
-            "
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-colors duration-200"
           >
             Criar conta
           </button>
@@ -136,200 +90,306 @@ export default function Landing() {
       </motion.nav>
 
       {/* Hero */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 md:px-8 pt-20 md:pt-28 pb-24 md:pb-32 text-center">
-        <motion.div
+      <section className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 pt-16 md:pt-24 pb-20 md:pb-28">
+        <motion.h1
           custom={0}
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="
-            inline-flex items-center gap-2 px-3 py-1.5 mb-8
-            rounded-full border border-[#4C8A6A]/25
-            bg-[#4C8A6A]/8 text-[#8FC4A6] text-xs font-medium
-          "
+          className="font-display font-bold tracking-tight leading-[1.08] text-4xl md:text-6xl mb-6 max-w-2xl"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#7DB99A]" />
-          Domine suas finanças
-        </motion.div>
+          <span className="text-white">Organize suas finanças.</span>
+          <br />
+          <span className="text-white/45">Sem transformar sua vida</span>
+          <br />
+          <span className="text-white/45">em uma planilha.</span>
+        </motion.h1>
 
-        <motion.h1
+        <motion.p
           custom={1}
           variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="font-display text-4xl md:text-6xl font-bold leading-[1.12] tracking-tight mb-6"
+          className="text-base md:text-lg text-white/50 max-w-md mb-9 leading-relaxed"
         >
-          Organização financeira{" "}
-          <span className="text-[#8FC4A6]">com calma.</span>
-        </motion.h1>
-
-        <motion.p
-          custom={2}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="text-base md:text-lg text-white/55 max-w-lg mx-auto mb-10 leading-relaxed"
-        >
-          Contas, parcelas e análises em um só lugar — sem planilhas, sem
-          ansiedade. Apenas clareza sobre para onde seu dinheiro vai.
+          Contas, parcelas e análises em um só lugar — pensado para quem
+          quer entender o próprio dinheiro, não estudar uma planilha.
         </motion.p>
 
-        <motion.div
-          custom={3}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col sm:flex-row items-center justify-center gap-3"
-        >
+        <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible">
           <button
             onClick={() => navigate("/register")}
-            className="
-              group flex items-center gap-2
-              px-6 py-3 rounded-xl text-sm font-semibold
-              bg-[#4C8A6A] hover:bg-[#5A9C78]
-              text-[#090B0A] transition-all duration-200
-            "
+            className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200"
           >
             Começar gratuitamente
-            <ArrowRight
-              size={16}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </button>
-          <button
-            onClick={() => navigate("/login")}
-            className="
-              px-6 py-3 rounded-xl text-sm font-medium
-              border border-white/10 hover:border-white/20
-              text-white/65 hover:text-white
-              transition-all duration-200
-            "
-          >
-            Já tenho conta
+            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
       </section>
 
-      {/* Dashboard preview */}
+      {/* Cards flutuantes — produto real */}
       <motion.section
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 pb-28 md:pb-36"
+      >
+        <div className="relative h-[280px] md:h-[320px]">
+          {/* Patrimônio líquido */}
+          <div
+            className="absolute left-0 top-0 w-[230px] md:w-[260px] rounded-2xl border border-white/[0.08] bg-[#0F1612] p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]"
+            style={{ transform: "rotate(-3deg)" }}
+          >
+            <div className="flex items-center gap-2 mb-3 text-white/40">
+              <Wallet size={14} />
+              <span className="text-xs">Patrimônio líquido</span>
+            </div>
+            <p className="text-2xl font-display font-bold text-[#8FC4A6]">R$ 24.830</p>
+            <p className="text-xs text-white/35 mt-1">+8,3% nos últimos 30 dias</p>
+          </div>
+
+          {/* Compra parcelada */}
+          <div
+            className="absolute right-0 top-6 md:top-10 w-[230px] md:w-[260px] rounded-2xl border border-white/[0.08] bg-[#0F1612] p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]"
+            style={{ transform: "rotate(2.5deg)" }}
+          >
+            <div className="flex items-center gap-2 mb-3 text-white/40">
+              <CreditCard size={14} />
+              <span className="text-xs">Compra parcelada</span>
+            </div>
+            <p className="text-sm font-medium text-white/85 mb-3">Notebook — 6x R$ 500</p>
+            <div className="flex gap-1">
+              {installments.map((inst) => (
+                <span
+                  key={inst.n}
+                  className={`flex-1 h-1.5 rounded-full ${
+                    inst.paid ? "bg-[#4C8A6A]" : "bg-white/10"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-white/35 mt-2">2 de 6 parcelas pagas</p>
+          </div>
+
+          {/* Compromissos futuros */}
+          <div
+            className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[230px] md:w-[260px] rounded-2xl border border-white/[0.08] bg-[#0F1612] p-5 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]"
+            style={{ transform: "rotate(-1deg)" }}
+          >
+            <div className="flex items-center gap-2 mb-3 text-white/40">
+              <CalendarClock size={14} />
+              <span className="text-xs">Compromissos futuros</span>
+            </div>
+            <p className="text-2xl font-display font-bold text-[#D9B36A]">R$ 2.000</p>
+            <p className="text-xs text-white/35 mt-1">em 4 parcelas pendentes</p>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Declaração editorial */}
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 mb-28 md:mb-36"
+        transition={{ duration: 0.7 }}
+        className="relative z-10 max-w-3xl mx-auto px-6 md:px-8 py-28 md:py-36 text-center"
       >
-        <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-hidden">
-          {/* Fake topbar */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06]">
-            <ValoreMark size={14} className="text-white/30" />
-            <span className="text-xs text-white/25 font-mono">
-              valore-finance.vercel.app
+        <span className="text-xs text-[#8FC4A6]/70 tracking-widest uppercase mb-6 block">
+          Filosofia
+        </span>
+        <p className="font-display text-2xl md:text-4xl font-semibold leading-snug text-white/90">
+          Clareza é saber onde você está,
+          <br />
+          antes de decidir para onde vai.
+        </p>
+      </motion.section>
+
+      {/* Como funciona */}
+      <section className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 pb-28 md:pb-36">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6 }}
+          className="font-display text-2xl md:text-3xl font-bold mb-14 tracking-tight"
+        >
+          Como o Valore funciona
+        </motion.h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+          {steps.map((step, i) => (
+            <motion.div
+              key={step.number}
+              custom={i}
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+            >
+              <span className="font-mono text-sm text-[#D9B36A]/70 block mb-3">
+                {step.number}
+              </span>
+              <h3 className="font-display font-semibold text-lg text-white/90 mb-2">
+                {step.title}
+              </h3>
+              <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Parcelamentos — diferencial */}
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.7 }}
+        className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 pb-28 md:pb-36"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+          <div>
+            <span className="text-xs text-[#8FC4A6]/70 tracking-widest uppercase mb-5 block">
+              Cartão de crédito
             </span>
+            <h2 className="font-display text-2xl md:text-3xl font-bold leading-tight mb-5 tracking-tight">
+              Cada parcela.
+              <br />
+              Cada vencimento.
+              <br />
+              <span className="text-white/45">Sem surpresas na fatura.</span>
+            </h2>
+            <p className="text-sm md:text-base text-white/50 leading-relaxed">
+              Compras parceladas se distribuem automaticamente pelos meses
+              certos. Você sabe exatamente o que falta pagar — e quando.
+            </p>
           </div>
 
-          <div className="p-5 md:p-7 grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              {
-                label: "Patrimônio",
-                value: "R$ 24.830",
-                color: "text-[#8FC4A6]",
-              },
-              { label: "Receitas", value: "R$ 8.450", color: "text-[#8FC4A6]" },
-              { label: "Despesas", value: "R$ 3.120", color: "text-[#D98B7E]" },
-              { label: "Saldo", value: "R$ 5.330", color: "text-[#7FAFC9]" },
-            ].map((card) => (
-              <div
-                key={card.label}
-                className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
-              >
-                <p className="text-xs text-white/35 mb-1">{card.label}</p>
-                <p className={`text-base md:text-lg font-bold ${card.color}`}>
-                  {card.value}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="px-5 md:px-7 pb-5 md:pb-7">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 h-28 md:h-32 flex items-end gap-1.5">
-              {[35, 55, 45, 70, 50, 80, 62, 40, 75, 55, 68, 88].map((h, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.035 }}
-                  style={{ height: `${h}%`, originY: 1 }}
-                  className="flex-1 rounded-t-sm bg-[#4C8A6A]/45"
-                />
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0F1612] p-6">
+            <p className="text-sm font-medium text-white/85 mb-1">iPhone 16</p>
+            <p className="text-xs text-white/35 mb-5">12x de R$ 500,00</p>
+            <div className="space-y-2.5">
+              {installments.map((inst) => (
+                <div key={inst.n} className="flex items-center gap-3">
+                  <span
+                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono shrink-0 ${
+                      inst.paid
+                        ? "bg-[#4C8A6A] text-[#090B0A]"
+                        : "border border-white/15 text-white/35"
+                    }`}
+                  >
+                    {inst.n}
+                  </span>
+                  <div className="flex-1 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        inst.paid ? "bg-[#4C8A6A]" : "bg-transparent"
+                      }`}
+                      style={{ width: inst.paid ? "100%" : "0%" }}
+                    />
+                  </div>
+                  <span className="text-xs text-white/35 font-mono w-16 text-right">
+                    {inst.paid ? "pago" : "pendente"}
+                  </span>
+                </div>
               ))}
             </div>
           </div>
         </div>
       </motion.section>
 
-      {/* Princípios / features */}
-      <section className="relative z-10 max-w-5xl mx-auto px-6 md:px-8 pb-28 md:pb-36">
-        <motion.div
-          custom={0}
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="text-center mb-14"
-        >
-          <h2 className="font-display text-2xl md:text-3xl font-bold mb-3 tracking-tight">
-            Construído para tranquilidade, não para pressa
+      {/* Análises financeiras */}
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.7 }}
+        className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 pb-28 md:pb-36"
+      >
+        <div className="text-center mb-12">
+          <span className="text-xs text-[#8FC4A6]/70 tracking-widest uppercase mb-5 block">
+            Análises
+          </span>
+          <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight max-w-lg mx-auto">
+            Números que ajudam a decidir, não que confundem
           </h2>
-          <p className="text-white/45 max-w-md mx-auto text-sm md:text-base">
-            Cada parte do Valore existe para reduzir ruído — não para adicionar
-            mais um painel para checar.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {principles.map((f, i) => (
-            <PrincipleCard key={f.title} {...f} index={i} />
-          ))}
         </div>
-      </section>
 
-      {/* CTA final */}
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0F1612] p-6 md:p-8">
+          <p className="text-xs text-white/35 mb-5">Evolução mensal</p>
+          <div className="h-32 md:h-40 flex items-end gap-1.5 mb-2">
+            {[35, 50, 42, 65, 48, 75, 58, 38, 70, 52, 64, 85].map((h, i) => (
+              <motion.div
+                key={i}
+                initial={{ scaleY: 0 }}
+                whileInView={{ scaleY: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.03 }}
+                style={{ height: `${h}%`, originY: 1 }}
+                className="flex-1 rounded-t-sm bg-[#4C8A6A]/45"
+              />
+            ))}
+          </div>
+          <div className="flex justify-between text-[10px] text-white/25 font-mono">
+            <span>jan</span>
+            <span>jun</span>
+            <span>dez</span>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Números honestos */}
       <motion.section
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.6 }}
-        className="relative z-10 max-w-5xl mx-auto px-6 md:px-8 pb-24 text-center"
+        className="relative z-10 max-w-2xl mx-auto px-6 md:px-8 pb-28 md:pb-36 text-center"
       >
-        <div className="rounded-3xl border border-[#4C8A6A]/15 bg-[#4C8A6A]/[0.04] p-12 md:p-16">
-          <h2 className="font-display text-2xl md:text-3xl font-bold mb-4 tracking-tight">
-            Comece a organizar hoje
-          </h2>
-          <p className="text-white/50 mb-8 max-w-sm mx-auto text-sm md:text-base">
-            Sem cartão de crédito, sem complicação. Crie sua conta e veja suas
-            finanças com outros olhos.
-          </p>
-          <button
-            onClick={() => navigate("/register")}
-            className="
-              group inline-flex items-center gap-2
-              px-7 py-3.5 rounded-xl font-semibold text-sm
-              bg-[#4C8A6A] hover:bg-[#5A9C78]
-              text-[#090B0A] transition-all duration-200
-            "
-          >
-            Criar conta grátis
-            <ArrowRight
-              size={16}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </button>
+        <div className="space-y-3 mb-3">
+          {honestPoints.map((point) => (
+            <p key={point} className="text-lg md:text-xl text-white/55 font-display">
+              {point}
+            </p>
+          ))}
         </div>
+        <p className="text-lg md:text-xl font-display font-semibold text-white/90 mt-6">
+          Seus dados são seus.
+        </p>
+
+        <div className="flex items-center justify-center gap-6 mt-8 text-white/30">
+          <Lock size={16} />
+          <EyeOff size={16} />
+          <ShieldOff size={16} />
+        </div>
+      </motion.section>
+
+      {/* CTA final */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.6 }}
+        className="relative z-10 max-w-3xl mx-auto px-6 md:px-8 pb-24 text-center"
+      >
+        <h2 className="font-display text-2xl md:text-3xl font-bold mb-8 tracking-tight">
+          Comece a organizar hoje
+        </h2>
+        <button
+          onClick={() => navigate("/register")}
+          className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200"
+        >
+          Começar gratuitamente
+          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        </button>
       </motion.section>
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/[0.06] py-8 text-center">
+        <div className="flex items-center justify-center gap-2 mb-3 text-white/25">
+          <ValoreMark size={14} />
+          <span className="text-xs">valore</span>
+        </div>
         <p className="text-xs text-white/25">
           © 2026 Valore · Desenvolvido como TCC — CSTSI / IFSul
         </p>
