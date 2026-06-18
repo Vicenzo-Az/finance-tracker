@@ -66,58 +66,9 @@ export default function Landing() {
 
   return (
     <div
-      className="relative min-h-screen text-[#F2F4F0] overflow-x-hidden"
-      style={{
-        fontFamily: "Inter, sans-serif",
-        backgroundColor: "#090B0A",
-        backgroundImage:
-          "linear-gradient(180deg, #0C0E0D 0%, #090B0A 42%, #0C1511 100%), radial-gradient(circle at 12% 12%, rgba(242,236,222,0.10) 0%, transparent 34%), radial-gradient(circle at 86% 8%, rgba(143,196,166,0.12) 0%, transparent 36%), radial-gradient(circle at 50% 90%, rgba(76,138,106,0.10) 0%, transparent 46%)",
-      }}
+      className="min-h-screen text-[#F2F4F0] overflow-x-hidden"
+      style={{ fontFamily: "Inter, sans-serif" }}
     >
-      <div className="absolute inset-0 pointer-events-none" aria-hidden>
-        <div
-          className="absolute inset-0 opacity-[0.14]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)",
-            backgroundSize: "88px 88px",
-            maskImage:
-              "radial-gradient(circle at 50% 28%, black 22%, transparent 86%)",
-            WebkitMaskImage:
-              "radial-gradient(circle at 50% 28%, black 22%, transparent 86%)",
-          }}
-        />
-
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(0deg, rgba(255,255,255,0.24) 0px, rgba(255,255,255,0.24) 1px, transparent 1px, transparent 2px)",
-          }}
-        />
-
-        <motion.div
-          className="absolute -top-28 -left-16 w-72 h-72 rounded-full blur-3xl"
-          style={{ background: "rgba(242,236,222,0.14)" }}
-          animate={{ x: [0, 20, 0], y: [0, 12, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        <motion.div
-          className="absolute top-[28%] -right-20 w-80 h-80 rounded-full blur-3xl"
-          style={{ background: "rgba(143,196,166,0.14)" }}
-          animate={{ x: [0, -24, 0], y: [0, -18, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        <motion.div
-          className="absolute -bottom-20 left-[22%] w-[28rem] h-[28rem] rounded-full blur-3xl"
-          style={{ background: "rgba(76,138,106,0.12)" }}
-          animate={{ x: [0, 14, 0], y: [0, -16, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
       {/* ─── NAVBAR — bg: #090B0A ──────────────────────────── */}
       <div
         style={{
@@ -140,7 +91,7 @@ export default function Landing() {
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative z-20 flex items-center justify-between px-6 md:px-10 py-5 max-w-6xl mx-auto"
+          className="flex items-center justify-between px-6 md:px-10 py-5 max-w-6xl mx-auto"
         >
           <ValoreLogo size={30} className="text-[#7DB99A]" />
           <div className="flex items-center gap-2">
@@ -161,7 +112,12 @@ export default function Landing() {
       </div>
 
       {/* ─── HERO — bg: #090B0A ────────────────────────────── */}
-      <section className="relative z-10">
+      <section
+        style={{
+          background:
+            "radial-gradient(70% 50% at 10% 0%, rgba(76,138,106,0.14) 0%, transparent 65%), radial-gradient(50% 40% at 90% 10%, rgba(199,163,90,0.09) 0%, transparent 65%), #090B0A",
+        }}
+      >
         <div className="max-w-5xl mx-auto px-6 md:px-10 pt-28 md:pt-36 pb-20 md:pb-28">
           <motion.h1
             custom={0}
@@ -249,7 +205,7 @@ export default function Landing() {
       </section>
 
       {/* ─── CARDS FLUTUANTES — bg: #0B1512 ───────────────── */}
-      <section className="relative z-10">
+      <section style={{ background: "#0B1512" }}>
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -375,7 +331,7 @@ export default function Landing() {
       </section>
 
       {/* ─── COMO FUNCIONA — bg: #0B1512 ──────────────────── */}
-      <section className="relative z-10">
+      <section style={{ background: "#0B1512" }}>
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-20 md:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -463,7 +419,7 @@ export default function Landing() {
       </section>
 
       {/* ─── PARCELAMENTOS — bg: #0D1511 ──────────────────── */}
-      <section className="relative z-10">
+      <section style={{ background: "#0D1511" }}>
         <div className="max-w-4xl mx-auto px-6 md:px-10 py-20 md:py-28">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
             <div>
@@ -545,7 +501,7 @@ export default function Landing() {
       </section>
 
       {/* ─── ANÁLISES — bg: #0B1512 ───────────────────────── */}
-      <section className="relative z-10">
+      <section style={{ background: "#0B1512" }}>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -626,7 +582,7 @@ export default function Landing() {
       </section>
 
       {/* ─── NÚMEROS HONESTOS — bg: #090B0A ───────────────── */}
-      <section className="relative z-10">
+      <section style={{ background: "#090B0A" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -673,7 +629,7 @@ export default function Landing() {
       </section>
 
       {/* ─── CTA FINAL — bg: #0B1512 ──────────────────────── */}
-      <section className="relative z-10">
+      <section style={{ background: "#0B1512" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
