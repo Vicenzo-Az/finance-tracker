@@ -332,13 +332,13 @@ export default function Landing() {
 
       {/* ─── COMO FUNCIONA — bg: #0B1512 ──────────────────── */}
       <section style={{ background: "#0B1512" }}>
-        <div className="max-w-4xl mx-auto px-6 md:px-10 py-20 md:py-28">
+        <div className="max-w-5xl mx-auto px-6 md:px-10 py-20 md:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6 }}
-            className="mb-14"
+            className="mb-16"
           >
             <div className="flex items-center gap-3 mb-4">
               <span className="w-5 h-px bg-[#C7A35A]/50" />
@@ -346,67 +346,74 @@ export default function Landing() {
                 Como funciona
               </span>
             </div>
+
             <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
               Três passos. Sem curva de aprendizado.
             </h2>
           </motion.div>
 
-          <div className="relative">
-            {/* Linha de conexão */}
-            <div className="hidden md:block absolute top-6 left-6 right-6 h-px bg-gradient-to-r from-[#4C8A6A]/40 via-[#C7A35A]/40 to-transparent" />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
-              {steps.map((step, i) => (
-                <motion.div
-                  key={step.number}
-                  custom={i}
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-40px" }}
-                  className="relative"
-                >
-                  <div className="flex items-center gap-3 mb-5">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                      style={{
-                        background:
-                          i === 0
-                            ? "rgba(76,138,106,0.15)"
-                            : i === 1
-                              ? "rgba(199,163,90,0.12)"
-                              : "rgba(76,138,106,0.10)",
-                        border:
-                          i === 0
-                            ? "1px solid rgba(76,138,106,0.3)"
-                            : i === 1
-                              ? "1px solid rgba(199,163,90,0.25)"
-                              : "1px solid rgba(76,138,106,0.2)",
-                      }}
-                    >
-                      <span
-                        className="font-mono text-sm font-bold"
-                        style={{ color: i === 1 ? "#D9B36A" : "#8FC4A6" }}
-                      >
-                        {step.number}
-                      </span>
-                    </div>
-                    {i < 2 && (
-                      <ArrowRight
-                        size={14}
-                        className="hidden md:block text-white/12 absolute -right-5 top-3.5"
-                      />
-                    )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-10">
+            {steps.map((step, i) => (
+              <motion.div
+                key={step.number}
+                custom={i}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                className="relative"
+              >
+                {/* Linha de conexão desktop */}
+                {i < steps.length - 1 && (
+                  <div className="hidden md:block absolute top-6 left-[72px] w-[calc(100%-48px)] h-px">
+                    <div className="h-full bg-gradient-to-r from-[#4C8A6A]/45 via-[#C7A35A]/30 to-transparent" />
                   </div>
-                  <h3 className="font-display font-semibold text-lg text-white/90 mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-white/45 leading-relaxed">
-                    {step.desc}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
+                )}
+
+                {/* Linha vertical mobile */}
+                {i < steps.length - 1 && (
+                  <div className="md:hidden absolute left-6 top-14 bottom-[-36px] w-px bg-gradient-to-b from-[#4C8A6A]/40 to-transparent" />
+                )}
+
+                <div className="flex items-start gap-4">
+                  <div
+                    className="relative z-10 w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                    style={{
+                      background:
+                        i === 0
+                          ? "rgba(76,138,106,0.15)"
+                          : i === 1
+                            ? "rgba(199,163,90,0.12)"
+                            : "rgba(76,138,106,0.10)",
+                      border:
+                        i === 0
+                          ? "1px solid rgba(76,138,106,0.3)"
+                          : i === 1
+                            ? "1px solid rgba(199,163,90,0.25)"
+                            : "1px solid rgba(76,138,106,0.2)",
+                      boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
+                    }}
+                  >
+                    <span
+                      className="font-mono text-sm font-bold"
+                      style={{ color: i === 1 ? "#D9B36A" : "#8FC4A6" }}
+                    >
+                      {step.number}
+                    </span>
+                  </div>
+
+                  <div className="pt-1">
+                    <h3 className="font-display font-semibold text-lg text-white/90 mb-2">
+                      {step.title}
+                    </h3>
+
+                    <p className="text-sm text-white/45 leading-relaxed max-w-xs">
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
