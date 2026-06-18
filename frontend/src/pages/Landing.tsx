@@ -1,5 +1,4 @@
 import { ValoreLogo, ValoreMark } from "@/components/brand/Logo";
-import { AnimatedValoreBackground } from "@/components/landing/AnimatedValoreBackground";
 import { motion, type Variants } from "framer-motion";
 import {
   ArrowDown,
@@ -68,9 +67,56 @@ export default function Landing() {
   return (
     <div
       className="relative min-h-screen text-[#F2F4F0] overflow-x-hidden"
-      style={{ fontFamily: "Inter, sans-serif" }}
+      style={{
+        fontFamily: "Inter, sans-serif",
+        backgroundColor: "#090B0A",
+        backgroundImage:
+          "linear-gradient(180deg, #0C0E0D 0%, #090B0A 42%, #0C1511 100%), radial-gradient(circle at 12% 12%, rgba(242,236,222,0.10) 0%, transparent 34%), radial-gradient(circle at 86% 8%, rgba(143,196,166,0.12) 0%, transparent 36%), radial-gradient(circle at 50% 90%, rgba(76,138,106,0.10) 0%, transparent 46%)",
+      }}
     >
-      <AnimatedValoreBackground />
+      <div className="absolute inset-0 pointer-events-none" aria-hidden>
+        <div
+          className="absolute inset-0 opacity-[0.14]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)",
+            backgroundSize: "88px 88px",
+            maskImage:
+              "radial-gradient(circle at 50% 28%, black 22%, transparent 86%)",
+            WebkitMaskImage:
+              "radial-gradient(circle at 50% 28%, black 22%, transparent 86%)",
+          }}
+        />
+
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(0deg, rgba(255,255,255,0.24) 0px, rgba(255,255,255,0.24) 1px, transparent 1px, transparent 2px)",
+          }}
+        />
+
+        <motion.div
+          className="absolute -top-28 -left-16 w-72 h-72 rounded-full blur-3xl"
+          style={{ background: "rgba(242,236,222,0.14)" }}
+          animate={{ x: [0, 20, 0], y: [0, 12, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <motion.div
+          className="absolute top-[28%] -right-20 w-80 h-80 rounded-full blur-3xl"
+          style={{ background: "rgba(143,196,166,0.14)" }}
+          animate={{ x: [0, -24, 0], y: [0, -18, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <motion.div
+          className="absolute -bottom-20 left-[22%] w-[28rem] h-[28rem] rounded-full blur-3xl"
+          style={{ background: "rgba(76,138,106,0.12)" }}
+          animate={{ x: [0, 14, 0], y: [0, -16, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
 
       {/* ─── NAVBAR — bg: #090B0A ──────────────────────────── */}
       <div
