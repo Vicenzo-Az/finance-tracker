@@ -115,13 +115,7 @@ export default function Landing() {
       </div>
 
       {/* ─── HERO — bg: #090B0A ────────────────────────────── */}
-      <section
-        className="relative z-10"
-        style={{
-          background:
-            "radial-gradient(70% 50% at 10% 0%, rgba(76,138,106,0.14) 0%, transparent 65%), radial-gradient(50% 40% at 90% 10%, rgba(199,163,90,0.09) 0%, transparent 65%), #090B0A",
-        }}
-      >
+      <section className="relative z-10">
         <div className="max-w-5xl mx-auto px-6 md:px-10 pt-28 md:pt-36 pb-20 md:pb-28">
           <motion.h1
             custom={0}
@@ -209,7 +203,7 @@ export default function Landing() {
       </section>
 
       {/* ─── CARDS FLUTUANTES — bg: #0B1512 ───────────────── */}
-      <section style={{ background: "#0B1512" }}>
+      <section className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -335,7 +329,7 @@ export default function Landing() {
       </section>
 
       {/* ─── COMO FUNCIONA — bg: #0B1512 ──────────────────── */}
-      <section style={{ background: "#0B1512" }}>
+      <section className="relative z-10">
         <div className="max-w-5xl mx-auto px-6 md:px-10 py-20 md:py-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -423,7 +417,7 @@ export default function Landing() {
       </section>
 
       {/* ─── PARCELAMENTOS — bg: #0D1511 ──────────────────── */}
-      <section style={{ background: "#0D1511" }}>
+      <section className="relative z-10">
         <div className="max-w-4xl mx-auto px-6 md:px-10 py-20 md:py-28">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
             <div>
@@ -505,7 +499,7 @@ export default function Landing() {
       </section>
 
       {/* ─── ANÁLISES — bg: #0B1512 ───────────────────────── */}
-      <section style={{ background: "#0B1512" }}>
+      <section className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -586,7 +580,7 @@ export default function Landing() {
       </section>
 
       {/* ─── NÚMEROS HONESTOS — bg: #090B0A ───────────────── */}
-      <section style={{ background: "#090B0A" }}>
+      <section className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -633,7 +627,7 @@ export default function Landing() {
       </section>
 
       {/* ─── CTA FINAL — bg: #0B1512 ──────────────────────── */}
-      <section style={{ background: "#0B1512" }}>
+      <section className="relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

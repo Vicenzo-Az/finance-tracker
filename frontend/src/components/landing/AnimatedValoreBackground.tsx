@@ -20,7 +20,7 @@ export function AnimatedValoreBackground() {
         animate={{
           x: [0, 12, -8, 0],
           y: [0, -10, 6, 0],
-          opacity: [0.018, 0.032, 0.022, 0.018],
+          opacity: [0.25, 0.4, 0.3],
         }}
         transition={{
           duration: 24,
@@ -34,19 +34,19 @@ export function AnimatedValoreBackground() {
         <path
           d="M120 180 L280 340 L440 180 L600 340"
           stroke="#7DB99A"
-          strokeWidth="1.4"
+          strokeWidth="4"
           fill="none"
         />
         <path
           d="M900 260 L1060 420 L1220 260 L1380 420"
           stroke="#C7A35A"
-          strokeWidth="1.4"
+          strokeWidth="4"
           fill="none"
         />
         <path
           d="M220 860 L380 1020 L540 860 L700 1020"
           stroke="#7DB99A"
-          strokeWidth="1.4"
+          strokeWidth="4"
           fill="none"
         />
       </motion.svg>
