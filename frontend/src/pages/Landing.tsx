@@ -82,7 +82,7 @@ export default function Landing() {
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 999,
+          zIndex: 50,
           transition: "all 250ms ease",
           boxShadow: scrolled ? "0 12px 40px rgba(0,0,0,0.28)" : "none",
         }}
@@ -150,28 +150,34 @@ export default function Landing() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
           >
-            <button
-              onClick={() => navigate("/register")}
-              className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200"
-            >
-              Começar gratuitamente
-              <ArrowRight
-                size={16}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </button>
-            <button
-              onClick={() => navigate("/login")}
-              className="text-sm text-white/40 hover:text-white/70 transition-colors underline underline-offset-4"
-            >
-              Já tenho conta
-            </button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <button
+                onClick={() => navigate("/register")}
+                className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold bg-[#4C8A6A] hover:bg-[#5A9C78] text-[#090B0A] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Começar gratuitamente
+                <ArrowRight
+                  size={16}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              </button>
+
+              <button
+                onClick={() => navigate("/login")}
+                className="text-sm text-white/40 hover:text-white/70 transition-colors underline underline-offset-4"
+              >
+                Já tenho conta
+              </button>
+            </div>
+
             <div className="flex flex-wrap gap-3 mt-6">
               {["Sem anúncios", "Sem venda de dados", "Sem sync bancário"].map(
                 (item) => (
-                  <div className="px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.02] text-xs text-white/45">
+                  <div
+                    key={item}
+                    className="px-3 py-2 rounded-lg border border-white/[0.08] bg-white/[0.02] text-xs text-white/45"
+                  >
                     {item}
                   </div>
                 ),
@@ -505,12 +511,12 @@ export default function Landing() {
                 </span>
               </div>
               <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight max-w-sm">
-                Números que ajudam a decidir
+                Entenda para onde seu dinheiro está indo
               </h2>
             </div>
             <p className="text-sm text-white/40 max-w-xs md:text-right leading-relaxed">
-              Evolução mensal, por categoria, despesas recorrentes e
-              compromissos futuros — tudo em um só painel.
+              Visualize receitas, despesas e tendências de gastos em um painel
+              claro e útil.
             </p>
           </div>
 
@@ -535,8 +541,7 @@ export default function Landing() {
                 <motion.div
                   key={i}
                   initial={{ scaleY: 0 }}
-                  whileInView={{ scaleY: 1 }}
-                  viewport={{ once: true }}
+                  animate={{ scaleY: 1 }}
                   transition={{
                     duration: 0.45,
                     delay: i * 0.035,
@@ -643,38 +648,23 @@ export default function Landing() {
               className="absolute inset-0 pointer-events-none"
             >
               {[
-                {
-                  label: "Patrimônio",
-                  value: "R$ 24.830",
-                  top: "6%",
-                  left: "50%",
-                },
-                {
-                  label: "Parcela",
-                  value: "R$ 500",
-                  top: "68%",
-                  left: "20%",
-                },
-                {
-                  label: "Receitas",
-                  value: "R$ 5.000",
-                  top: "68%",
-                  left: "80%",
-                },
+                { label: "Patrimônio", value: "R$ 24.830", angle: 0 },
+                { label: "Parcela", value: "R$ 500", angle: 120 },
+                { label: "Receitas", value: "R$ 5.000", angle: 240 },
               ].map((card, i) => (
                 <div
                   key={i}
-                  className="absolute rounded-xl border border-white/[0.08] bg-[#0F1E18]/90 px-4 py-3 shadow-xl backdrop-blur-sm"
+                  className="absolute top-1/2 left-1/2"
                   style={{
-                    top: card.top,
-                    left: card.left,
-                    transform: "translate(-50%, -50%)",
+                    transform: `translate(-50%, -50%) rotate(${card.angle}deg) translateX(170px) rotate(-${card.angle}deg)`,
                   }}
                 >
-                  <p className="text-[10px] text-white/30">{card.label}</p>
-                  <p className="text-sm font-bold text-[#8FC4A6]">
-                    {card.value}
-                  </p>
+                  <div className="rounded-xl border border-white/[0.08] bg-[#0F1E18]/90 px-4 py-3 shadow-xl backdrop-blur-sm">
+                    <p className="text-[10px] text-white/30">{card.label}</p>
+                    <p className="text-sm font-bold text-[#8FC4A6]">
+                      {card.value}
+                    </p>
+                  </div>
                 </div>
               ))}
             </motion.div>
@@ -688,7 +678,7 @@ export default function Landing() {
                 duration: 4,
                 repeat: Infinity,
               }}
-              className="absolute inset-0"
+              className="absolute inset-0 pointer-events-none"
               style={{
                 background:
                   "radial-gradient(circle at center, rgba(76,138,106,0.16), transparent 60%)",
@@ -706,16 +696,11 @@ export default function Landing() {
                 className="flex items-center justify-center mb-6"
               >
                 <div className="relative">
-                  <motion.div
-                    animate={{ scale: [1, 1.12, 1] }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 3,
-                      ease: "easeInOut",
-                    }}
-                    className="absolute inset-0 rounded-full bg-[#4C8A6A]/15"
-                    style={{ margin: "-10px" }}
+                  <div
+                    className="absolute inset-0 rounded-full bg-[#4C8A6A]/12 blur-xl pointer-events-none"
+                    style={{ margin: "-14px" }}
                   />
+
                   <ValoreMark
                     size={44}
                     className="text-[#7DB99A] relative z-10"
@@ -772,9 +757,9 @@ export default function Landing() {
             </nav>
 
             <p className="text-xs text-white/20 text-center md:text-right leading-relaxed">
-              © 2026 Valore · CSTSI / IFSul
+              © 2026 Valore
               <br />
-              Desenvolvido por Vicenzo Escobar de Azambuja
+              Desenvolvido no CSTSI - IFSul
             </p>
           </div>
         </div>
