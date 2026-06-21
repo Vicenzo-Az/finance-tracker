@@ -578,7 +578,7 @@ export default function Landing() {
           transition={{ duration: 0.6 }}
           className="max-w-2xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center"
         >
-          <ValoreMark size={32} variant="moss" className="mx-auto mb-10" />{" "}
+          <ValoreMark size={32} className="text-[#4C8A6A]/40 mx-auto mb-10" />
           <div className="space-y-3 mb-6">
             {honestPoints.map((line, i) => (
               <motion.p
@@ -709,12 +709,7 @@ export default function Landing() {
 
                   <ValoreMark
                     size={44}
-                    className="text-moss-300 relative z-10"
-                  />
-                  <ValoreMark
-                    size={44}
-                    variant="moss"
-                    className="mx-auto mb-10"
+                    className="text-[#7DB99A] relative z-10"
                   />
                 </div>
               </motion.div>
