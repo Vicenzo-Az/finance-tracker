@@ -4,16 +4,17 @@ interface LogoProps {
 }
 
 /**
- * Marca Valore — V aninhado, paths extraídos do logo oficial.
- * viewBox original 1536x1024 preservado para fidelidade total ao desenho.
+ * Marca Valore — V aninhado.
+ * viewBox recortado no bounding box real do desenho (com leve respiro),
+ * eliminando a margem morta do canvas original e garantindo que o
+ * "chão" visual do V coincida com a borda inferior do elemento SVG.
  */
 export function ValoreMark({ size = 32, className = "" }: LogoProps) {
-  const height = size * (1024 / 1536);
   return (
     <svg
       width={size}
-      height={height}
-      viewBox="0 0 1536 1024"
+      height={size}
+      viewBox="306 50 925 925"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
@@ -27,11 +28,11 @@ export function ValoreMark({ size = 32, className = "" }: LogoProps) {
 
 export function ValoreLogo({ size = 28, className = "" }: LogoProps) {
   return (
-    <div className={`flex items-end gap-2 ${className}`}>
+    <div className={`flex items-end gap-2.5 ${className}`}>
       <ValoreMark size={size} className="shrink-0" />
       <span
         className="font-display font-bold tracking-tight leading-none"
-        style={{ fontSize: size * 0.62 }}
+        style={{ fontSize: size * 0.72 }}
       >
         Valore
       </span>

@@ -93,7 +93,7 @@ export default function Landing() {
           transition={{ duration: 0.5 }}
           className="flex items-center justify-between px-6 md:px-10 py-5 max-w-6xl mx-auto"
         >
-          <ValoreLogo size={44} className="text-[#7DB99A]" />
+          <ValoreLogo size={52} className="text-[#7DB99A]" />
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate("/login")}
@@ -401,11 +401,11 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─── PARCELAMENTOS — transição suave com vizinhas ──── */}
+      {/* ─── PARCELAMENTOS — transição suave, sem mancha radial ─── */}
       <section
         style={{
           background:
-            "radial-gradient(55% 60% at 88% 15%, rgba(199,163,90,0.07) 0%, transparent 70%), linear-gradient(180deg, #0B1512 0%, #11201A 14%, #11201A 86%, #0B1512 100%)",
+            "linear-gradient(180deg, #0B1512 0%, #101C16 50%, #0B1512 100%)",
         }}
       >
         <div className="max-w-4xl mx-auto px-6 md:px-10 py-20 md:py-28">
@@ -578,7 +578,7 @@ export default function Landing() {
           transition={{ duration: 0.6 }}
           className="max-w-2xl mx-auto px-6 md:px-10 py-20 md:py-28 text-center"
         >
-          <ValoreMark size={32} className="text-[#4C8A6A]/40 mx-auto mb-10" />
+          <ValoreMark size={84} className="text-[#4C8A6A]/50 mx-auto mb-10" />
           <div className="space-y-3 mb-6">
             {honestPoints.map((line, i) => (
               <motion.p
