@@ -36,7 +36,7 @@ export function ValoreLogo({ size = 28, className = "" }: LogoProps) {
       <ValoreMark
         size={size}
         className="shrink-0"
-        style={{ transform: "translateY(6%)" }}
+        style={{ transform: "translateY(2%)" }}
       />
       <span
         className="font-display font-bold tracking-tight leading-none"
