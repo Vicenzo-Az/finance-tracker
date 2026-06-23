@@ -93,7 +93,7 @@ export default function Landing() {
           transition={{ duration: 0.5 }}
           className="flex items-center justify-between px-6 md:px-10 py-5 max-w-6xl mx-auto"
         >
-          <ValoreLogo size={52} className="text-[#7DB99A]" />
+          <ValoreLogo size={36} className="text-[#7DB99A]" />
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate("/login")}

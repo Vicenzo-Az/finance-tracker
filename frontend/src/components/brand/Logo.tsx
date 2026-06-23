@@ -1,6 +1,9 @@
+import type React from "react";
+
 interface LogoProps {
   size?: number;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -9,7 +12,7 @@ interface LogoProps {
  * eliminando a margem morta do canvas original e garantindo que o
  * "chão" visual do V coincida com a borda inferior do elemento SVG.
  */
-export function ValoreMark({ size = 32, className = "" }: LogoProps) {
+export function ValoreMark({ size = 32, className = "", style }: LogoProps) {
   return (
     <svg
       width={size}
@@ -17,6 +20,7 @@ export function ValoreMark({ size = 32, className = "" }: LogoProps) {
       viewBox="306 50 925 925"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      style={style}
     >
       <g fill="currentColor">
         <path d="M725.8 810.5 c-9.6 -2.4 -17.7 -7.1 -25.3 -14.9 -5.8 -5.9 -9.4 -11.2 -20.9 -31.1 -31 -53.4 -69.4 -118.2 -174.1 -293 -142.5 -237.9 -134.1 -223.7 -135.5 -230 -2.2 -10 2.7 -20.2 12.2 -25.2 l5.3 -2.8 125.5 0 c118.6 0 125.9 0.1 132 1.8 13.6 3.9 27.6 12.6 35.7 22.3 2.2 2.7 8.3 11.9 13.5 20.4 5.2 8.5 16.7 27.2 25.5 41.5 8.7 14.3 23.3 38 32.3 52.7 9 14.8 16.7 26.8 17.1 26.8 0.4 0 2.4 -2.8 4.5 -6.3 20 -33.3 78.5 -126.8 83.4 -133.2 5.9 -7.8 14.6 -14.7 24.5 -19.5 15.1 -7.3 9.4 -7 143.3 -7 136.2 0 127.1 -0.5 135.4 8 3.6 3.8 4.9 6 5.9 10.4 2.3 10.5 4 7.1 -41.9 84.6 -8 13.5 -21.7 36.7 -30.5 51.5 -8.8 14.9 -23.5 39.6 -32.7 55 -53.7 89.9 -120.1 202.1 -179 302.5 -13.4 22.8 -27.4 46.7 -31.1 53.1 -10.7 18.1 -18.1 25.2 -32.5 30.7 l-6.9 2.7 -40 0.2 c-31.7 0.2 -41.2 -0.1 -45.7 -1.2z m83 -33.1 c5.5 -2.2 9.7 -6.8 15.6 -16.9 2.9 -4.9 14.4 -24.7 25.6 -44 35.7 -61.5 98.6 -168 182.5 -309 12.8 -21.4 39.4 -66.3 59.3 -99.8 l36 -60.7 -113.7 0.2 -113.6 0.3 -6.5 3.2 c-10.9 5.4 -7.5 0.4 -64.7 93.3 -13.7 22.3 -28.5 46.4 -32.8 53.5 -10.1 16.7 -15.1 21.8 -22.6 23.5 -4.7 1.1 -6.4 1 -11.1 -0.4 -7.3 -2.1 -10.8 -5.8 -21.4 -23.1 -4.8 -7.7 -12.9 -21 -18.2 -29.5 -10.5 -17.2 -43.6 -71.4 -57.5 -94.3 -9.4 -15.6 -12.6 -19 -21.7 -23.5 l-5.5 -2.7 -114.9 -0.3 -114.9 -0.2 1.5 2.2 c1.8 2.9 98.3 163.8 151.8 253.3 40 66.9 119.9 202.5 153.8 261 4.6 7.9 7.1 10.6 12.8 13.5 3.7 1.8 6.1 1.9 40.2 2 30.6 0 36.8 -0.2 40 -1.6z" />
@@ -28,8 +32,12 @@ export function ValoreMark({ size = 32, className = "" }: LogoProps) {
 
 export function ValoreLogo({ size = 28, className = "" }: LogoProps) {
   return (
-    <div className={`flex items-end gap-2.5 ${className}`}>
-      <ValoreMark size={size} className="shrink-0" />
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <ValoreMark
+        size={size}
+        className="shrink-0"
+        style={{ transform: "translateY(6%)" }}
+      />
       <span
         className="font-display font-bold tracking-tight leading-none"
         style={{ fontSize: size * 0.72 }}
