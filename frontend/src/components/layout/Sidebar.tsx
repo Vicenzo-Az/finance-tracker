@@ -45,8 +45,14 @@ export function Sidebar({ onClose }: Props) {
         )}
       </div>
 
-      {/* Divisor */}
-      <div className="mx-5 h-px bg-white/[0.06] mb-4" />
+      {/* Divisor com acento dourado */}
+      <div
+        className="mx-5 mb-4 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(199,163,90,0.3) 0%, rgba(255,255,255,0.04) 60%)",
+        }}
+      />
 
       {/* Nav */}
       <nav className="flex-1 px-3 space-y-0.5">
@@ -57,10 +63,11 @@ export function Sidebar({ onClose }: Props) {
             end={to === "/"}
             onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
+              /* border sempre presente (1px) para não causar layout shift */
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 border ${
                 isActive
-                  ? "bg-[#4C8A6A]/20 text-[#8FC4A6] border border-[#4C8A6A]/20"
-                  : "text-white/45 hover:text-white/80 hover:bg-white/[0.04]"
+                  ? "border-[#C7A35A]/20 bg-[#C7A35A]/08 text-[#D9B36A]"
+                  : "border-transparent text-white/40 hover:text-white/75 hover:bg-white/[0.04]"
               }`
             }
           >
@@ -69,7 +76,7 @@ export function Sidebar({ onClose }: Props) {
                 <Icon
                   size={17}
                   strokeWidth={isActive ? 2 : 1.75}
-                  className={isActive ? "text-[#7DB99A]" : ""}
+                  style={{ color: isActive ? "#C7A35A" : undefined }}
                 />
                 {label}
               </>
@@ -78,10 +85,16 @@ export function Sidebar({ onClose }: Props) {
         ))}
       </nav>
 
-      {/* Footer da sidebar */}
+      {/* Footer */}
       <div className="px-5 py-5 mt-auto">
-        <div className="h-px bg-white/[0.06] mb-4" />
-        <p className="text-[10px] text-white/20 leading-relaxed">
+        <div
+          className="h-px mb-4"
+          style={{ background: "rgba(255,255,255,0.05)" }}
+        />
+        <p
+          className="text-[10px] leading-relaxed"
+          style={{ color: "rgba(255,255,255,0.18)" }}
+        >
           Valore · CSTSI / IFSul
           <br />© 2026
         </p>
