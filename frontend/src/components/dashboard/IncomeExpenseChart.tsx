@@ -1,8 +1,8 @@
-import { useTheme } from "next-themes";
 import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -14,78 +14,88 @@ type Props = {
   expenses: number;
 };
 
-// ------------------------------------------------------
-interface CustomCursorProps {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  payload?: Array<{ payload: { name: string } }>;
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ value: number; payload: { name: string } }>;
+  label?: string;
 }
 
-// Custom cursor that changes color based on the bar being hovered
-const CustomCursor = (props: CustomCursorProps) => {
-  const { x, y, width, height, payload } = props;
-
-  if (!payload || !payload[0]) return null;
-
-  // Get color based on the data name
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (!active || !payload || !payload.length) return null;
   const isIncome = payload[0].payload.name === "Receita";
-  const fillColor = isIncome
-    ? "rgba(16, 185, 129, 0.1)"
-    : "rgba(175, 37, 37, 0.1)";
-
   return (
-    <rect
-      x={x}
-      y={y}
-      width={width}
-      height={height}
-      fill={fillColor}
-      stroke="none"
-    />
+    <div
+      className="rounded-xl px-4 py-3"
+      style={{
+        background: "#121814",
+        border: "1px solid rgba(255,255,255,0.08)",
+        boxShadow: "0 8px 32px -8px rgba(0,0,0,0.5)",
+      }}
+    >
+      <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+        {label}
+      </p>
+      <p
+        className="text-sm font-semibold font-display"
+        style={{ color: isIncome ? "#8FC4A6" : "#D98B7E" }}
+      >
+        R$ {payload[0].value.toFixed(2)}
+      </p>
+    </div>
   );
 };
-// ------------------------------------------------------
 
 export function IncomeExpenseChart({ income, expenses }: Props) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
-
   const data = [
-    { name: "Receita", value: income, fill: "#10b981" },
-    { name: "Despesas", value: expenses, fill: "#af2525" },
+    { name: "Receita", value: income },
+    { name: "Despesas", value: expenses },
   ];
 
   return (
-    <div className="h-80 w-full rounded-xl border border-border bg-card p-6">
-      <h3 className="text-lg font-medium mb-6">Receita vs Despesas</h3>
+    <div
+      className="h-80 w-full rounded-2xl p-6"
+      style={{
+        background: "#121814",
+        border: "1px solid rgba(255,255,255,0.06)",
+      }}
+    >
+      <h3
+        className="text-sm font-semibold mb-6"
+        style={{ color: "rgba(255,255,255,0.7)" }}
+      >
+        Receita vs Despesas
+      </h3>
 
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height="85%">
         <BarChart
           data={data}
           margin={{ left: 10, right: 10, top: 5, bottom: 5 }}
         >
-          {" "}
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip
-            cursor={<CustomCursor />}
-            contentStyle={{
-              backgroundColor: isDark ? "#1f2937" : "#ffffff",
-              border: `1px solid ${isDark ? "#374151" : "#e5e7eb"}`,
-              borderRadius: "8px",
-            }}
-            itemStyle={{
-              color: isDark ? "#f3f4f6" : "#1f2937",
-            }}
-            labelStyle={{
-              color: isDark ? "#f3f4f6" : "#1f2937",
-              fontWeight: "bold",
-            }}
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="rgba(255,255,255,0.04)"
+            vertical={false}
           />
-          <Bar dataKey="value" radius={[6, 6, 0, 0]} />
+          <XAxis
+            dataKey="name"
+            tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 12 }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <YAxis
+            tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 11 }}
+            axisLine={false}
+            tickLine={false}
+            width={55}
+          />
+          <Tooltip
+            cursor={{ fill: "rgba(255,255,255,0.03)" }}
+            content={<CustomTooltip />}
+          />
+          <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+            <Cell fill="#4C8A6A" fillOpacity={0.85} />
+            <Cell fill="#C94A3F" fillOpacity={0.75} />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
