@@ -1,7 +1,5 @@
 import { CategoryChart } from "@/components/dashboard/CategoryChart";
 import { MonthlyChart } from "@/components/dashboard/MonthlyChart";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   compareMonths,
   getByCategory,
@@ -31,30 +29,53 @@ function formatMonth(value: string): string {
 
 function VariationBadge({ value }: { value: number | null }) {
   if (value === null)
-    return <span className="text-xs text-muted-foreground font-medium">—</span>;
+    return (
+      <span
+        className="text-xs font-medium"
+        style={{ color: "rgba(255,255,255,0.3)" }}
+      >
+        —
+      </span>
+    );
   const isPositive = value > 0;
   const isZero = value === 0;
   return (
     <span
-      className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
+      className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
+      style={
         isZero
-          ? "bg-muted text-muted-foreground"
+          ? {
+              background: "rgba(255,255,255,0.06)",
+              color: "rgba(255,255,255,0.4)",
+            }
           : isPositive
-            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-            : "bg-red-500/10 text-red-600 dark:text-red-400"
-      }`}
+            ? { background: "rgba(76,138,106,0.12)", color: "#8FC4A6" }
+            : { background: "rgba(201,74,63,0.12)", color: "#D98B7E" }
+      }
     >
       {isZero ? (
-        <Minus size={12} />
+        <Minus size={11} />
       ) : isPositive ? (
-        <TrendingUp size={12} />
+        <TrendingUp size={11} />
       ) : (
-        <TrendingDown size={12} />
+        <TrendingDown size={11} />
       )}
       {Math.abs(value)}%
     </span>
   );
 }
+
+const cardStyle = {
+  background: "#121814",
+  border: "1px solid rgba(255,255,255,0.06)",
+  borderRadius: "1rem",
+};
+
+const sectionTitle = "text-base font-semibold mb-4";
+const sectionTitleStyle = { color: "rgba(255,255,255,0.75)" };
+const mutedText = { color: "rgba(255,255,255,0.35)" };
+const thStyle = "text-left px-6 py-3 text-xs font-medium";
+const thStyleRight = "text-right px-6 py-3 text-xs font-medium";
 
 export default function Analytics() {
   const currentYear = new Date().getFullYear();
@@ -125,7 +146,10 @@ export default function Analytics() {
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
+        <Loader2
+          className="w-6 h-6 animate-spin"
+          style={{ color: "#7DB99A" }}
+        />
       </div>
     );
   }
@@ -134,11 +158,21 @@ export default function Analytics() {
     <div className="space-y-10">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight">Análises</h1>
+        <h1
+          className="text-2xl font-display font-semibold tracking-tight"
+          style={{ color: "rgba(255,255,255,0.9)" }}
+        >
+          Análises
+        </h1>
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className="text-sm border border-border rounded-md px-3 h-9 bg-background outline-none"
+          className="text-sm rounded-xl px-3 h-9 outline-none"
+          style={{
+            background: "#121814",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.7)",
+          }}
         >
           {years.map((y) => (
             <option key={y} value={y}>
@@ -148,40 +182,56 @@ export default function Analytics() {
         </select>
       </div>
 
-      {/* Resumo geral */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Cards de resumo */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           {
             label: "Patrimônio Total",
             value: summary?.net_worth ?? 0,
-            color: "text-emerald-500",
+            color: "#8FC4A6",
+            accent: "rgba(76,138,106,0.5)",
           },
           {
             label: "Total Receitas",
             value: summary?.income ?? 0,
-            color: "text-emerald-400",
+            color: "#8FC4A6",
+            accent: "rgba(76,138,106,0.4)",
           },
           {
             label: "Total Despesas",
             value: summary?.expense ?? 0,
-            color: "text-red-400",
+            color: "#D98B7E",
+            accent: "rgba(201,74,63,0.45)",
           },
           {
             label: "Saldo Líquido",
             value: summary?.balance ?? 0,
-            color:
-              (summary?.balance ?? 0) >= 0 ? "text-blue-400" : "text-red-400",
+            color: "#D9B36A",
+            accent: "rgba(199,163,90,0.45)",
           },
         ].map((item) => (
-          <Card key={item.label} className="relative overflow-hidden">
-            <div className="absolute top-0 left-0 h-1 w-full bg-emerald-500/40" />
-            <CardContent className="p-5">
-              <p className="text-xs text-muted-foreground mb-1">{item.label}</p>
-              <p className={`text-xl font-bold ${item.color}`}>
-                R$ {item.value.toFixed(2)}
-              </p>
-            </CardContent>
-          </Card>
+          <div
+            key={item.label}
+            className="relative overflow-hidden rounded-2xl p-5 pt-6"
+            style={{
+              background: "#121814",
+              border: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div
+              className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
+              style={{ background: item.accent }}
+            />
+            <p className="text-xs font-medium mb-2" style={mutedText}>
+              {item.label}
+            </p>
+            <p
+              className="text-xl font-bold font-display"
+              style={{ color: item.color }}
+            >
+              R$ {item.value.toFixed(2)}
+            </p>
+          </div>
         ))}
       </div>
 
@@ -189,26 +239,32 @@ export default function Analytics() {
       {monthly.length > 0 ? (
         <MonthlyChart data={monthly} />
       ) : (
-        <Card className="p-8 text-center text-muted-foreground text-sm">
+        <div
+          className="p-8 text-center rounded-2xl text-sm"
+          style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+        >
           Sem dados mensais para {selectedYear}
-        </Card>
+        </div>
       )}
 
       {/* Distribuição por categoria */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">
+        <h2 className={sectionTitle} style={sectionTitleStyle}>
           Distribuição por Categoria
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {expenseByCategory.length > 0 ? (
             <CategoryChart
               data={expenseByCategory}
               title="Despesas por Categoria"
             />
           ) : (
-            <Card className="p-8 text-center text-muted-foreground text-sm">
+            <div
+              className="p-8 text-center rounded-2xl text-sm"
+              style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+            >
               Sem despesas registradas
-            </Card>
+            </div>
           )}
           {incomeByCategory.length > 0 ? (
             <CategoryChart
@@ -216,9 +272,12 @@ export default function Analytics() {
               title="Receitas por Categoria"
             />
           ) : (
-            <Card className="p-8 text-center text-muted-foreground text-sm">
+            <div
+              className="p-8 text-center rounded-2xl text-sm"
+              style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+            >
               Sem receitas registradas
-            </Card>
+            </div>
           )}
         </div>
       </div>
@@ -226,428 +285,500 @@ export default function Analytics() {
       {/* Ranking de despesas */}
       {expenseByCategory.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-4">Ranking de Despesas</h2>
-          <Card>
-            <CardContent className="p-0">
-              {/* Desktop */}
-              <table className="w-full text-sm hidden md:table">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left px-6 py-3 text-muted-foreground font-medium">
-                      #
-                    </th>
-                    <th className="text-left px-6 py-3 text-muted-foreground font-medium">
-                      Categoria
-                    </th>
-                    <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                      Total
-                    </th>
-                    <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                      % do total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {expenseByCategory.map((cat, index) => {
-                    const totalExpense = expenseByCategory.reduce(
-                      (acc, c) => acc + c.total,
-                      0,
-                    );
-                    const pct =
-                      totalExpense > 0
-                        ? ((cat.total / totalExpense) * 100).toFixed(1)
-                        : "0";
-                    return (
-                      <tr
-                        key={cat.category_id}
-                        className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
-                      >
-                        <td className="px-6 py-3 text-muted-foreground">
-                          {index + 1}
-                        </td>
-                        <td className="px-6 py-3">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="w-3 h-3 rounded-full shrink-0"
-                              style={{ backgroundColor: cat.category_color }}
-                            />
-                            {cat.category_name}
-                          </div>
-                        </td>
-                        <td className="px-6 py-3 text-right font-medium text-red-400">
-                          R$ {cat.total.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-3 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-red-400"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                            <span className="text-muted-foreground w-10 text-right">
-                              {pct}%
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-
-              {/* Mobile */}
-              <div className="md:hidden divide-y divide-border">
+          <h2 className={sectionTitle} style={sectionTitleStyle}>
+            Ranking de Despesas
+          </h2>
+          <div style={cardStyle}>
+            <table className="w-full text-sm hidden md:table">
+              <thead>
+                <tr
+                  style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                >
+                  <th className={thStyle} style={mutedText}>
+                    #
+                  </th>
+                  <th className={thStyle} style={mutedText}>
+                    Categoria
+                  </th>
+                  <th className={thStyleRight} style={mutedText}>
+                    Total
+                  </th>
+                  <th className={thStyleRight} style={mutedText}>
+                    % do total
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
                 {expenseByCategory.map((cat, index) => {
-                  const totalExpense = expenseByCategory.reduce(
+                  const total = expenseByCategory.reduce(
                     (acc, c) => acc + c.total,
                     0,
                   );
                   const pct =
-                    totalExpense > 0
-                      ? ((cat.total / totalExpense) * 100).toFixed(1)
-                      : "0";
+                    total > 0 ? ((cat.total / total) * 100).toFixed(1) : "0";
                   return (
-                    <div
+                    <tr
                       key={cat.category_id}
-                      className="px-4 py-3 flex items-center gap-3"
+                      style={{
+                        borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      }}
                     >
-                      <span className="text-xs text-muted-foreground w-4">
+                      <td className="px-6 py-3 text-sm" style={mutedText}>
                         {index + 1}
-                      </span>
-                      <span
-                        className="w-3 h-3 rounded-full shrink-0"
-                        style={{ backgroundColor: cat.category_color }}
-                      />
-                      <span className="flex-1 text-sm">
-                        {cat.category_name}
-                      </span>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-red-400">
-                          R$ {cat.total.toFixed(2)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{pct}%</p>
-                      </div>
-                    </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ background: cat.category_color }}
+                          />
+                          <span
+                            className="text-sm"
+                            style={{ color: "rgba(255,255,255,0.75)" }}
+                          >
+                            {cat.category_name}
+                          </span>
+                        </div>
+                      </td>
+                      <td
+                        className="px-6 py-3 text-right text-sm font-medium"
+                        style={{ color: "#D98B7E" }}
+                      >
+                        R$ {cat.total.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <div
+                            className="w-16 h-1.5 rounded-full overflow-hidden"
+                            style={{ background: "rgba(255,255,255,0.06)" }}
+                          >
+                            <div
+                              className="h-full rounded-full"
+                              style={{
+                                width: `${pct}%`,
+                                background: "#C94A3F",
+                                opacity: 0.7,
+                              }}
+                            />
+                          </div>
+                          <span
+                            className="text-xs w-10 text-right"
+                            style={mutedText}
+                          >
+                            {pct}%
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })}
-              </div>
-            </CardContent>
-          </Card>
+              </tbody>
+            </table>
+            <div
+              className="md:hidden divide-y"
+              style={{ borderColor: "rgba(255,255,255,0.04)" }}
+            >
+              {expenseByCategory.map((cat, index) => {
+                const total = expenseByCategory.reduce(
+                  (acc, c) => acc + c.total,
+                  0,
+                );
+                const pct =
+                  total > 0 ? ((cat.total / total) * 100).toFixed(1) : "0";
+                return (
+                  <div
+                    key={cat.category_id}
+                    className="px-4 py-3 flex items-center gap-3"
+                  >
+                    <span className="text-xs w-4" style={mutedText}>
+                      {index + 1}
+                    </span>
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ background: cat.category_color }}
+                    />
+                    <span
+                      className="flex-1 text-sm"
+                      style={{ color: "rgba(255,255,255,0.7)" }}
+                    >
+                      {cat.category_name}
+                    </span>
+                    <div className="text-right">
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: "#D98B7E" }}
+                      >
+                        R$ {cat.total.toFixed(2)}
+                      </p>
+                      <p className="text-xs" style={mutedText}>
+                        {pct}%
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 
       {/* Despesas recorrentes */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Despesas Recorrentes</h2>
+        <h2 className={sectionTitle} style={sectionTitleStyle}>
+          Despesas Recorrentes
+        </h2>
         {!recurring || recurring.by_category.length === 0 ? (
-          <Card className="p-8 text-center text-muted-foreground text-sm">
+          <div
+            className="p-8 text-center rounded-2xl text-sm"
+            style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+          >
             Nenhuma despesa marcada como recorrente ainda.
-          </Card>
+          </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
                 {
                   label: "Média mensal total",
                   value: `R$ ${recurring.average_monthly.toFixed(2)}`,
-                  color: "text-red-400",
+                  color: "#D98B7E",
                 },
                 {
                   label: "Total registrado",
                   value: `R$ ${recurring.total_recurring.toFixed(2)}`,
-                  color: "",
+                  color: "rgba(255,255,255,0.8)",
                 },
                 {
                   label: "Meses com recorrentes",
                   value: String(recurring.n_months),
-                  color: "",
+                  color: "rgba(255,255,255,0.8)",
                 },
               ].map((item) => (
-                <Card key={item.label}>
-                  <CardContent className="p-5">
-                    <p className="text-xs text-muted-foreground mb-1">
-                      {item.label}
-                    </p>
-                    <p className={`text-xl font-bold ${item.color}`}>
-                      {item.value}
-                    </p>
-                  </CardContent>
-                </Card>
+                <div
+                  key={item.label}
+                  className="rounded-2xl p-5"
+                  style={cardStyle}
+                >
+                  <p className="text-xs mb-1 font-medium" style={mutedText}>
+                    {item.label}
+                  </p>
+                  <p
+                    className="text-xl font-bold font-display"
+                    style={{ color: item.color }}
+                  >
+                    {item.value}
+                  </p>
+                </div>
               ))}
             </div>
-            <Card>
-              <CardContent className="p-0">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left px-6 py-3 text-muted-foreground font-medium">
-                        Categoria
-                      </th>
-                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                        Total
-                      </th>
-                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                        Média/mês
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recurring.by_category.map((cat) => (
-                      <tr
-                        key={cat.category_id}
-                        className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
-                      >
-                        <td className="px-6 py-3">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="w-3 h-3 rounded-full shrink-0"
-                              style={{ backgroundColor: cat.category_color }}
-                            />
+            <div style={cardStyle}>
+              <table className="w-full text-sm">
+                <thead>
+                  <tr
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                  >
+                    <th className={thStyle} style={mutedText}>
+                      Categoria
+                    </th>
+                    <th className={thStyleRight} style={mutedText}>
+                      Total
+                    </th>
+                    <th className={thStyleRight} style={mutedText}>
+                      Média/mês
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recurring.by_category.map((cat) => (
+                    <tr
+                      key={cat.category_id}
+                      style={{
+                        borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      }}
+                    >
+                      <td className="px-6 py-3">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ background: cat.category_color }}
+                          />
+                          <span style={{ color: "rgba(255,255,255,0.75)" }}>
                             {cat.category_name}
-                          </div>
-                        </td>
-                        <td className="px-6 py-3 text-right font-medium text-red-400">
-                          R$ {cat.total.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-3 text-right text-muted-foreground">
-                          R$ {cat.monthly_average.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
+                          </span>
+                        </div>
+                      </td>
+                      <td
+                        className="px-6 py-3 text-right font-medium"
+                        style={{ color: "#D98B7E" }}
+                      >
+                        R$ {cat.total.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-3 text-right" style={mutedText}>
+                        R$ {cat.monthly_average.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
 
       {/* Compromissos futuros */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Compromissos Futuros</h2>
+        <h2 className={sectionTitle} style={sectionTitleStyle}>
+          Compromissos Futuros
+        </h2>
         {!futureCommitments || futureCommitments.total_pending === 0 ? (
-          <Card className="p-8 text-center text-muted-foreground text-sm">
+          <div
+            className="p-8 text-center rounded-2xl text-sm"
+            style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+          >
             Nenhuma parcela pendente.
-          </Card>
+          </div>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card>
-                <CardContent className="p-5">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Total pendente
-                  </p>
-                  <p className="text-xl font-bold text-red-400">
-                    R$ {futureCommitments.total_pending.toFixed(2)}
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-5">
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Compras parceladas ativas
-                  </p>
-                  <p className="text-xl font-bold">
-                    {futureCommitments.by_group.length}
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="rounded-2xl p-5" style={cardStyle}>
+                <p className="text-xs mb-1 font-medium" style={mutedText}>
+                  Total pendente
+                </p>
+                <p
+                  className="text-xl font-bold font-display"
+                  style={{ color: "#D9B36A" }}
+                >
+                  R$ {futureCommitments.total_pending.toFixed(2)}
+                </p>
+              </div>
+              <div className="rounded-2xl p-5" style={cardStyle}>
+                <p className="text-xs mb-1 font-medium" style={mutedText}>
+                  Compras parceladas ativas
+                </p>
+                <p
+                  className="text-xl font-bold"
+                  style={{ color: "rgba(255,255,255,0.8)" }}
+                >
+                  {futureCommitments.by_group.length}
+                </p>
+              </div>
             </div>
-
-            {/* Por compra */}
-            <Card>
-              <CardContent className="p-0">
-                {/* Desktop */}
-                <table className="w-full text-sm hidden md:table">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left px-6 py-3 text-muted-foreground font-medium">
-                        Descrição
-                      </th>
-                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                        Parcelas restantes
-                      </th>
-                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                        Valor/parcela
-                      </th>
-                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                        Total restante
-                      </th>
-                      <th className="text-right px-6 py-3 text-muted-foreground font-medium">
-                        Próximo venc.
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {futureCommitments.by_group.map((group) => (
-                      <tr
-                        key={group.installment_group_id}
-                        className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors"
-                      >
-                        <td className="px-6 py-3 font-medium">
-                          {group.description}
-                        </td>
-                        <td className="px-6 py-3 text-right text-muted-foreground">
-                          {group.remaining_installments}/
-                          {group.installment_total}
-                        </td>
-                        <td className="px-6 py-3 text-right">
-                          R$ {group.installment_amount.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-3 text-right font-medium text-red-400">
-                          R$ {group.remaining_total.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-3 text-right text-muted-foreground">
-                          {new Date(
-                            group.next_due + "T00:00:00",
-                          ).toLocaleDateString("pt-BR", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* Mobile */}
-                <div className="md:hidden divide-y divide-border">
+            <div style={cardStyle}>
+              <table className="w-full text-sm hidden md:table">
+                <thead>
+                  <tr
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                  >
+                    <th className={thStyle} style={mutedText}>
+                      Descrição
+                    </th>
+                    <th className={thStyleRight} style={mutedText}>
+                      Parcelas restantes
+                    </th>
+                    <th className={thStyleRight} style={mutedText}>
+                      Valor/parcela
+                    </th>
+                    <th className={thStyleRight} style={mutedText}>
+                      Total restante
+                    </th>
+                    <th className={thStyleRight} style={mutedText}>
+                      Próximo venc.
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
                   {futureCommitments.by_group.map((group) => (
-                    <div
+                    <tr
                       key={group.installment_group_id}
-                      className="px-4 py-3 space-y-1"
+                      style={{
+                        borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      }}
                     >
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">
-                          {group.description}
-                        </p>
-                        <p className="text-sm font-medium text-red-400">
-                          R$ {group.remaining_total.toFixed(2)}
-                        </p>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>
-                          {group.remaining_installments}/
-                          {group.installment_total} parcelas · R${" "}
-                          {group.installment_amount.toFixed(2)}/mês
-                        </span>
-                        <span>
-                          Venc.{" "}
-                          {new Date(
-                            group.next_due + "T00:00:00",
-                          ).toLocaleDateString("pt-BR", {
-                            day: "2-digit",
-                            month: "short",
-                          })}
-                        </span>
-                      </div>
-                    </div>
+                      <td
+                        className="px-6 py-3 font-medium"
+                        style={{ color: "rgba(255,255,255,0.75)" }}
+                      >
+                        {group.description}
+                      </td>
+                      <td className="px-6 py-3 text-right" style={mutedText}>
+                        {group.remaining_installments}/{group.installment_total}
+                      </td>
+                      <td
+                        className="px-6 py-3 text-right"
+                        style={{ color: "rgba(255,255,255,0.6)" }}
+                      >
+                        R$ {group.installment_amount.toFixed(2)}
+                      </td>
+                      <td
+                        className="px-6 py-3 text-right font-medium"
+                        style={{ color: "#D9B36A" }}
+                      >
+                        R$ {group.remaining_total.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-3 text-right" style={mutedText}>
+                        {new Date(
+                          group.next_due + "T00:00:00",
+                        ).toLocaleDateString("pt-BR", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
-
-      {/* Comparativo entre meses */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Comparar Meses</h2>
-        <Card>
-          <CardContent className="p-6 space-y-6">
-            <div className="flex items-end gap-3 flex-wrap">
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground font-medium">
-                  Mês A
-                </label>
-                <input
-                  type="month"
-                  value={compareA}
-                  onChange={(e) => setCompareA(e.target.value)}
-                  className="text-sm border border-border rounded-md px-3 h-9 bg-background outline-none block"
-                />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground font-medium">
-                  Mês B
-                </label>
-                <input
-                  type="month"
-                  value={compareB}
-                  onChange={(e) => setCompareB(e.target.value)}
-                  className="text-sm border border-border rounded-md px-3 h-9 bg-background outline-none block"
-                />
-              </div>
-              <Button
-                variant="outline"
-                className="gap-2 h-9"
-                onClick={handleCompare}
-                disabled={isLoadingCompare}
+                </tbody>
+              </table>
+              <div
+                className="md:hidden divide-y"
+                style={{ borderColor: "rgba(255,255,255,0.04)" }}
               >
-                {isLoadingCompare ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <RefreshCw size={14} />
-                )}
-                Comparar
-              </Button>
-            </div>
-
-            {compareData && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {[
-                  {
-                    label: "Receitas",
-                    key: "income" as const,
-                    color: "text-emerald-500",
-                  },
-                  {
-                    label: "Despesas",
-                    key: "expense" as const,
-                    color: "text-red-400",
-                  },
-                  {
-                    label: "Saldo",
-                    key: "balance" as const,
-                    color: "text-blue-400",
-                  },
-                ].map(({ label, key, color }) => (
-                  <div key={key} className="space-y-3">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {label}
-                    </p>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-0.5 capitalize">
-                          {formatMonth(compareA)}
-                        </p>
-                        <p className={`text-lg font-bold ${color}`}>
-                          R$ {compareData.month_a[key].toFixed(2)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground mb-0.5 capitalize">
-                          {formatMonth(compareB)}
-                        </p>
-                        <p className={`text-lg font-bold ${color}`}>
-                          R$ {compareData.month_b[key].toFixed(2)}
-                        </p>
-                      </div>
+                {futureCommitments.by_group.map((group) => (
+                  <div
+                    key={group.installment_group_id}
+                    className="px-4 py-3 space-y-1"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: "rgba(255,255,255,0.75)" }}
+                      >
+                        {group.description}
+                      </p>
+                      <p
+                        className="text-sm font-medium"
+                        style={{ color: "#D9B36A" }}
+                      >
+                        R$ {group.remaining_total.toFixed(2)}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <VariationBadge value={compareData.variation[key]} />
-                      <span className="text-xs text-muted-foreground">
-                        vs mês B
+                    <div
+                      className="flex items-center justify-between text-xs"
+                      style={mutedText}
+                    >
+                      <span>
+                        {group.remaining_installments}/{group.installment_total}{" "}
+                        parcelas · R$ {group.installment_amount.toFixed(2)}/mês
+                      </span>
+                      <span>
+                        Venc.{" "}
+                        {new Date(
+                          group.next_due + "T00:00:00",
+                        ).toLocaleDateString("pt-BR", {
+                          day: "2-digit",
+                          month: "short",
+                        })}
                       </span>
                     </div>
                   </div>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Comparar meses */}
+      <div>
+        <h2 className={sectionTitle} style={sectionTitleStyle}>
+          Comparar Meses
+        </h2>
+        <div className="rounded-2xl p-6" style={cardStyle}>
+          <div className="flex items-end gap-3 flex-wrap mb-6">
+            {[
+              { label: "Mês A", value: compareA, set: setCompareA },
+              { label: "Mês B", value: compareB, set: setCompareB },
+            ].map((f) => (
+              <div key={f.label} className="space-y-1">
+                <label className="text-xs font-medium" style={mutedText}>
+                  {f.label}
+                </label>
+                <input
+                  type="month"
+                  value={f.value}
+                  onChange={(e) => f.set(e.target.value)}
+                  className="text-sm rounded-xl px-3 h-9 outline-none block"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.7)",
+                  }}
+                />
+              </div>
+            ))}
+            <button
+              onClick={handleCompare}
+              disabled={isLoadingCompare}
+              className="flex items-center gap-2 px-4 h-9 rounded-xl text-sm font-medium transition-all"
+              style={{
+                border: "1px solid rgba(255,255,255,0.08)",
+                color: "rgba(255,255,255,0.5)",
+              }}
+            >
+              {isLoadingCompare ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <RefreshCw size={14} />
+              )}
+              Comparar
+            </button>
+          </div>
+
+          {compareData && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { label: "Receitas", key: "income" as const, color: "#8FC4A6" },
+                {
+                  label: "Despesas",
+                  key: "expense" as const,
+                  color: "#D98B7E",
+                },
+                { label: "Saldo", key: "balance" as const, color: "#D9B36A" },
+              ].map(({ label, key, color }) => (
+                <div key={key} className="space-y-3">
+                  <p className="text-sm font-medium" style={mutedText}>
+                    {label}
+                  </p>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p
+                        className="text-xs mb-0.5 capitalize"
+                        style={mutedText}
+                      >
+                        {formatMonth(compareA)}
+                      </p>
+                      <p
+                        className="text-lg font-bold font-display"
+                        style={{ color }}
+                      >
+                        R$ {compareData.month_a[key].toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p
+                        className="text-xs mb-0.5 capitalize"
+                        style={mutedText}
+                      >
+                        {formatMonth(compareB)}
+                      </p>
+                      <p
+                        className="text-lg font-bold font-display"
+                        style={{ color }}
+                      >
+                        R$ {compareData.month_b[key].toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <VariationBadge value={compareData.variation[key]} />
+                    <span className="text-xs" style={mutedText}>
+                      vs mês B
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
