@@ -1,3 +1,4 @@
+import { useTheme } from "next-themes";
 import {
   Bar,
   BarChart,
@@ -16,28 +17,37 @@ type Props = {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: Array<{ value: number; payload: { name: string } }>;
-  label?: string;
+  payload?: ReadonlyArray<{ value: number; payload: { name: string } }>;
+  label?: string | number;
+  isDark: boolean;
 }
 
-const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  isDark,
+}: CustomTooltipProps) => {
   if (!active || !payload || !payload.length) return null;
   const isIncome = payload[0].payload.name === "Receita";
   return (
     <div
       className="rounded-xl px-4 py-3"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.08)",
-        boxShadow: "0 8px 32px -8px rgba(0,0,0,0.5)",
+        background: isDark ? "#121814" : "#ffffff",
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "#e5e8e1"}`,
+        boxShadow: "0 8px 32px -8px rgba(0,0,0,0.2)",
       }}
     >
-      <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+      <p
+        className="text-xs mb-1"
+        style={{ color: isDark ? "rgba(255,255,255,0.4)" : "#6B7A70" }}
+      >
         {label}
       </p>
       <p
         className="text-sm font-semibold font-display"
-        style={{ color: isIncome ? "#8FC4A6" : "#D98B7E" }}
+        style={{ color: isIncome ? "#4C8A6A" : "#C94A3F" }}
       >
         R$ {payload[0].value.toFixed(2)}
       </p>
@@ -46,6 +56,13 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export function IncomeExpenseChart({ income, expenses }: Props) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  const gridColor = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)";
+  const axisColor = isDark ? "rgba(255,255,255,0.35)" : "#6B7A70";
+  const axisColorMuted = isDark ? "rgba(255,255,255,0.25)" : "#8A928B";
+
   const data = [
     { name: "Receita", value: income },
     { name: "Despesas", value: expenses },
@@ -55,13 +72,13 @@ export function IncomeExpenseChart({ income, expenses }: Props) {
     <div
       className="h-80 w-full rounded-2xl p-6"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--surface-card)",
+        border: "1px solid var(--border-subtle)",
       }}
     >
       <h3
         className="text-sm font-semibold mb-6"
-        style={{ color: "rgba(255,255,255,0.7)" }}
+        style={{ color: "var(--text-secondary)" }}
       >
         Receita vs Despesas
       </h3>
@@ -73,24 +90,26 @@ export function IncomeExpenseChart({ income, expenses }: Props) {
         >
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="rgba(255,255,255,0.04)"
+            stroke={gridColor}
             vertical={false}
           />
           <XAxis
             dataKey="name"
-            tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 12 }}
+            tick={{ fill: axisColor, fontSize: 12 }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 11 }}
+            tick={{ fill: axisColorMuted, fontSize: 11 }}
             axisLine={false}
             tickLine={false}
             width={55}
           />
           <Tooltip
-            cursor={{ fill: "rgba(255,255,255,0.03)" }}
-            content={<CustomTooltip />}
+            cursor={{
+              fill: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+            }}
+            content={(props) => <CustomTooltip {...props} isDark={isDark} />}
           />
           <Bar dataKey="value" radius={[8, 8, 0, 0]}>
             <Cell fill="#4C8A6A" fillOpacity={0.85} />

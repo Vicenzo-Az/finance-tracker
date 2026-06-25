@@ -7,11 +7,7 @@ interface Props {
 
 function VariationBadge({ value }: { value: number | null }) {
   if (value === null)
-    return (
-      <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-        —
-      </span>
-    );
+    return <span className="text-xs text-muted-foreground">—</span>;
 
   const isPositive = value > 0;
   const isZero = value === 0;
@@ -22,12 +18,13 @@ function VariationBadge({ value }: { value: number | null }) {
       style={
         isZero
           ? {
-              background: "rgba(255,255,255,0.06)",
-              color: "rgba(255,255,255,0.4)",
+              background:
+                "color-mix(in srgb, var(--foreground) 8%, transparent)",
+              color: "var(--text-muted)",
             }
           : isPositive
-            ? { background: "rgba(76,138,106,0.12)", color: "#8FC4A6" }
-            : { background: "rgba(201,74,63,0.12)", color: "#D98B7E" }
+            ? { background: "rgba(76,138,106,0.12)", color: "#4C8A6A" }
+            : { background: "rgba(201,74,63,0.12)", color: "#C94A3F" }
       }
     >
       {isZero ? (
@@ -51,21 +48,21 @@ export function TrendsCard({ trends }: Props) {
       current: current_month.income,
       previous: previous_month.income,
       variation: variation.income,
-      color: "#8FC4A6",
+      color: "#4C8A6A",
     },
     {
       label: "Despesas",
       current: current_month.expense,
       previous: previous_month.expense,
       variation: variation.expense,
-      color: "#D98B7E",
+      color: "#C94A3F",
     },
     {
       label: "Saldo",
       current: current_month.balance,
       previous: previous_month.balance,
       variation: variation.balance,
-      color: "#D9B36A", // gold — saldo como indicador de patrimônio
+      color: "#C7A35A",
     },
   ];
 
@@ -73,18 +70,18 @@ export function TrendsCard({ trends }: Props) {
     <div
       className="rounded-2xl p-6"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--surface-card)",
+        border: "1px solid var(--border-subtle)",
       }}
     >
       <div className="flex items-center justify-between mb-6">
         <h3
           className="text-sm font-semibold"
-          style={{ color: "rgba(255,255,255,0.7)" }}
+          style={{ color: "var(--text-secondary)" }}
         >
           Comparativo Mensal
         </h3>
-        <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+        <span className="text-xs" style={{ color: "var(--text-muted)" }}>
           vs. mês anterior
         </span>
       </div>
@@ -94,7 +91,7 @@ export function TrendsCard({ trends }: Props) {
           <div key={item.label} className="space-y-1.5">
             <p
               className="text-xs font-medium"
-              style={{ color: "rgba(255,255,255,0.35)" }}
+              style={{ color: "var(--text-muted)" }}
             >
               {item.label}
             </p>
@@ -106,10 +103,7 @@ export function TrendsCard({ trends }: Props) {
             </p>
             <div className="flex items-center gap-2">
               <VariationBadge value={item.variation} />
-              <span
-                className="text-xs"
-                style={{ color: "rgba(255,255,255,0.25)" }}
-              >
+              <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                 R$ {item.previous.toFixed(2)} antes
               </span>
             </div>

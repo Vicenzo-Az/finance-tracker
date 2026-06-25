@@ -1,4 +1,5 @@
 import type { MonthlyData } from "@/types";
+import { useTheme } from "next-themes";
 import {
   CartesianGrid,
   Legend,
@@ -22,24 +23,30 @@ function formatMonth(month: string): string {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: Array<{ name: string; value: number; color: string }>;
-  label?: string;
+  payload?: ReadonlyArray<{ name: string; value: number; color: string }>;
+  label?: string | number;
+  isDark: boolean;
 }
 
-const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+  isDark,
+}: CustomTooltipProps) => {
   if (!active || !payload || !payload.length) return null;
   return (
     <div
       className="rounded-xl px-4 py-3 min-w-[160px]"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.08)",
-        boxShadow: "0 8px 32px -8px rgba(0,0,0,0.5)",
+        background: isDark ? "#121814" : "#ffffff",
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "#e5e8e1"}`,
+        boxShadow: "0 8px 32px -8px rgba(0,0,0,0.2)",
       }}
     >
       <p
         className="text-xs mb-2 font-medium"
-        style={{ color: "rgba(255,255,255,0.4)" }}
+        style={{ color: isDark ? "rgba(255,255,255,0.4)" : "#6B7A70" }}
       >
         {label}
       </p>
@@ -48,7 +55,10 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
           key={entry.name}
           className="flex items-center justify-between gap-4 mb-1"
         >
-          <span className="text-xs" style={{ color: "rgba(255,255,255,0.45)" }}>
+          <span
+            className="text-xs"
+            style={{ color: isDark ? "rgba(255,255,255,0.45)" : "#4A5750" }}
+          >
             {entry.name}
           </span>
           <span
@@ -64,6 +74,14 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 export function MonthlyChart({ data }: Props) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+
+  const gridColor = isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)";
+  const axisColor = isDark ? "rgba(255,255,255,0.35)" : "#6B7A70";
+  const axisColorMuted = isDark ? "rgba(255,255,255,0.25)" : "#8A928B";
+  const legendColor = isDark ? "rgba(255,255,255,0.45)" : "#4A5750";
+
   const chartData = data.map((d) => ({
     ...d,
     month: formatMonth(d.month),
@@ -73,13 +91,13 @@ export function MonthlyChart({ data }: Props) {
     <div
       className="w-full rounded-2xl p-6"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--surface-card)",
+        border: "1px solid var(--border-subtle)",
       }}
     >
       <h3
         className="text-sm font-semibold mb-6"
-        style={{ color: "rgba(255,255,255,0.7)" }}
+        style={{ color: "var(--text-secondary)" }}
       >
         Evolução Mensal
       </h3>
@@ -91,27 +109,29 @@ export function MonthlyChart({ data }: Props) {
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.04)"
+              stroke={gridColor}
               vertical={false}
             />
             <XAxis
               dataKey="month"
-              tick={{ fill: "rgba(255,255,255,0.35)", fontSize: 11 }}
+              tick={{ fill: axisColor, fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 11 }}
+              tick={{ fill: axisColorMuted, fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               width={55}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip
+              content={(props) => <CustomTooltip {...props} isDark={isDark} />}
+            />
             <Legend
               iconType="circle"
               iconSize={8}
               formatter={(value) => (
-                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 12 }}>
+                <span style={{ color: legendColor, fontSize: 12 }}>
                   {value}
                 </span>
               )}
@@ -134,7 +154,6 @@ export function MonthlyChart({ data }: Props) {
               dot={{ r: 3, fill: "#C94A3F", strokeWidth: 0 }}
               activeDot={{ r: 5, fill: "#D98B7E", strokeWidth: 0 }}
             />
-            {/* Saldo em dourado — gold finalmente na linha do patrimônio */}
             <Line
               type="monotone"
               dataKey="balance"

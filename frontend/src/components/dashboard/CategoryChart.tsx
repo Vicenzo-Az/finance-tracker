@@ -1,4 +1,5 @@
 import type { CategoryData } from "@/types";
+import { useTheme } from "next-themes";
 import {
   Cell,
   Legend,
@@ -15,23 +16,24 @@ interface Props {
 
 interface CustomTooltipProps {
   active?: boolean;
-  payload?: Array<{
+  payload?: ReadonlyArray<{
     name: string;
     value: number;
     payload: { category_color: string };
   }>;
+  isDark: boolean;
 }
 
-const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+const CustomTooltip = ({ active, payload, isDark }: CustomTooltipProps) => {
   if (!active || !payload || !payload.length) return null;
   const item = payload[0];
   return (
     <div
       className="rounded-xl px-4 py-3"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.08)",
-        boxShadow: "0 8px 32px -8px rgba(0,0,0,0.5)",
+        background: isDark ? "#121814" : "#ffffff",
+        border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "#e5e8e1"}`,
+        boxShadow: "0 8px 32px -8px rgba(0,0,0,0.2)",
       }}
     >
       <div className="flex items-center gap-2 mb-1">
@@ -39,13 +41,16 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
           className="w-2 h-2 rounded-full shrink-0"
           style={{ background: item.payload.category_color }}
         />
-        <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+        <p
+          className="text-xs"
+          style={{ color: isDark ? "rgba(255,255,255,0.4)" : "#6B7A70" }}
+        >
           {item.name}
         </p>
       </div>
       <p
         className="text-sm font-semibold font-display"
-        style={{ color: "#D9B36A" }}
+        style={{ color: "#C7A35A" }}
       >
         R$ {item.value.toFixed(2)}
       </p>
@@ -53,7 +58,6 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   );
 };
 
-// Paleta que harmoniza com o design system quando as categorias não têm cor própria
 const FALLBACK_COLORS = [
   "#4C8A6A",
   "#C7A35A",
@@ -69,17 +73,21 @@ export function CategoryChart({
   data,
   title = "Despesas por Categoria",
 }: Props) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const legendColor = isDark ? "rgba(255,255,255,0.5)" : "#4A5750";
+
   return (
     <div
       className="w-full rounded-2xl p-6"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--surface-card)",
+        border: "1px solid var(--border-subtle)",
       }}
     >
       <h3
         className="text-sm font-semibold mb-6"
-        style={{ color: "rgba(255,255,255,0.7)" }}
+        style={{ color: "var(--text-secondary)" }}
       >
         {title}
       </h3>
@@ -108,12 +116,14 @@ export function CategoryChart({
                 />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip
+              content={(props) => <CustomTooltip {...props} isDark={isDark} />}
+            />
             <Legend
               iconType="circle"
               iconSize={8}
               formatter={(value) => (
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>
+                <span style={{ color: legendColor, fontSize: 12 }}>
                   {value}
                 </span>
               )}
