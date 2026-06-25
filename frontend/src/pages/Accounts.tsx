@@ -43,8 +43,8 @@ function AccountCard({
     <div
       className="relative overflow-hidden rounded-2xl transition-all duration-300 hover:-translate-y-0.5"
       style={{
-        background: "#121814",
-        border: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--surface-card)",
+        border: "1px solid var(--border-subtle)",
         borderLeft: `3px solid ${account.color}`,
         boxShadow: "0 4px 24px -8px rgba(0,0,0,0.4)",
       }}
@@ -61,7 +61,7 @@ function AccountCard({
             <div>
               <p
                 className="font-semibold text-sm"
-                style={{ color: "rgba(255,255,255,0.85)" }}
+                style={{ color: "var(--text-primary)" }}
               >
                 {account.name}
               </p>
@@ -82,10 +82,7 @@ function AccountCard({
                 >
                   {account.is_credit ? "Crédito" : "Débito"}
                 </span>
-                <p
-                  className="text-xs"
-                  style={{ color: "rgba(255,255,255,0.3)" }}
-                >
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                   Inicial: R$ {account.initial_balance.toFixed(2)}
                 </p>
               </div>
@@ -94,7 +91,7 @@ function AccountCard({
           <div className="flex gap-1">
             <button
               className="h-8 w-8 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5"
-              style={{ color: "rgba(255,255,255,0.35)" }}
+              style={{ color: "var(--text-muted)" }}
               onClick={() => onEdit(account)}
             >
               <Pencil size={13} />
@@ -109,10 +106,7 @@ function AccountCard({
           </div>
         </div>
         <div>
-          <p
-            className="text-xs mb-1"
-            style={{ color: "rgba(255,255,255,0.3)" }}
-          >
+          <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>
             Saldo atual
           </p>
           <p
@@ -165,9 +159,9 @@ function AccountForm({
   }
 
   const inputStyle = {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    color: "rgba(255,255,255,0.85)",
+    background: "var(--surface-elevated)",
+    border: "1px solid var(--border-subtle)",
+    color: "var(--text-primary)",
   };
 
   return (
@@ -175,7 +169,7 @@ function AccountForm({
       <div>
         <label
           className="text-xs mb-1.5 block font-medium"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          style={{ color: "var(--text-muted)" }}
         >
           Nome da conta
         </label>
@@ -189,7 +183,7 @@ function AccountForm({
       <div>
         <label
           className="text-xs mb-1.5 block font-medium"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          style={{ color: "var(--text-muted)" }}
         >
           Saldo inicial
         </label>
@@ -200,14 +194,14 @@ function AccountForm({
           onChange={(e) => setInitialBalance(e.target.value)}
           style={inputStyle}
         />
-        <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>
+        <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
           Quanto você já tem nessa conta antes de registrar transações.
         </p>
       </div>
       <div>
         <label
           className="text-xs mb-1.5 block font-medium"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          style={{ color: "var(--text-muted)" }}
         >
           Cor
         </label>
@@ -225,7 +219,7 @@ function AccountForm({
       <div>
         <label
           className="text-xs mb-1.5 block font-medium"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          style={{ color: "var(--text-muted)" }}
         >
           Tipo de conta
         </label>
@@ -242,8 +236,8 @@ function AccountForm({
                     color: "#8FC4A6",
                   }
                 : {
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "rgba(255,255,255,0.4)",
+                    border: "1px solid var(--border-subtle)",
+                    color: "var(--text-muted)",
                   }
             }
           >
@@ -261,8 +255,8 @@ function AccountForm({
                     color: "#D9B36A",
                   }
                 : {
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "rgba(255,255,255,0.4)",
+                    border: "1px solid var(--border-subtle)",
+                    color: "var(--text-muted)",
                   }
             }
           >
@@ -279,8 +273,8 @@ function AccountForm({
         <button
           className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all"
           style={{
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "rgba(255,255,255,0.5)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-secondary)",
           }}
           onClick={onCancel}
         >
@@ -391,14 +385,11 @@ export default function Accounts() {
         <div>
           <h1
             className="text-2xl font-display font-semibold tracking-tight"
-            style={{ color: "rgba(255,255,255,0.9)" }}
+            style={{ color: "var(--text-primary)" }}
           >
             Contas
           </h1>
-          <p
-            className="text-sm mt-1"
-            style={{ color: "rgba(255,255,255,0.4)" }}
-          >
+          <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
             Patrimônio total:{" "}
             <span
               className="font-semibold"
@@ -434,8 +425,8 @@ export default function Accounts() {
         <div
           className="p-12 text-center rounded-2xl"
           style={{
-            background: "#121814",
-            border: "1px dashed rgba(255,255,255,0.08)",
+            background: "var(--surface-card)",
+            border: "1px dashed var(--border-subtle)",
           }}
         >
           <div className="max-w-sm mx-auto space-y-4">
@@ -448,14 +439,11 @@ export default function Accounts() {
             <div className="space-y-1">
               <h3
                 className="font-semibold text-lg"
-                style={{ color: "rgba(255,255,255,0.8)" }}
+                style={{ color: "var(--text-primary)" }}
               >
                 Nenhuma conta criada
               </h3>
-              <p
-                className="text-sm"
-                style={{ color: "rgba(255,255,255,0.35)" }}
-              >
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                 Crie sua primeira conta para começar a organizar suas finanças.
               </p>
             </div>
@@ -520,11 +508,11 @@ export default function Accounts() {
             <DialogTitle>Deletar conta</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-2">
-            <p className="text-sm" style={{ color: "rgba(255,255,255,0.5)" }}>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
               Tem certeza que deseja deletar a conta{" "}
               <span
                 className="font-semibold"
-                style={{ color: "rgba(255,255,255,0.8)" }}
+                style={{ color: "var(--text-primary)" }}
               >
                 {deleteAccountTarget?.name}
               </span>
@@ -541,10 +529,7 @@ export default function Accounts() {
                 <p className="text-sm" style={{ color: "#D9B36A" }}>
                   {deleteAccountError}
                 </p>
-                <p
-                  className="text-xs"
-                  style={{ color: "rgba(255,255,255,0.35)" }}
-                >
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                   Escolha como deseja proceder:
                 </p>
                 <div className="flex flex-col gap-2">
@@ -572,7 +557,7 @@ export default function Accounts() {
                   </button>
                   <button
                     className="py-2.5 rounded-xl text-sm transition-all"
-                    style={{ color: "rgba(255,255,255,0.4)" }}
+                    style={{ color: "var(--text-muted)" }}
                     onClick={() => {
                       setDeleteAccountTarget(null);
                       setDeleteAccountError("");
@@ -588,8 +573,8 @@ export default function Accounts() {
                 <button
                   className="flex-1 py-2.5 rounded-xl text-sm transition-all"
                   style={{
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "rgba(255,255,255,0.4)",
+                    border: "1px solid var(--border-subtle)",
+                    color: "var(--text-muted)",
                   }}
                   onClick={() => setDeleteAccountTarget(null)}
                 >

@@ -32,7 +32,7 @@ function VariationBadge({ value }: { value: number | null }) {
     return (
       <span
         className="text-xs font-medium"
-        style={{ color: "rgba(255,255,255,0.3)" }}
+        style={{ color: "var(--text-muted)" }}
       >
         —
       </span>
@@ -45,8 +45,8 @@ function VariationBadge({ value }: { value: number | null }) {
       style={
         isZero
           ? {
-              background: "rgba(255,255,255,0.06)",
-              color: "rgba(255,255,255,0.4)",
+              background: "var(--surface-elevated)",
+              color: "var(--text-muted)",
             }
           : isPositive
             ? { background: "rgba(76,138,106,0.12)", color: "#8FC4A6" }
@@ -66,14 +66,14 @@ function VariationBadge({ value }: { value: number | null }) {
 }
 
 const cardStyle = {
-  background: "#121814",
-  border: "1px solid rgba(255,255,255,0.06)",
+  background: "var(--surface-card)",
+  border: "1px solid var(--border-subtle)",
   borderRadius: "1rem",
 };
 
 const sectionTitle = "text-base font-semibold mb-4";
-const sectionTitleStyle = { color: "rgba(255,255,255,0.75)" };
-const mutedText = { color: "rgba(255,255,255,0.35)" };
+const sectionTitleStyle = { color: "var(--text-secondary)" };
+const mutedText = { color: "var(--text-muted)" };
 const thStyle = "text-left px-6 py-3 text-xs font-medium";
 const thStyleRight = "text-right px-6 py-3 text-xs font-medium";
 
@@ -160,7 +160,7 @@ export default function Analytics() {
       <div className="flex items-center justify-between">
         <h1
           className="text-2xl font-display font-semibold tracking-tight"
-          style={{ color: "rgba(255,255,255,0.9)" }}
+          style={{ color: "var(--text-primary)" }}
         >
           Análises
         </h1>
@@ -169,9 +169,9 @@ export default function Analytics() {
           onChange={(e) => setSelectedYear(Number(e.target.value))}
           className="text-sm rounded-xl px-3 h-9 outline-none"
           style={{
-            background: "#121814",
-            border: "1px solid rgba(255,255,255,0.08)",
-            color: "rgba(255,255,255,0.7)",
+            background: "var(--surface-card)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-secondary)",
           }}
         >
           {years.map((y) => (
@@ -214,8 +214,8 @@ export default function Analytics() {
             key={item.label}
             className="relative overflow-hidden rounded-2xl p-5 pt-6"
             style={{
-              background: "#121814",
-              border: "1px solid rgba(255,255,255,0.06)",
+              background: "var(--surface-card)",
+              border: "1px solid var(--border-subtle)",
             }}
           >
             <div
@@ -241,7 +241,7 @@ export default function Analytics() {
       ) : (
         <div
           className="p-8 text-center rounded-2xl text-sm"
-          style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+          style={{ ...cardStyle, color: "var(--text-muted)" }}
         >
           Sem dados mensais para {selectedYear}
         </div>
@@ -261,7 +261,7 @@ export default function Analytics() {
           ) : (
             <div
               className="p-8 text-center rounded-2xl text-sm"
-              style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+              style={{ ...cardStyle, color: "var(--text-muted)" }}
             >
               Sem despesas registradas
             </div>
@@ -274,7 +274,7 @@ export default function Analytics() {
           ) : (
             <div
               className="p-8 text-center rounded-2xl text-sm"
-              style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+              style={{ ...cardStyle, color: "var(--text-muted)" }}
             >
               Sem receitas registradas
             </div>
@@ -291,9 +291,7 @@ export default function Analytics() {
           <div style={cardStyle}>
             <table className="w-full text-sm hidden md:table">
               <thead>
-                <tr
-                  style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-                >
+                <tr style={{ borderBottom: "1px solid var(--border-subtle)" }}>
                   <th className={thStyle} style={mutedText}>
                     #
                   </th>
@@ -319,9 +317,7 @@ export default function Analytics() {
                   return (
                     <tr
                       key={cat.category_id}
-                      style={{
-                        borderBottom: "1px solid rgba(255,255,255,0.04)",
-                      }}
+                      style={{ borderBottom: "1px solid var(--border-subtle)" }}
                     >
                       <td className="px-6 py-3 text-sm" style={mutedText}>
                         {index + 1}
@@ -334,7 +330,7 @@ export default function Analytics() {
                           />
                           <span
                             className="text-sm"
-                            style={{ color: "rgba(255,255,255,0.75)" }}
+                            style={{ color: "var(--text-secondary)" }}
                           >
                             {cat.category_name}
                           </span>
@@ -350,7 +346,7 @@ export default function Analytics() {
                         <div className="flex items-center justify-end gap-2">
                           <div
                             className="w-16 h-1.5 rounded-full overflow-hidden"
-                            style={{ background: "rgba(255,255,255,0.06)" }}
+                            style={{ background: "var(--surface-elevated)" }}
                           >
                             <div
                               className="h-full rounded-full"
@@ -376,7 +372,7 @@ export default function Analytics() {
             </table>
             <div
               className="md:hidden divide-y"
-              style={{ borderColor: "rgba(255,255,255,0.04)" }}
+              style={{ borderColor: "var(--border-subtle)" }}
             >
               {expenseByCategory.map((cat, index) => {
                 const total = expenseByCategory.reduce(
@@ -399,7 +395,7 @@ export default function Analytics() {
                     />
                     <span
                       className="flex-1 text-sm"
-                      style={{ color: "rgba(255,255,255,0.7)" }}
+                      style={{ color: "var(--text-secondary)" }}
                     >
                       {cat.category_name}
                     </span>
@@ -430,7 +426,7 @@ export default function Analytics() {
         {!recurring || recurring.by_category.length === 0 ? (
           <div
             className="p-8 text-center rounded-2xl text-sm"
-            style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+            style={{ ...cardStyle, color: "var(--text-muted)" }}
           >
             Nenhuma despesa marcada como recorrente ainda.
           </div>
@@ -446,12 +442,12 @@ export default function Analytics() {
                 {
                   label: "Total registrado",
                   value: `R$ ${recurring.total_recurring.toFixed(2)}`,
-                  color: "rgba(255,255,255,0.8)",
+                  color: "var(--text-primary)",
                 },
                 {
                   label: "Meses com recorrentes",
                   value: String(recurring.n_months),
-                  color: "rgba(255,255,255,0.8)",
+                  color: "var(--text-primary)",
                 },
               ].map((item) => (
                 <div
@@ -475,7 +471,7 @@ export default function Analytics() {
               <table className="w-full text-sm">
                 <thead>
                   <tr
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                    style={{ borderBottom: "1px solid var(--border-subtle)" }}
                   >
                     <th className={thStyle} style={mutedText}>
                       Categoria
@@ -492,9 +488,7 @@ export default function Analytics() {
                   {recurring.by_category.map((cat) => (
                     <tr
                       key={cat.category_id}
-                      style={{
-                        borderBottom: "1px solid rgba(255,255,255,0.04)",
-                      }}
+                      style={{ borderBottom: "1px solid var(--border-subtle)" }}
                     >
                       <td className="px-6 py-3">
                         <div className="flex items-center gap-2">
@@ -502,7 +496,7 @@ export default function Analytics() {
                             className="w-2.5 h-2.5 rounded-full shrink-0"
                             style={{ background: cat.category_color }}
                           />
-                          <span style={{ color: "rgba(255,255,255,0.75)" }}>
+                          <span style={{ color: "var(--text-secondary)" }}>
                             {cat.category_name}
                           </span>
                         </div>
@@ -533,7 +527,7 @@ export default function Analytics() {
         {!futureCommitments || futureCommitments.total_pending === 0 ? (
           <div
             className="p-8 text-center rounded-2xl text-sm"
-            style={{ ...cardStyle, color: "rgba(255,255,255,0.35)" }}
+            style={{ ...cardStyle, color: "var(--text-muted)" }}
           >
             Nenhuma parcela pendente.
           </div>
@@ -557,7 +551,7 @@ export default function Analytics() {
                 </p>
                 <p
                   className="text-xl font-bold"
-                  style={{ color: "rgba(255,255,255,0.8)" }}
+                  style={{ color: "var(--text-primary)" }}
                 >
                   {futureCommitments.by_group.length}
                 </p>
@@ -567,7 +561,7 @@ export default function Analytics() {
               <table className="w-full text-sm hidden md:table">
                 <thead>
                   <tr
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                    style={{ borderBottom: "1px solid var(--border-subtle)" }}
                   >
                     <th className={thStyle} style={mutedText}>
                       Descrição
@@ -590,13 +584,11 @@ export default function Analytics() {
                   {futureCommitments.by_group.map((group) => (
                     <tr
                       key={group.installment_group_id}
-                      style={{
-                        borderBottom: "1px solid rgba(255,255,255,0.04)",
-                      }}
+                      style={{ borderBottom: "1px solid var(--border-subtle)" }}
                     >
                       <td
                         className="px-6 py-3 font-medium"
-                        style={{ color: "rgba(255,255,255,0.75)" }}
+                        style={{ color: "var(--text-secondary)" }}
                       >
                         {group.description}
                       </td>
@@ -605,7 +597,7 @@ export default function Analytics() {
                       </td>
                       <td
                         className="px-6 py-3 text-right"
-                        style={{ color: "rgba(255,255,255,0.6)" }}
+                        style={{ color: "var(--text-secondary)" }}
                       >
                         R$ {group.installment_amount.toFixed(2)}
                       </td>
@@ -630,7 +622,7 @@ export default function Analytics() {
               </table>
               <div
                 className="md:hidden divide-y"
-                style={{ borderColor: "rgba(255,255,255,0.04)" }}
+                style={{ borderColor: "var(--border-subtle)" }}
               >
                 {futureCommitments.by_group.map((group) => (
                   <div
@@ -640,7 +632,7 @@ export default function Analytics() {
                     <div className="flex items-center justify-between">
                       <p
                         className="text-sm font-medium"
-                        style={{ color: "rgba(255,255,255,0.75)" }}
+                        style={{ color: "var(--text-secondary)" }}
                       >
                         {group.description}
                       </p>
@@ -698,9 +690,9 @@ export default function Analytics() {
                   onChange={(e) => f.set(e.target.value)}
                   className="text-sm rounded-xl px-3 h-9 outline-none block"
                   style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    color: "rgba(255,255,255,0.7)",
+                    background: "var(--surface-elevated)",
+                    border: "1px solid var(--border-subtle)",
+                    color: "var(--text-secondary)",
                   }}
                 />
               </div>
@@ -710,8 +702,8 @@ export default function Analytics() {
               disabled={isLoadingCompare}
               className="flex items-center gap-2 px-4 h-9 rounded-xl text-sm font-medium transition-all"
               style={{
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "rgba(255,255,255,0.5)",
+                border: "1px solid var(--border-subtle)",
+                color: "var(--text-secondary)",
               }}
             >
               {isLoadingCompare ? (

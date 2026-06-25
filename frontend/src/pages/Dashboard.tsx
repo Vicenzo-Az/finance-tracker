@@ -89,7 +89,7 @@ export default function Dashboard() {
       <div>
         <h1
           className="text-2xl font-display font-semibold tracking-tight leading-none mb-6"
-          style={{ color: "rgba(255,255,255,0.9)" }}
+          style={{ color: "var(--text-primary)" }}
         >
           Visão Geral
         </h1>
@@ -133,7 +133,7 @@ export default function Dashboard() {
               style={{ color: "#D9B36A" }}
               className="shrink-0"
             />
-            <p className="text-sm" style={{ color: "rgba(255,255,255,0.7)" }}>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
               <span className="font-medium" style={{ color: "#D9B36A" }}>
                 Crie uma conta financeira
               </span>{" "}
@@ -159,22 +159,19 @@ export default function Dashboard() {
         <div
           className="p-12 text-center rounded-2xl"
           style={{
-            background: "#121814",
-            border: "1px dashed rgba(255,255,255,0.08)",
+            background: "var(--surface-card)",
+            border: "1px dashed var(--border-subtle)",
           }}
         >
           <div className="max-w-md mx-auto space-y-6">
             <div className="space-y-2">
               <h3
                 className="text-lg font-semibold"
-                style={{ color: "rgba(255,255,255,0.8)" }}
+                style={{ color: "var(--text-primary)" }}
               >
                 Nenhuma transação ainda
               </h3>
-              <p
-                className="text-sm"
-                style={{ color: "rgba(255,255,255,0.35)" }}
-              >
+              <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                 Comece adicionando sua primeira receita ou despesa.
               </p>
             </div>
@@ -207,7 +204,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <h3
                 className="text-base font-semibold"
-                style={{ color: "rgba(255,255,255,0.7)" }}
+                style={{ color: "var(--text-secondary)" }}
               >
                 Transações Recentes
               </h3>
@@ -220,10 +217,10 @@ export default function Dashboard() {
               </button>
             </div>
             <div
-              className="rounded-2xl overflow-hidden divide-y divide-white/[0.04]"
+              className="rounded-2xl overflow-hidden divide-y divide-border"
               style={{
-                background: "#121814",
-                border: "1px solid rgba(255,255,255,0.06)",
+                background: "var(--surface-card)",
+                border: "1px solid var(--border-subtle)",
               }}
             >
               {recentTransactions.map((t) => (

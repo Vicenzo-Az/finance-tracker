@@ -28,8 +28,9 @@ export function Sidebar({ onClose }: Props) {
     <aside
       className="h-screen w-64 flex flex-col overflow-y-auto"
       style={{
-        background: "linear-gradient(180deg, #0D1511 0%, #0B1210 100%)",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--sidebar)",
+        borderRight: "1px solid var(--sidebar-border)",
+        color: "var(--sidebar-foreground)",
       }}
     >
       {/* Logo */}
@@ -38,7 +39,8 @@ export function Sidebar({ onClose }: Props) {
         {onClose && (
           <button
             onClick={onClose}
-            className="md:hidden p-1.5 rounded-md transition-colors text-white/30 hover:text-white/60 hover:bg-white/5"
+            className="md:hidden p-1.5 rounded-md transition-colors"
+            style={{ color: "rgba(255,255,255,0.3)" }}
           >
             <X size={18} />
           </button>
@@ -63,12 +65,16 @@ export function Sidebar({ onClose }: Props) {
             end={to === "/"}
             onClick={onClose}
             className={({ isActive }) =>
-              /* border sempre presente (1px) para não causar layout shift */
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 border ${
                 isActive
-                  ? "border-[#C7A35A]/20 bg-[#C7A35A]/08 text-[#D9B36A]"
-                  : "border-transparent text-white/40 hover:text-white/75 hover:bg-white/[0.04]"
+                  ? "border-[#C7A35A]/20 text-[#D9B36A]"
+                  : "border-transparent hover:bg-white/[0.04]"
               }`
+            }
+            style={({ isActive }) =>
+              isActive
+                ? { background: "rgba(199,163,90,0.08)", color: "#D9B36A" }
+                : { color: "rgba(255,255,255,0.45)" }
             }
           >
             {({ isActive }) => (
