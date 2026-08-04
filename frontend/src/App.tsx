@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AppLayout } from "./components/layout/AppLayout";
 import Accounts from "./pages/Accounts";
 import Analytics from "./pages/Analytics";
+import Categories from "./pages/Categories";
 import Dashboard from "./pages/Dashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import Landing from "./pages/Landing";
@@ -95,6 +96,7 @@ export default function App() {
         path="/transactions"
         element={<AppRoute component={Transactions} />}
       />
+      <Route path="/categories" element={<AppRoute component={Categories} />} />
       <Route path="/analytics" element={<AppRoute component={Analytics} />} />
       <Route path="/profile" element={<AppRoute component={Profile} />} />
       <Route path="/settings" element={<AppRoute component={Settings} />} />
