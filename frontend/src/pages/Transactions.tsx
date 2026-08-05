@@ -848,24 +848,6 @@ export default function Transactions() {
               {editErrors.amount && (
                 <p className="text-xs text-red-500 mt-1">{editErrors.amount}</p>
               )}
-              {editingTransaction?.installment_group_id && (
-                <div className="flex items-center gap-2 mt-2">
-                  <input
-                    type="checkbox"
-                    id="edit_apply_to_all"
-                    checked={editApplyToAll}
-                    onChange={(e) => setEditApplyToAll(e.target.checked)}
-                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
-                  />
-                  <label
-                    htmlFor="edit_apply_to_all"
-                    className="text-xs text-muted-foreground cursor-pointer select-none"
-                  >
-                    Aplicar descrição, valor, categoria e conta a todas as
-                    parcelas restantes
-                  </label>
-                </div>
-              )}
             </div>
 
             {/* Tipo — só para transações normais */}
@@ -953,6 +935,25 @@ export default function Transactions() {
                 </Select>
               </div>
             </div>
+
+            {editingTransaction?.installment_group_id && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="edit_apply_to_all"
+                  checked={editApplyToAll}
+                  onChange={(e) => setEditApplyToAll(e.target.checked)}
+                  className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="edit_apply_to_all"
+                  className="text-xs text-muted-foreground cursor-pointer select-none"
+                >
+                  Aplicar descrição, valor, categoria e conta a todas as
+                  parcelas restantes
+                </label>
+              </div>
+            )}
 
             {/* Data */}
             <div>
