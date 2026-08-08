@@ -48,7 +48,7 @@ def _set_refresh_cookie(response: Response, token: str) -> None:
         secure=prod,
         samesite="none" if prod else "lax",
         max_age=settings.refresh_token_expire_days * 24 * 60 * 60,
-        path="/auth/refresh",
+        path="/",
     )
 
 
@@ -60,7 +60,7 @@ def _clear_cookies(response: Response) -> None:
             httponly=True,
             secure=prod,
             samesite="none" if prod else "lax",
-            path=path,
+            path="/"
         )
 
 
