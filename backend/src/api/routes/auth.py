@@ -159,13 +159,18 @@ def refresh_token(
 
 @router.post("/logout")
 def logout(
+    request: Request,
     response: Response,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
 ):
-    db.query(RefreshToken).filter(
-        RefreshToken.user_id == current_user.id).delete()
-    db.commit()
+    # Tenta invalidar o refresh token se existir, mas não exige auth válida
+    raw_refresh = request.cookies.get("refresh_token")
+    if raw_refresh:
+        token_hash = hash_refresh_token(raw_refresh)
+        db.query(RefreshToken).filter(
+            RefreshToken.token_hash == token_hash
+        ).delete()
+        db.commit()
     _clear_cookies(response)
     return {"message": "Logout realizado com sucesso"}
 

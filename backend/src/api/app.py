@@ -12,7 +12,11 @@ from src.core.cors import setup_cors
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title="Valore API", version="1.0.0")
+    app = FastAPI(
+        title="Valore API",
+        version="1.0.0",
+        swagger_ui_parameters={"withCredentials": True},
+    )
 
     setup_cors(app)
 
