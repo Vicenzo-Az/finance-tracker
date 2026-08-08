@@ -69,9 +69,9 @@ describe("amountClass", () => {
     expect(amountClass(t)).toContain("text-emerald-500");
   });
 
-  it("retorna classe azul para transferência", () => {
+  it("retorna classe dourada para transferência", () => {
     const t = makeTransaction({ type: "transfer", transfer_direction: "in" });
-    expect(amountClass(t)).toContain("text-blue-500");
+    expect(amountClass(t)).toContain("text-amber-200");
   });
 });
 
