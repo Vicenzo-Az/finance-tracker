@@ -27,3 +27,8 @@ class Category(Base):
     subcategories = relationship("Category", back_populates="parent")
     parent = relationship(
         "Category", back_populates="subcategories", remote_side="Category.id")
+    description_hints = relationship(
+        "DescriptionHint",
+        foreign_keys="DescriptionHint.category_id",
+        cascade="all, delete-orphan",
+    )

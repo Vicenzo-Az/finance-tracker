@@ -10,7 +10,8 @@ class DescriptionHint(Base):
     id: Mapped[str] = Column(String, primary_key=True)
     description: Mapped[str] = Column(String, nullable=False)
     category_id: Mapped[str] = Column(
-        String, ForeignKey("categories.id"), nullable=False)
+        String, ForeignKey("categories.id", ondelete="CASCADE"), nullable=False
+    )
     user_id: Mapped[str] = Column(
         String, ForeignKey("users.id"), nullable=False)
 
