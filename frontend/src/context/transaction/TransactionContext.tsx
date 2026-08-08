@@ -61,8 +61,17 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
   const removeTransaction = async (id: string) => {
     try {
       setError(null);
+      const transaction = transactions.find((t) => t.id === id);
       await apiDelete(id);
-      setTransactions((prev) => prev.filter((t) => t.id !== id));
+
+      if (transaction?.transfer_id) {
+        // Remove ambos os lados da transferência do estado local
+        setTransactions((prev) =>
+          prev.filter((t) => t.transfer_id !== transaction.transfer_id),
+        );
+      } else {
+        setTransactions((prev) => prev.filter((t) => t.id !== id));
+      }
     } catch {
       setError("Erro ao remover transação.");
     }
