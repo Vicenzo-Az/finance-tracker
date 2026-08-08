@@ -21,8 +21,8 @@ export function formatAmount(transaction: Transaction): string {
 export function amountClass(transaction: Transaction): string {
   if (transaction.type === "transfer") {
     return transaction.transfer_direction === "out"
-      ? "text-right font-semibold text-blue-400"
-      : "text-right font-semibold text-blue-500";
+      ? "text-right font-semibold tabular-nums text-amber-300"
+      : "text-right font-semibold tabular-nums text-amber-200";
   }
   return `text-right font-semibold ${
     transaction.type === "income" ? "text-emerald-500" : "text-red-500"

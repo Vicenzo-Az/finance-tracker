@@ -16,8 +16,8 @@ function formatAmount(transaction: Transaction): string {
 function amountClass(transaction: Transaction): string {
   if (transaction.type === "transfer") {
     return transaction.transfer_direction === "out"
-      ? "text-blue-400"
-      : "text-blue-500";
+      ? "text-amber-300"
+      : "text-amber-200";
   }
   return transaction.type === "income" ? "text-emerald-500" : "text-red-500";
 }
@@ -27,7 +27,7 @@ export function TransactionItem({ transaction }: TransactionItemProps) {
     <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-card">
       <div className="flex items-center gap-3">
         {transaction.type === "transfer" && (
-          <ArrowLeftRight size={16} className="text-blue-400 shrink-0" />
+          <ArrowLeftRight size={16} className="text-amber-300 shrink-0" />
         )}
         <div>
           <p className="font-medium">{transaction.description}</p>

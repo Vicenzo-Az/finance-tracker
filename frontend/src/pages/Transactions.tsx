@@ -62,12 +62,21 @@ function formatAmount(transaction: Transaction): string {
 function amountClass(transaction: Transaction): string {
   if (transaction.type === "transfer") {
     return transaction.transfer_direction === "out"
-      ? "text-right font-semibold text-blue-400"
-      : "text-right font-semibold text-blue-500";
+      ? "text-right text-[0.98rem] font-semibold tabular-nums tracking-tight text-amber-300"
+      : "text-right text-[0.98rem] font-semibold tabular-nums tracking-tight text-amber-200";
   }
-  return `text-right font-semibold ${
+  return `text-right text-[0.98rem] font-semibold tabular-nums tracking-tight ${
     transaction.type === "income" ? "text-emerald-500" : "text-red-500"
   }`;
+}
+
+function amountToneClass(transaction: Transaction): string {
+  if (transaction.type === "transfer") {
+    return transaction.transfer_direction === "out"
+      ? "text-amber-300"
+      : "text-amber-200";
+  }
+  return transaction.type === "income" ? "text-emerald-500" : "text-red-500";
 }
 
 export default function Transactions() {
@@ -1036,79 +1045,129 @@ export default function Transactions() {
 
       {/* Tabela */}
       {/* Tabela agrupada por mês */}
-      <div className="space-y-6">
+      <div className="space-y-8">
         {filteredTransactions.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
+          <div className="rounded-2xl border border-white/5 bg-card/70 p-12 text-center text-muted-foreground shadow-[0_18px_50px_-36px_rgba(0,0,0,0.9)]">
             Nenhuma transação encontrada
           </div>
         ) : (
           groupedByMonth.map(([monthKey, monthTransactions]) => (
             <div
               key={monthKey}
-              className="rounded-xl border border-border bg-card overflow-hidden"
+              className="overflow-hidden rounded-2xl border border-white/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.015),rgba(255,255,255,0.0))] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.95)]"
             >
               {/* Cabeçalho do mês */}
-              <div className="px-4 md:px-6 py-3 bg-muted/40 border-b border-border flex items-center justify-between">
-                <span className="text-sm font-semibold capitalize">
-                  {formatMonthHeader(monthKey)}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {monthTransactions.length} transação
-                  {monthTransactions.length !== 1 ? "s" : ""}
-                </span>
+              <div className="px-4 md:px-6 pt-4 pb-3">
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-sm font-semibold capitalize tracking-tight text-foreground">
+                    {formatMonthHeader(monthKey)}
+                  </span>
+                  <span className="inline-flex w-fit items-center rounded-full border border-amber-500/15 bg-amber-500/5 px-2.5 py-1 text-[11px] font-medium text-amber-100/70 tabular-nums tracking-wide">
+                    {monthTransactions.length} transação
+                    {monthTransactions.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
               </div>
 
               {/* Desktop — tabela */}
-              <div className="hidden md:block">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Data</TableHead>
-                      <TableHead>Descrição</TableHead>
-                      <TableHead>Categoria</TableHead>
-                      <TableHead>Conta</TableHead>
-                      <TableHead className="text-right">Valor</TableHead>
-                      <TableHead className="text-center">Ações</TableHead>
+              <div className="hidden md:block px-4 md:px-6 pb-4">
+                <Table className="table-fixed">
+                  <colgroup>
+                    <col className="w-[14%]" />
+                    <col className="w-[34%]" />
+                    <col className="w-[16%]" />
+                    <col className="w-[14%]" />
+                    <col className="w-[14%]" />
+                    <col className="w-[8%]" />
+                  </colgroup>
+                  <TableHeader className="[&_tr]:border-border/15">
+                    <TableRow className="border-transparent bg-amber-500/[0.03] hover:bg-transparent">
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                        Data
+                      </TableHead>
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                        Descrição
+                      </TableHead>
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                        Categoria
+                      </TableHead>
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                        Conta
+                      </TableHead>
+                      <TableHead className="text-right text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                        Valor
+                      </TableHead>
+                      <TableHead className="text-center text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                        Ações
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {monthTransactions.map((t) => (
-                      <TableRow key={t.id}>
-                        <TableCell>{formatDate(t.date)}</TableCell>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
+                      <TableRow
+                        key={t.id}
+                        className="group border-transparent transition-colors hover:bg-white/[0.02] even:bg-white/[0.008]"
+                      >
+                        <TableCell className="text-xs text-muted-foreground">
+                          {formatDate(t.date)}
+                        </TableCell>
+                        <TableCell className="min-w-0 font-medium text-foreground">
+                          <div className="flex min-w-0 items-center gap-2">
                             {t.type === "transfer" && (
                               <ArrowLeftRight
                                 size={14}
-                                className="text-blue-400 shrink-0"
+                                className="shrink-0 text-amber-300"
                               />
                             )}
-                            {t.description}
+                            <span className="truncate">{t.description}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{getCategoryName(t.category_id)}</TableCell>
-                        <TableCell>{getAccountName(t.account_id)}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          <span className="truncate">
+                            {getCategoryName(t.category_id)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          <span className="truncate">
+                            {getAccountName(t.account_id)}
+                          </span>
+                        </TableCell>
                         <TableCell className={amountClass(t)}>
                           {formatAmount(t)}
                         </TableCell>
-                        <TableCell className="text-center">
-                          {t.type !== "transfer" && (
+                        <TableCell className="w-[108px] text-center">
+                          <div className="inline-flex items-center justify-center gap-1 opacity-80 transition-opacity group-hover:opacity-100">
+                            {t.type !== "transfer" && (
+                              <Button
+                                variant="ghost"
+                                size="icon-xs"
+                                className="rounded-full text-muted-foreground hover:bg-white/[0.03] hover:text-foreground"
+                                title="Editar transação"
+                                aria-label="Editar transação"
+                                onClick={() => handleEditClick(t)}
+                              >
+                                <Pencil size={12} />
+                              </Button>
+                            )}
                             <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditClick(t)}
+                              variant="ghost"
+                              size="icon-xs"
+                              className="rounded-full text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                              title={
+                                t.type === "transfer"
+                                  ? "Cancelar transferência"
+                                  : "Deletar transação"
+                              }
+                              aria-label={
+                                t.type === "transfer"
+                                  ? "Cancelar transferência"
+                                  : "Deletar transação"
+                              }
+                              onClick={() => setDeleteTarget(t)}
                             >
-                              Editar
+                              <Trash2 size={12} />
                             </Button>
-                          )}
-                          <span className="mx-1" />
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setDeleteTarget(t)}
-                          >
-                            {t.type === "transfer" ? "Cancelar" : "Deletar"}
-                          </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1117,41 +1176,36 @@ export default function Transactions() {
               </div>
 
               {/* Mobile — cards */}
-              <div className="md:hidden divide-y divide-border">
+              <div className="md:hidden px-4 pb-4 pt-1 divide-y divide-white/5">
                 {monthTransactions.map((t) => (
                   <div
                     key={t.id}
-                    className="px-4 py-3 flex items-center justify-between gap-3"
+                    className="group flex items-center justify-between gap-3 py-3.5 transition-colors hover:bg-white/[0.02]"
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-0.5">
+                      <div className="flex items-center gap-1.5 mb-1">
                         {t.type === "transfer" && (
                           <ArrowLeftRight
                             size={12}
-                            className="text-blue-400 shrink-0"
+                            className="shrink-0 text-amber-300"
                           />
                         )}
-                        <p className="text-sm font-medium truncate">
+                        <p className="text-sm font-medium text-foreground truncate leading-tight">
                           {t.description}
                         </p>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(t.date)}
-                        {getCategoryName(t.category_id) !== "—" &&
-                          ` · ${getCategoryName(t.category_id)}`}
-                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <span>{formatDate(t.date)}</span>
+                        {getCategoryName(t.category_id) !== "—" && (
+                          <span className="rounded-full border border-border/60 bg-background/60 px-2 py-0.5">
+                            {getCategoryName(t.category_id)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span
-                        className={`text-sm font-semibold ${
-                          t.type === "transfer"
-                            ? t.transfer_direction === "out"
-                              ? "text-blue-400"
-                              : "text-blue-500"
-                            : t.type === "income"
-                              ? "text-emerald-500"
-                              : "text-red-500"
-                        }`}
+                        className={`inline-flex items-center rounded-full border border-white/5 bg-white/[0.02] px-2.5 py-1 text-xs font-semibold tabular-nums tracking-tight ${amountToneClass(t)}`}
                       >
                         {formatAmount(t)}
                       </span>
@@ -1159,20 +1213,32 @@ export default function Transactions() {
                         {t.type !== "transfer" && (
                           <Button
                             variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
+                            size="icon-xs"
+                            className="rounded-full text-muted-foreground hover:bg-white/[0.03] hover:text-foreground"
+                            title="Editar transação"
+                            aria-label="Editar transação"
                             onClick={() => handleEditClick(t)}
                           >
-                            <Pencil size={13} />
+                            <Pencil size={12} />
                           </Button>
                         )}
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-red-500"
+                          size="icon-xs"
+                          className="rounded-full text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                          title={
+                            t.type === "transfer"
+                              ? "Cancelar transferência"
+                              : "Deletar transação"
+                          }
+                          aria-label={
+                            t.type === "transfer"
+                              ? "Cancelar transferência"
+                              : "Deletar transação"
+                          }
                           onClick={() => setDeleteTarget(t)}
                         >
-                          <Trash2 size={13} />
+                          <Trash2 size={12} />
                         </Button>
                       </div>
                     </div>
