@@ -1,14 +1,18 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import Optional
 from uuid import uuid4
+import pandas as pd
+import io
 
 from src.core.database import get_db
 from src.core.dependencies import get_current_user
 from src.models.transaction import Transaction as TransactionModel
 from src.models.account import Account as AccountModel
+from src.models.category import Category as CategoryModel
 from src.models.user import User
 from src.models.description_hint import DescriptionHint
 from src.schemas.transaction import (
@@ -290,3 +294,70 @@ def delete_single_transaction(
         raise HTTPException(status_code=404, detail="Transação não encontrada")
     db.delete(transaction)
     db.commit()
+
+
+@router.get("/export/csv")
+def export_csv(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    date_from: Optional[str] = Query(default=None),
+    date_to: Optional[str] = Query(default=None),
+):
+    query = db.query(TransactionModel).filter(
+        TransactionModel.user_id == current_user.id
+    )
+
+    if date_from:
+        query = query.filter(TransactionModel.date >= date_from)
+    if date_to:
+        query = query.filter(TransactionModel.date <= date_to)
+
+    transactions = query.order_by(TransactionModel.date.desc()).all()
+
+    # Busca nomes de categorias e contas
+
+    categories = {
+        c.id: c.name
+        for c in db.query(CategoryModel).filter(
+            CategoryModel.user_id.in_([None, current_user.id])
+        ).all()
+    }
+    accounts = {
+        a.id: a.name
+        for a in db.query(AccountModel).filter(
+            AccountModel.user_id == current_user.id
+        ).all()
+    }
+
+    rows = []
+    for t in transactions:
+        parcela = ""
+        if t.installment_number and t.installment_total:
+            parcela = f"{t.installment_number}/{t.installment_total}"
+
+        rows.append({
+            "Data": t.date,
+            "Descrição": t.description,
+            "Tipo": {"income": "Receita", "expense": "Despesa", "transfer": "Transferência"}.get(t.type, t.type),
+            "Valor": t.amount,
+            "Categoria": categories.get(t.category_id, "—") if t.category_id else "—",
+            "Conta": accounts.get(t.account_id, "—") if t.account_id else "—",
+            "Status": "Pago" if t.is_paid else "Pendente",
+            "Parcela": parcela,
+        })
+
+    df = pd.DataFrame(rows)
+
+    output = io.StringIO()
+    df.to_csv(output, index=False, sep=";", encoding="utf-8-sig")
+    output.seek(0)
+
+    filename = "valore_transacoes.csv"
+    if date_from or date_to:
+        filename = f"valore_transacoes_{date_from or 'inicio'}_{date_to or 'fim'}.csv"
+
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
