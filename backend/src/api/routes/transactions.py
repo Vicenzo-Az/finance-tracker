@@ -2,6 +2,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from typing import Optional
 from uuid import uuid4
@@ -319,7 +320,10 @@ def export_csv(
     categories = {
         c.id: c.name
         for c in db.query(CategoryModel).filter(
-            CategoryModel.user_id.in_([None, current_user.id])
+            or_(
+                CategoryModel.user_id == None,
+                CategoryModel.user_id == current_user.id,
+            )
         ).all()
     }
     accounts = {
