@@ -165,7 +165,7 @@ export default function Transactions() {
   // useEffect que dispara quando a descrição muda
   useEffect(() => {
     const timeout = setTimeout(async () => {
-      if (description.trim().length >= 3 && !categoryWasManuallySet.current) {
+      if (description.trim().length >= 2 && !categoryWasManuallySet.current) {
         const suggested = await getHint(description);
         if (suggested) setCategoryId(suggested);
       }
@@ -217,8 +217,8 @@ export default function Transactions() {
 
   function validate(desc: string, amt: string, dt: string) {
     const e = { description: "", amount: "", date: "" };
-    if (!desc.trim() || desc.trim().length < 3)
-      e.description = "Mínimo 3 caracteres";
+    if (!desc.trim() || desc.trim().length < 2)
+      e.description = "Mínimo 2 caracteres";
     if (!amt || isNaN(Number(amt)) || Number(amt) <= 0)
       e.amount = "Valor inválido";
     if (!dt) e.date = "Data obrigatória";
