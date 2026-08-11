@@ -1047,14 +1047,14 @@ export default function Transactions() {
       {/* Tabela agrupada por mês */}
       <div className="space-y-8">
         {filteredTransactions.length === 0 ? (
-          <div className="rounded-2xl border border-white/5 bg-card/70 p-12 text-center text-muted-foreground shadow-[0_18px_50px_-36px_rgba(0,0,0,0.9)]">
+          <div className="rounded-2xl border border-border bg-card p-12 text-center text-muted-foreground">
             Nenhuma transação encontrada
           </div>
         ) : (
           groupedByMonth.map(([monthKey, monthTransactions]) => (
             <div
               key={monthKey}
-              className="overflow-hidden rounded-2xl border border-white/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.015),rgba(255,255,255,0.0))] shadow-[0_18px_50px_-36px_rgba(0,0,0,0.95)]"
+              className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
             >
               {/* Cabeçalho do mês */}
               <div className="px-4 md:px-6 pt-4 pb-3">
@@ -1062,7 +1062,7 @@ export default function Transactions() {
                   <span className="text-sm font-semibold capitalize tracking-tight text-foreground">
                     {formatMonthHeader(monthKey)}
                   </span>
-                  <span className="inline-flex w-fit items-center rounded-full border border-amber-500/15 bg-amber-500/5 px-2.5 py-1 text-[11px] font-medium text-amber-100/70 tabular-nums tracking-wide">
+                  <span className="inline-flex w-fit items-center rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground tabular-nums">
                     {monthTransactions.length} transação
                     {monthTransactions.length !== 1 ? "s" : ""}
                   </span>
@@ -1070,8 +1070,8 @@ export default function Transactions() {
               </div>
 
               {/* Desktop — tabela */}
-              <div className="hidden md:block px-4 md:px-6 pb-4">
-                <Table className="table-fixed">
+              <div className="hidden md:block overflow-x-auto px-4 md:px-6 pb-4">
+                <Table>
                   <colgroup>
                     <col className="w-[14%]" />
                     <col className="w-[34%]" />
@@ -1081,23 +1081,23 @@ export default function Transactions() {
                     <col className="w-[8%]" />
                   </colgroup>
                   <TableHeader className="[&_tr]:border-border/15">
-                    <TableRow className="border-transparent bg-amber-500/[0.03] hover:bg-transparent">
-                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                    <TableRow className="border-border/40 bg-muted/30 hover:bg-transparent">
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-muted-foreground">
                         Data
                       </TableHead>
-                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-muted-foreground">
                         Descrição
                       </TableHead>
-                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-muted-foreground">
                         Categoria
                       </TableHead>
-                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                      <TableHead className="text-[0.68rem] font-medium tracking-[0.12em] text-muted-foreground">
                         Conta
                       </TableHead>
-                      <TableHead className="text-right text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                      <TableHead className="text-right text-[0.68rem] font-medium tracking-[0.12em] text-muted-foreground">
                         Valor
                       </TableHead>
-                      <TableHead className="text-center text-[0.68rem] font-medium tracking-[0.12em] text-amber-100/55">
+                      <TableHead className="text-center text-[0.68rem] font-medium tracking-[0.12em] text-muted-foreground">
                         Ações
                       </TableHead>
                     </TableRow>
@@ -1106,7 +1106,7 @@ export default function Transactions() {
                     {monthTransactions.map((t) => (
                       <TableRow
                         key={t.id}
-                        className="group border-transparent transition-colors hover:bg-white/[0.02] even:bg-white/[0.008]"
+                        className="group border-border/20 transition-colors hover:bg-muted/30"
                       >
                         <TableCell className="text-xs text-muted-foreground">
                           {formatDate(t.date)}
@@ -1176,7 +1176,7 @@ export default function Transactions() {
               </div>
 
               {/* Mobile — cards */}
-              <div className="md:hidden px-4 pb-4 pt-1 divide-y divide-white/5">
+              <div className="md:hidden px-4 pb-4 pt-1 divide-y divide-border">
                 {monthTransactions.map((t) => (
                   <div
                     key={t.id}
