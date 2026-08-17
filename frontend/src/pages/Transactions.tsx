@@ -6,6 +6,7 @@ import { createTransfer } from "@/services/transactionService";
 import type { Account, Category, Transaction } from "@/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { CategoryPicker } from "@/components/ui/CategoryPicker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -580,30 +581,14 @@ export default function Transactions() {
                     <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
                       Categoria
                     </label>
-                    <Select
+                    <CategoryPicker
+                      categories={filteredCategories}
                       value={categoryId}
-                      onValueChange={(v) => {
+                      onChange={(v) => {
                         setCategoryId(v);
                         categoryWasManuallySet.current = true;
                       }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Opcional" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filteredCategories.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="w-2.5 h-2.5 rounded-full shrink-0"
-                                style={{ backgroundColor: c.color }}
-                              />
-                              {c.name}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
