@@ -22,6 +22,7 @@ export function CategoryPicker({
 }: CategoryPickerProps) {
   const [open, setOpen] = useState(false);
   const selected = categories.find((c) => c.id === value);
+  const [, setHoveredId] = useState<string | null>(null);
 
   function handleSelect(id: string) {
     onChange(value === id ? "" : id);
@@ -72,7 +73,13 @@ export function CategoryPicker({
       </button>
 
       {/* Modal centralizado */}
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(v) => {
+          setOpen(v);
+          if (!v) setHoveredId(null); // reseta ao fechar
+        }}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Selecionar categoria</DialogTitle>
@@ -86,7 +93,7 @@ export function CategoryPicker({
                   key={cat.id}
                   type="button"
                   onClick={() => handleSelect(cat.id)}
-                  className="flex flex-col items-center justify-center gap-2 rounded-xl border transition-all"
+                  className="category-chip flex flex-col items-center justify-center gap-2 rounded-xl border transition-all"
                   style={{
                     padding: "12px 8px",
                     minHeight: "72px",
@@ -97,6 +104,7 @@ export function CategoryPicker({
                       ? `1.5px solid ${cat.color}`
                       : `1px solid ${cat.color}30`,
                     color: cat.color,
+                    transition: "border 0.15s ease, transform 0.15s ease",
                   }}
                 >
                   <Icon size={22} strokeWidth={1.75} />

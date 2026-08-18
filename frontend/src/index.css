@@ -178,3 +178,10 @@
     font-family: var(--font-display);
   }
 }
+
+@media (hover: hover) {
+  .category-chip:hover {
+    transform: scale(0.96);
+    border: 2px solid currentColor !important;
+  }
+}
