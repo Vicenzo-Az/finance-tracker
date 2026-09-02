@@ -126,6 +126,7 @@ def get_by_category(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
     type: Optional[str] = Query(default=None),
+    year: Optional[int] = Query(default=None),
 ):
     transactions = (
         db.query(TransactionModel)
@@ -143,6 +144,9 @@ def get_by_category(
 
     if type:
         df = df[df["type"] == type]
+
+    if year:
+        df = df[df["date"].dt.year == year]
 
     category_ids = df["category_id"].dropna().unique().tolist()
     categories = (
@@ -235,6 +239,7 @@ def get_trends(
 def get_recurring_average(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
+    year: Optional[int] = Query(default=None),
 ):
     """Média mensal das despesas recorrentes por categoria."""
     transactions = (
@@ -251,6 +256,9 @@ def get_recurring_average(
 
     if df.empty:
         return {"average_monthly": 0.0, "by_category": [], "total_recurring": 0.0}
+
+    if year:
+        df = df[df["date"].dt.year == year]
 
     # Adiciona coluna de mês
     df["month"] = df["date"].dt.to_period("M").astype(str)
@@ -445,7 +453,8 @@ def get_monthly_detail(
             raise ValueError
     except (ValueError, AttributeError):
         from fastapi import HTTPException
-        raise HTTPException(status_code=422, detail="Formato de mês inválido. Use YYYY-MM.")
+        raise HTTPException(
+            status_code=422, detail="Formato de mês inválido. Use YYYY-MM.")
 
     transactions = (
         db.query(TransactionModel)
@@ -481,15 +490,18 @@ def get_monthly_detail(
         return empty()
 
     income = round(float(frame[frame["type"] == "income"]["amount"].sum()), 2)
-    expense = round(float(frame[frame["type"] == "expense"]["amount"].sum()), 2)
+    expense = round(
+        float(frame[frame["type"] == "expense"]["amount"].sum()), 2)
 
     # Mês anterior
     prev_month_date = (
         f"{year - 1}-12" if m == 1 else f"{year}-{str(m - 1).zfill(2)}"
     )
     prev_frame = df[df["month"] == prev_month_date]
-    prev_income = round(float(prev_frame[prev_frame["type"] == "income"]["amount"].sum()), 2) if not prev_frame.empty else 0.0
-    prev_expense = round(float(prev_frame[prev_frame["type"] == "expense"]["amount"].sum()), 2) if not prev_frame.empty else 0.0
+    prev_income = round(float(prev_frame[prev_frame["type"] == "income"]["amount"].sum(
+    )), 2) if not prev_frame.empty else 0.0
+    prev_expense = round(float(prev_frame[prev_frame["type"] == "expense"]["amount"].sum(
+    )), 2) if not prev_frame.empty else 0.0
     prev_balance = round(prev_income - prev_expense, 2)
 
     def variation(curr: float, prev: float):
@@ -513,12 +525,14 @@ def get_monthly_detail(
             )
             .all()
         ) if cat_ids else []
-        cat_map = {c.id: {"name": c.name, "color": c.color, "icon": c.icon} for c in categories}
+        cat_map = {c.id: {"name": c.name, "color": c.color, "icon": c.icon}
+                   for c in categories}
         grouped = filtered.groupby("category_id")["amount"].sum().reset_index()
         result = []
         for _, row in grouped.iterrows():
             cat_id = row["category_id"]
-            cat_info = cat_map.get(cat_id, {"name": "Sem categoria", "color": "#94a3b8", "icon": "tag"})
+            cat_info = cat_map.get(
+                cat_id, {"name": "Sem categoria", "color": "#94a3b8", "icon": "tag"})
             result.append({
                 "category_id": cat_id,
                 "category_name": cat_info["name"],
@@ -543,7 +557,8 @@ def get_monthly_detail(
     if not rec_df.empty:
         rec_df["month"] = rec_df["date"].dt.to_period("M").astype(str)
         rec_frame = rec_df[rec_df["month"] == month]
-        recurring_total = round(float(rec_frame["amount"].sum()), 2) if not rec_frame.empty else 0.0
+        recurring_total = round(
+            float(rec_frame["amount"].sum()), 2) if not rec_frame.empty else 0.0
     else:
         recurring_total = 0.0
 
