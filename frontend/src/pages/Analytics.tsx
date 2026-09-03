@@ -5,10 +5,12 @@ import {
   getByCategory,
   getFutureCommitments,
   getMonthly,
+  getMonthlyDetail,
   getRecurringAverage,
   getSummary,
   type CompareMonthsData,
   type FutureCommitmentsData,
+  type MonthlyDetailData,
   type RecurringAverageData,
 } from "@/services/analyticsService";
 import type { AnalyticsSummary, CategoryData, MonthlyData } from "@/types";
@@ -21,6 +23,9 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+const currentYear = new Date().getFullYear();
+const currentMonthStr = `${currentYear}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
+
 function formatMonth(value: string): string {
   const [year, month] = value.split("-");
   const date = new Date(Number(year), Number(month) - 1);
@@ -29,14 +34,7 @@ function formatMonth(value: string): string {
 
 function VariationBadge({ value }: { value: number | null }) {
   if (value === null)
-    return (
-      <span
-        className="text-xs font-medium"
-        style={{ color: "var(--text-muted)" }}
-      >
-        —
-      </span>
-    );
+    return <span className="text-xs text-muted-foreground">—</span>;
   const isPositive = value > 0;
   const isZero = value === 0;
   return (
@@ -44,13 +42,10 @@ function VariationBadge({ value }: { value: number | null }) {
       className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
       style={
         isZero
-          ? {
-              background: "var(--surface-elevated)",
-              color: "var(--text-muted)",
-            }
+          ? { background: "rgba(255,255,255,0.06)", color: "var(--text-muted)" }
           : isPositive
-            ? { background: "rgba(76,138,106,0.12)", color: "#8FC4A6" }
-            : { background: "rgba(201,74,63,0.12)", color: "#D98B7E" }
+            ? { background: "rgba(76,138,106,0.12)", color: "#4C8A6A" }
+            : { background: "rgba(201,74,63,0.12)", color: "#C94A3F" }
       }
     >
       {isZero ? (
@@ -71,25 +66,14 @@ const cardStyle = {
   borderRadius: "1rem",
 };
 
-const sectionTitle = "text-base font-semibold mb-4";
-const sectionTitleStyle = { color: "var(--text-secondary)" };
 const mutedText = { color: "var(--text-muted)" };
+const sectionTitleStyle = { color: "var(--text-secondary)" };
 const thStyle = "text-left px-6 py-3 text-xs font-medium";
 const thStyleRight = "text-right px-6 py-3 text-xs font-medium";
 
-export default function Analytics() {
-  const currentYear = new Date().getFullYear();
-  const currentMonth = `${currentYear}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
-  const prevMonth = new Date(new Date().setMonth(new Date().getMonth() - 1));
-  const prevMonthStr = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth() + 1).padStart(2, "0")}`;
-
-  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  const [compareA, setCompareA] = useState(currentMonth);
-  const [compareB, setCompareB] = useState(prevMonthStr);
-  const [compareData, setCompareData] = useState<CompareMonthsData | null>(
-    null,
-  );
-  const [isLoadingCompare, setIsLoadingCompare] = useState(false);
+// ─── ABA: VISÃO GERAL ────────────────────────────────────────────────────────
+function OverviewTab() {
+  const [selectedYear, setSelectedYear] = useState(currentYear);
 
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [monthly, setMonthly] = useState<MonthlyData[]>([]);
@@ -98,9 +82,9 @@ export default function Analytics() {
   );
   const [incomeByCategory, setIncomeByCategory] = useState<CategoryData[]>([]);
   const [recurring, setRecurring] = useState<RecurringAverageData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [futureCommitments, setFutureCommitments] =
     useState<FutureCommitmentsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -109,9 +93,9 @@ export default function Analytics() {
         const [s, m, ec, ic, r, fc] = await Promise.all([
           getSummary(),
           getMonthly(selectedYear),
-          getByCategory("expense"),
-          getByCategory("income"),
-          getRecurringAverage(),
+          getByCategory("expense", selectedYear),
+          getByCategory("income", selectedYear),
+          getRecurringAverage(selectedYear),
           getFutureCommitments(),
         ]);
         setSummary(s);
@@ -127,23 +111,12 @@ export default function Analytics() {
     load();
   }, [selectedYear]);
 
-  async function handleCompare() {
-    if (!compareA || !compareB) return;
-    setIsLoadingCompare(true);
-    try {
-      const data = await compareMonths(compareA, compareB);
-      setCompareData(data);
-    } finally {
-      setIsLoadingCompare(false);
-    }
-  }
-
   const years = Array.from(
     { length: currentYear - 2023 + 1 },
     (_, i) => currentYear - i,
   );
 
-  if (isLoading) {
+  if (isLoading)
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2
@@ -152,36 +125,9 @@ export default function Analytics() {
         />
       </div>
     );
-  }
 
   return (
     <div className="space-y-10">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1
-          className="text-2xl font-display font-semibold tracking-tight"
-          style={{ color: "var(--text-primary)" }}
-        >
-          Análises
-        </h1>
-        <select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className="text-sm rounded-xl px-3 h-9 outline-none"
-          style={{
-            background: "var(--surface-card)",
-            border: "1px solid var(--border-subtle)",
-            color: "var(--text-secondary)",
-          }}
-        >
-          {years.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* Cards de resumo */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
@@ -212,16 +158,13 @@ export default function Analytics() {
         ].map((item) => (
           <div
             key={item.label}
-            className="relative overflow-hidden rounded-2xl p-5 pt-6"
+            className="relative overflow-hidden rounded-2xl p-5"
             style={{
               background: "var(--surface-card)",
               border: "1px solid var(--border-subtle)",
+              borderLeft: `3px solid ${item.accent}`,
             }}
           >
-            <div
-              className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
-              style={{ background: item.accent }}
-            />
             <p className="text-xs font-medium mb-2" style={mutedText}>
               {item.label}
             </p>
@@ -235,7 +178,26 @@ export default function Analytics() {
         ))}
       </div>
 
-      {/* Evolução mensal */}
+      {/* Seletor de ano */}
+      <div className="flex items-center gap-3">
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+          className="text-sm rounded-xl px-3 h-9 outline-none"
+          style={{
+            background: "var(--surface-card)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-secondary)",
+          }}
+        >
+          {years.map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {monthly.length > 0 ? (
         <MonthlyChart data={monthly} />
       ) : (
@@ -249,7 +211,7 @@ export default function Analytics() {
 
       {/* Distribuição por categoria */}
       <div>
-        <h2 className={sectionTitle} style={sectionTitleStyle}>
+        <h2 className="text-base font-semibold mb-4" style={sectionTitleStyle}>
           Distribuição por Categoria
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -285,7 +247,10 @@ export default function Analytics() {
       {/* Ranking de despesas */}
       {expenseByCategory.length > 0 && (
         <div>
-          <h2 className={sectionTitle} style={sectionTitleStyle}>
+          <h2
+            className="text-base font-semibold mb-4"
+            style={sectionTitleStyle}
+          >
             Ranking de Despesas
           </h2>
           <div style={cardStyle}>
@@ -346,7 +311,7 @@ export default function Analytics() {
                         <div className="flex items-center justify-end gap-2">
                           <div
                             className="w-16 h-1.5 rounded-full overflow-hidden"
-                            style={{ background: "var(--surface-elevated)" }}
+                            style={{ background: "var(--border-subtle)" }}
                           >
                             <div
                               className="h-full rounded-full"
@@ -420,7 +385,7 @@ export default function Analytics() {
 
       {/* Despesas recorrentes */}
       <div>
-        <h2 className={sectionTitle} style={sectionTitleStyle}>
+        <h2 className="text-base font-semibold mb-4" style={sectionTitleStyle}>
           Despesas Recorrentes
         </h2>
         {!recurring || recurring.by_category.length === 0 ? (
@@ -428,7 +393,7 @@ export default function Analytics() {
             className="p-8 text-center rounded-2xl text-sm"
             style={{ ...cardStyle, color: "var(--text-muted)" }}
           >
-            Nenhuma despesa marcada como recorrente ainda.
+            Nenhuma despesa marcada como recorrente.
           </div>
         ) : (
           <div className="space-y-4">
@@ -521,7 +486,7 @@ export default function Analytics() {
 
       {/* Compromissos futuros */}
       <div>
-        <h2 className={sectionTitle} style={sectionTitleStyle}>
+        <h2 className="text-base font-semibold mb-4" style={sectionTitleStyle}>
           Compromissos Futuros
         </h2>
         {!futureCommitments || futureCommitments.total_pending === 0 ? (
@@ -668,10 +633,369 @@ export default function Analytics() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ─── ABA: POR MÊS ────────────────────────────────────────────────────────────
+function MonthTab() {
+  const [selectedMonth, setSelectedMonth] = useState(currentMonthStr);
+  const [detail, setDetail] = useState<MonthlyDetailData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [compareA, setCompareA] = useState(currentMonthStr);
+  const [compareB, setCompareB] = useState(() => {
+    const prev = new Date(new Date().setMonth(new Date().getMonth() - 1));
+    return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}`;
+  });
+  const [compareData, setCompareData] = useState<CompareMonthsData | null>(
+    null,
+  );
+  const [isLoadingCompare, setIsLoadingCompare] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      setIsLoading(true);
+      try {
+        const data = await getMonthlyDetail(selectedMonth);
+        setDetail(data);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    load();
+  }, [selectedMonth]);
+
+  async function handleCompare() {
+    if (!compareA || !compareB) return;
+    setIsLoadingCompare(true);
+    try {
+      const data = await compareMonths(compareA, compareB);
+      setCompareData(data);
+    } finally {
+      setIsLoadingCompare(false);
+    }
+  }
+
+  return (
+    <div className="space-y-10">
+      {/* Seletor mês + ano */}
+      <div className="flex items-center gap-2">
+        <select
+          value={selectedMonth.split("-")[0]}
+          onChange={(e) => {
+            const m = selectedMonth.split("-")[1];
+            setSelectedMonth(`${e.target.value}-${m}`);
+          }}
+          className="text-sm rounded-xl px-3 h-9 outline-none"
+          style={{
+            background: "var(--surface-card)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-secondary)",
+          }}
+        >
+          {Array.from(
+            { length: currentYear - 2023 + 1 },
+            (_, i) => currentYear - i,
+          ).map((y) => (
+            <option key={y} value={y}>
+              {y}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={selectedMonth.split("-")[1]}
+          onChange={(e) => {
+            const y = selectedMonth.split("-")[0];
+            setSelectedMonth(`${y}-${e.target.value}`);
+          }}
+          className="text-sm rounded-xl px-3 h-9 outline-none"
+          style={{
+            background: "var(--surface-card)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-secondary)",
+          }}
+        >
+          {[
+            ["01", "Janeiro"],
+            ["02", "Fevereiro"],
+            ["03", "Março"],
+            ["04", "Abril"],
+            ["05", "Maio"],
+            ["06", "Junho"],
+            ["07", "Julho"],
+            ["08", "Agosto"],
+            ["09", "Setembro"],
+            ["10", "Outubro"],
+            ["11", "Novembro"],
+            ["12", "Dezembro"],
+          ].map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {isLoading ? (
+        <div className="flex h-48 items-center justify-center">
+          <Loader2
+            className="w-6 h-6 animate-spin"
+            style={{ color: "#7DB99A" }}
+          />
+        </div>
+      ) : !detail || detail.transaction_count === 0 ? (
+        <div
+          className="p-8 text-center rounded-2xl text-sm"
+          style={{ ...cardStyle, color: "var(--text-muted)" }}
+        >
+          Nenhuma transação registrada em {formatMonth(selectedMonth)}.
+        </div>
+      ) : (
+        <>
+          {/* Cards do mês */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              {
+                label: "Receitas",
+                value: detail.income,
+                color: "#8FC4A6",
+                accent: "#4C8A6A",
+                variation: detail.variation.income,
+              },
+              {
+                label: "Despesas",
+                value: detail.expense,
+                color: "#D98B7E",
+                accent: "#C94A3F",
+                variation: detail.variation.expense,
+              },
+              {
+                label: "Saldo",
+                value: detail.balance,
+                color: "#D9B36A",
+                accent: "#C7A35A",
+                variation: detail.variation.balance,
+              },
+              {
+                label: "Recorrentes",
+                value: detail.recurring_total,
+                color: "var(--text-secondary)",
+                accent: "#8A928B",
+                variation: null,
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="relative overflow-hidden rounded-2xl p-5"
+                style={{
+                  background: "var(--surface-card)",
+                  border: "1px solid var(--border-subtle)",
+                  borderLeft: `3px solid ${item.accent}`,
+                }}
+              >
+                <p className="text-xs font-medium mb-1" style={mutedText}>
+                  {item.label}
+                </p>
+                <p
+                  className="text-xl font-bold font-display"
+                  style={{ color: item.color }}
+                >
+                  R$ {item.value.toFixed(2)}
+                </p>
+                {item.variation !== null && (
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <VariationBadge value={item.variation} />
+                    <span className="text-[10px]" style={mutedText}>
+                      vs mês anterior
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Categorias do mês */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {detail.expense_by_category.length > 0 ? (
+              <CategoryChart
+                data={detail.expense_by_category}
+                title="Despesas por Categoria"
+              />
+            ) : (
+              <div
+                className="p-8 text-center rounded-2xl text-sm"
+                style={{ ...cardStyle, color: "var(--text-muted)" }}
+              >
+                Sem despesas categorizadas
+              </div>
+            )}
+            {detail.income_by_category.length > 0 ? (
+              <CategoryChart
+                data={detail.income_by_category}
+                title="Receitas por Categoria"
+              />
+            ) : (
+              <div
+                className="p-8 text-center rounded-2xl text-sm"
+                style={{ ...cardStyle, color: "var(--text-muted)" }}
+              >
+                Sem receitas categorizadas
+              </div>
+            )}
+          </div>
+
+          {/* Ranking do mês */}
+          {detail.expense_by_category.length > 0 && (
+            <div>
+              <h2
+                className="text-base font-semibold mb-4"
+                style={sectionTitleStyle}
+              >
+                Ranking de Despesas — {formatMonth(selectedMonth)}
+              </h2>
+              <div style={cardStyle}>
+                <table className="w-full text-sm hidden md:table">
+                  <thead>
+                    <tr
+                      style={{ borderBottom: "1px solid var(--border-subtle)" }}
+                    >
+                      <th className={thStyle} style={mutedText}>
+                        #
+                      </th>
+                      <th className={thStyle} style={mutedText}>
+                        Categoria
+                      </th>
+                      <th className={thStyleRight} style={mutedText}>
+                        Total
+                      </th>
+                      <th className={thStyleRight} style={mutedText}>
+                        % do mês
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {detail.expense_by_category.map((cat, index) => {
+                      const total = detail.expense_by_category.reduce(
+                        (acc, c) => acc + c.total,
+                        0,
+                      );
+                      const pct =
+                        total > 0
+                          ? ((cat.total / total) * 100).toFixed(1)
+                          : "0";
+                      return (
+                        <tr
+                          key={cat.category_id}
+                          style={{
+                            borderBottom: "1px solid var(--border-subtle)",
+                          }}
+                        >
+                          <td className="px-6 py-3 text-sm" style={mutedText}>
+                            {index + 1}
+                          </td>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="w-2.5 h-2.5 rounded-full shrink-0"
+                                style={{ background: cat.category_color }}
+                              />
+                              <span
+                                className="text-sm"
+                                style={{ color: "var(--text-secondary)" }}
+                              >
+                                {cat.category_name}
+                              </span>
+                            </div>
+                          </td>
+                          <td
+                            className="px-6 py-3 text-right text-sm font-medium"
+                            style={{ color: "#D98B7E" }}
+                          >
+                            R$ {cat.total.toFixed(2)}
+                          </td>
+                          <td className="px-6 py-3 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <div
+                                className="w-16 h-1.5 rounded-full overflow-hidden"
+                                style={{ background: "var(--border-subtle)" }}
+                              >
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${pct}%`,
+                                    background: "#C94A3F",
+                                    opacity: 0.7,
+                                  }}
+                                />
+                              </div>
+                              <span
+                                className="text-xs w-10 text-right"
+                                style={mutedText}
+                              >
+                                {pct}%
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                <div
+                  className="md:hidden divide-y"
+                  style={{ borderColor: "var(--border-subtle)" }}
+                >
+                  {detail.expense_by_category.map((cat, index) => {
+                    const total = detail.expense_by_category.reduce(
+                      (acc, c) => acc + c.total,
+                      0,
+                    );
+                    const pct =
+                      total > 0 ? ((cat.total / total) * 100).toFixed(1) : "0";
+                    return (
+                      <div
+                        key={cat.category_id}
+                        className="px-4 py-3 flex items-center gap-3"
+                      >
+                        <span className="text-xs w-4" style={mutedText}>
+                          {index + 1}
+                        </span>
+                        <span
+                          className="w-2.5 h-2.5 rounded-full shrink-0"
+                          style={{ background: cat.category_color }}
+                        />
+                        <span
+                          className="flex-1 text-sm"
+                          style={{ color: "var(--text-secondary)" }}
+                        >
+                          {cat.category_name}
+                        </span>
+                        <div className="text-right">
+                          <p
+                            className="text-sm font-medium"
+                            style={{ color: "#D98B7E" }}
+                          >
+                            R$ {cat.total.toFixed(2)}
+                          </p>
+                          <p className="text-xs" style={mutedText}>
+                            {pct}%
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Comparar meses */}
       <div>
-        <h2 className={sectionTitle} style={sectionTitleStyle}>
+        <h2 className="text-base font-semibold mb-4" style={sectionTitleStyle}>
           Comparar Meses
         </h2>
         <div className="rounded-2xl p-6" style={cardStyle}>
@@ -703,7 +1027,7 @@ export default function Analytics() {
               className="flex items-center gap-2 px-4 h-9 rounded-xl text-sm font-medium transition-all"
               style={{
                 border: "1px solid var(--border-subtle)",
-                color: "var(--text-secondary)",
+                color: "var(--text-muted)",
               }}
             >
               {isLoadingCompare ? (
@@ -772,6 +1096,54 @@ export default function Analytics() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── PÁGINA PRINCIPAL ─────────────────────────────────────────────────────────
+export default function Analytics() {
+  const [activeTab, setActiveTab] = useState<"overview" | "month">("overview");
+
+  const tabs = [
+    { key: "overview" as const, label: "Visão Geral" },
+    { key: "month" as const, label: "Por Mês" },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Header + Tabs */}
+      <div>
+        <h1
+          className="text-2xl font-display font-semibold tracking-tight mb-6"
+          style={{ color: "var(--text-primary)" }}
+        >
+          Análises
+        </h1>
+        <div
+          className="flex gap-1 p-1 rounded-xl w-fit"
+          style={{
+            background: "var(--surface-card)",
+            border: "1px solid var(--border-subtle)",
+          }}
+        >
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className="px-5 py-2 rounded-lg text-sm font-medium transition-all"
+              style={
+                activeTab === tab.key
+                  ? { background: "#4C8A6A", color: "#090B0A" }
+                  : { color: "var(--text-muted)" }
+              }
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {activeTab === "overview" ? <OverviewTab /> : <MonthTab />}
     </div>
   );
 }
