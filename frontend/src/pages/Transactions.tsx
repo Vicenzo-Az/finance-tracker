@@ -889,27 +889,11 @@ export default function Transactions() {
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
                   Categoria
                 </label>
-                <Select
+                <CategoryPicker
+                  categories={editFilteredCategories}
                   value={editCategoryId}
-                  onValueChange={setEditCategoryId}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Opcional" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {editFilteredCategories.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: c.color }}
-                          />
-                          {c.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  onChange={setEditCategoryId}
+                />
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
