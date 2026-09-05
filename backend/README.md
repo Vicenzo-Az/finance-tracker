@@ -1,20 +1,23 @@
 # Valore — Backend
 
-API REST do **Valore** construída com **FastAPI** e **Python 3.13**.
+API REST desenvolvida com **FastAPI** e **PostgreSQL**, responsável por toda a lógica de negócio, autenticação e análise financeira do Valore.
 
 ---
 
-## Tecnologias
+## Stack
 
-- Python 3.13
-- FastAPI 0.128
-- SQLAlchemy 2.0 + Alembic
-- PostgreSQL + psycopg2
-- Pandas 3.0
-- Pydantic v2 + pydantic-settings
-- python-jose (JWT)
-- bcrypt
-- Uvicorn
+| Tecnologia  | Versão | Uso                 |
+| ----------- | ------ | ------------------- |
+| Python      | 3.13   | Linguagem principal |
+| FastAPI     | latest | Framework HTTP      |
+| SQLAlchemy  | 2.0+   | ORM                 |
+| Alembic     | latest | Migrações de banco  |
+| PostgreSQL  | 15     | Banco de dados      |
+| Pydantic v2 | latest | Validação de dados  |
+| python-jose | latest | JWT                 |
+| bcrypt      | latest | Hash de senhas      |
+| Pandas      | latest | Analytics           |
+| Uvicorn     | latest | Servidor ASGI       |
 
 ---
 
@@ -24,65 +27,45 @@ API REST do **Valore** construída com **FastAPI** e **Python 3.13**.
 backend/
 ├── src/
 │   ├── api/
-│   │   ├── app.py
+│   │   ├── app.py               # Fábrica da aplicação FastAPI
 │   │   └── routes/
-│   │       ├── auth.py
-│   │       ├── transactions.py
-│   │       ├── accounts.py
-│   │       ├── categories.py
-│   │       ├── analytics.py
-│   │       └── upload.py
+│   │       ├── auth.py          # Registro, login, logout, perfil, deleção de conta
+│   │       ├── accounts.py      # CRUD de contas financeiras
+│   │       ├── transactions.py  # CRUD, parcelamento, transferências, CSV
+│   │       ├── categories.py    # CRUD de categorias
+│   │       ├── analytics.py     # Resumo, mensal, por categoria, tendências, mensal-detalhe
+│   │       ├── hints.py         # Autocomplete de categorias por descrição
+│   │       └── password_reset.py # Recuperação de senha via Gmail SMTP
 │   ├── core/
-│   │   ├── config.py
-│   │   ├── cors.py
-│   │   ├── database.py
-│   │   ├── dependencies.py
-│   │   └── security.py
+│   │   ├── config.py            # Configurações via pydantic-settings
+│   │   ├── database.py          # Engine e sessão SQLAlchemy
+│   │   ├── dependencies.py      # get_current_user
+│   │   ├── security.py          # Hash, JWT, tokens de reset
+│   │   └── cors.py              # Configuração CORS
 │   ├── models/
 │   │   ├── user.py
 │   │   ├── account.py
 │   │   ├── transaction.py
 │   │   ├── category.py
-│   │   └── description_hint.py
+│   │   ├── description_hint.py
+│   │   └── password_reset_token.py
 │   ├── schemas/
 │   │   ├── user.py
 │   │   ├── account.py
 │   │   ├── transaction.py
-│   │   ├── category.py
-│   │   ├── finance.py
-│   │   └── error.py
-│   ├── services/
-│   │   ├── balance.py
-│   │   └── processing.py
-│   ├── pipelines/
-│   └── main.py
-├── alembic/
+│   │   └── category.py
+│   └── services/
+│       └── balance.py           # Cálculo de saldo de conta
 ├── tests/
 │   ├── conftest.py
 │   ├── test_auth.py
 │   ├── test_accounts.py
 │   ├── test_transactions.py
 │   └── test_analytics.py
-├── pytest.ini
+├── alembic/
+├── alembic.ini
 ├── requirements.txt
-└── README.md
-```
-
----
-
-## Variáveis de Ambiente
-
-Crie o arquivo `.env` na raiz de `backend/`:
-
-```env
-DATABASE_URL=postgresql://postgres:senha@localhost:5432/valore
-SECRET_KEY=sua_chave_secreta_longa
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Produção
-ENVIRONMENT=production
-FRONTEND_URL=https://valore-finance.vercel.app
+└── Procfile
 ```
 
 ---
@@ -100,114 +83,147 @@ uvicorn src.main:app --reload
 
 Documentação interativa disponível em:
 
-- Swagger: http://127.0.0.1:8000/docs
-- ReDoc: http://127.0.0.1:8000/redoc
+- Swagger: <http://127.0.0.1:8000/docs>
+- ReDoc: <http://127.0.0.1:8000/redoc>
 
 ---
 
 ## Endpoints
 
-### Autenticação
+### Autenticação (`/auth`)
 
-| Método | Rota             | Descrição                    |
-| ------ | ---------------- | ---------------------------- |
-| POST   | `/auth/register` | Cria nova conta              |
-| POST   | `/auth/login`    | Login — seta cookie httpOnly |
-| POST   | `/auth/logout`   | Logout — apaga cookie        |
-| GET    | `/auth/me`       | Retorna usuário autenticado  |
-| PUT    | `/auth/me`       | Atualiza perfil e senha      |
+| Método | Rota                    | Descrição                                |
+| ------ | ----------------------- | ---------------------------------------- |
+| POST   | `/auth/register`        | Cria conta de usuário                    |
+| POST   | `/auth/login`           | Autentica e retorna cookie JWT           |
+| POST   | `/auth/logout`          | Invalida sessão e limpa cookie           |
+| GET    | `/auth/me`              | Retorna dados do usuário autenticado     |
+| PUT    | `/auth/me`              | Atualiza nome, e-mail, senha ou avatar   |
+| DELETE | `/auth/me`              | Deleta conta e todos os dados em cascata |
+| POST   | `/auth/forgot-password` | Envia e-mail de recuperação de senha     |
+| POST   | `/auth/reset-password`  | Redefine senha com token válido          |
 
-### Contas
+### Contas (`/accounts`)
 
-| Método | Rota             | Descrição                                     |
-| ------ | ---------------- | --------------------------------------------- |
-| GET    | `/accounts/`     | Lista contas com saldo calculado              |
-| POST   | `/accounts/`     | Cria conta (débito ou crédito)                |
-| PUT    | `/accounts/{id}` | Atualiza conta                                |
-| DELETE | `/accounts/{id}` | Remove conta (`force`, `delete_transactions`) |
+| Método | Rota             | Descrição                          |
+| ------ | ---------------- | ---------------------------------- |
+| GET    | `/accounts/`     | Lista contas do usuário            |
+| POST   | `/accounts/`     | Cria conta (débito ou crédito)     |
+| PUT    | `/accounts/{id}` | Atualiza conta                     |
+| DELETE | `/accounts/{id}` | Deleta conta com opções de cascade |
 
-### Transações
+### Transações (`/transactions`)
 
 | Método | Rota                        | Descrição                                           |
 | ------ | --------------------------- | --------------------------------------------------- |
-| GET    | `/transactions/`            | Lista com filtros (conta, categoria, tipo, período) |
-| POST   | `/transactions/`            | Cria transação (simples ou parcelada)               |
-| PUT    | `/transactions/{id}`        | Atualiza transação                                  |
-| DELETE | `/transactions/{id}`        | Remove transação ou grupo                           |
-| DELETE | `/transactions/{id}/single` | Remove só esta parcela                              |
+| GET    | `/transactions/`            | Lista com filtros (tipo, conta, categoria, período) |
+| POST   | `/transactions/`            | Cria transação simples ou parcelada                 |
 | POST   | `/transactions/transfer`    | Cria transferência entre contas                     |
+| PUT    | `/transactions/{id}`        | Atualiza transação (ou grupo de parcelas)           |
+| DELETE | `/transactions/{id}`        | Deleta transação, grupo ou transferência            |
+| DELETE | `/transactions/{id}/single` | Deleta somente esta parcela                         |
+| GET    | `/transactions/export/csv`  | Exporta CSV com filtro de período opcional          |
 
-### Sugestões de Categoria (Hints)
-
-| Método | Rota                      | Descrição                                       |
-| ------ | ------------------------- | ----------------------------------------------- |
-| GET    | `/hints/?description=...` | Retorna a categoria sugerida para uma descrição |
-| POST   | `/hints/`                 | Salva/atualiza o par descrição → categoria      |
-
-### Categorias
+### Categorias (`/categories`)
 
 | Método | Rota               | Descrição                                |
 | ------ | ------------------ | ---------------------------------------- |
 | GET    | `/categories/`     | Lista categorias do sistema + do usuário |
 | POST   | `/categories/`     | Cria categoria personalizada             |
 | PUT    | `/categories/{id}` | Atualiza categoria do usuário            |
-| DELETE | `/categories/{id}` | Remove categoria do usuário              |
+| DELETE | `/categories/{id}` | Deleta categoria do usuário              |
 
-### Analytics
+### Analytics (`/analytics`)
 
-| Método | Rota                            | Descrição                            |
-| ------ | ------------------------------- | ------------------------------------ |
-| GET    | `/analytics/summary`            | Resumo geral (regime de caixa)       |
-| GET    | `/analytics/monthly`            | Receitas/despesas por mês            |
-| GET    | `/analytics/by-category`        | Totais por categoria                 |
-| GET    | `/analytics/trends`             | Comparativo mês atual vs anterior    |
-| GET    | `/analytics/recurring-average`  | Média mensal de despesas recorrentes |
-| GET    | `/analytics/compare-months`     | Compara dois meses específicos       |
-| GET    | `/analytics/future-commitments` | Parcelas pendentes agrupadas         |
+| Método | Rota                                          | Descrição                                       |
+| ------ | --------------------------------------------- | ----------------------------------------------- |
+| GET    | `/analytics/summary`                          | Patrimônio, receitas, despesas e saldo totais   |
+| GET    | `/analytics/monthly?year=`                    | Evolução mensal (filtrável por ano)             |
+| GET    | `/analytics/by-category?type=&year=`          | Gastos por categoria (filtrável por tipo e ano) |
+| GET    | `/analytics/trends`                           | Comparativo mês atual vs anterior               |
+| GET    | `/analytics/recurring-average?year=`          | Média mensal de despesas recorrentes            |
+| GET    | `/analytics/compare-months?month_a=&month_b=` | Comparativo entre dois meses                    |
+| GET    | `/analytics/future-commitments`               | Parcelas pendentes agrupadas                    |
+| GET    | `/analytics/monthly-detail?month=`            | Detalhamento completo de um mês (YYYY-MM)       |
 
 ---
 
 ## Autenticação
 
-JWT armazenado em cookie `httpOnly`. Em produção: `secure=True`, `samesite="none"` (necessário para frontend e backend em domínios distintos com proxy Vercel).
+O sistema usa **JWT em cookie `httpOnly`**, sem exposição de token no frontend. Em produção, o cookie é `secure` e `samesite=none` para funcionar com o proxy da Vercel.
 
-O hash de senhas usa **bcrypt** diretamente (sem passlib).
+### Segurança na recuperação de senha
+
+- Token gerado com `secrets.token_urlsafe(32)`
+- Armazenado como hash SHA-256 no banco (nunca em texto claro)
+- Validade de 1 hora
+- Uso único — invalidado após a primeira utilização
+- Tokens anteriores invalidados ao solicitar novo reset
+- Resposta genérica em todos os casos (previne enumeração de usuários)
 
 ---
 
 ## Banco de Dados
 
-PostgreSQL com SQLAlchemy 2.0 (ORM declarativo) e Alembic para migrações.
+### Migrações
 
-Principais tabelas: `users`, `accounts`, `transactions`, `categories`.
+```bash
+alembic upgrade head                    # aplica todas as migrações
+alembic revision --autogenerate -m ""   # gera nova migração
+alembic downgrade -1                    # reverte a última migração
+```
 
-Saldo de conta calculado dinamicamente em `services/balance.py` considerando apenas transações com `is_paid=True`.
+### Modelos
+
+- `users` — dados do usuário e avatar
+- `accounts` — contas financeiras (débito/crédito)
+- `transactions` — movimentações com suporte a parcelamento e transferências
+- `categories` — categorias do sistema (`user_id = null`) e do usuário
+- `description_hints` — histórico de categorias por descrição (autocomplete)
+- `password_reset_tokens` — tokens de recuperação de senha com expiração
+
+---
+
+## Configuração
+
+Crie `backend/.env`:
+
+```env
+DATABASE_URL=postgresql://postgres:senha@localhost:5432/valore
+SECRET_KEY=chave_secreta_longa
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+FRONTEND_URL=http://localhost:5173
+SMTP_USER=seu@gmail.com
+SMTP_PASSWORD=senha_de_app_gmail
+SMTP_FROM=Valore <seu@gmail.com>
+```
 
 ---
 
 ## Testes
 
 ```bash
-pytest
+cd backend
+pytest                    # todos os testes
+pytest tests/test_auth.py # somente autenticação
+pytest -v                 # verbose
 ```
 
-68 testes organizados em 4 módulos:
+68 testes automatizados — banco `valore_test` criado e destruído a cada execução.
 
-| Arquivo                | Cobertura                                                                                                       |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `test_auth.py`         | Registro, login, cookie httpOnly, perfil, troca de senha                                                        |
-| `test_accounts.py`     | CRUD de contas, isolamento entre usuários, cálculo de saldo (`is_paid`), exclusão com/sem transações vinculadas |
-| `test_transactions.py` | CRUD, parcelamento (cálculo de valores e datas), regras de conta de crédito, transferências, filtros            |
-| `test_analytics.py`    | Resumo, evolução mensal, por categoria, compromissos futuros, comparação de meses, despesas recorrentes         |
+---
 
-Os testes rodam contra um banco PostgreSQL dedicado (`valore_test`), criado e limpo automaticamente a cada execução via fixtures no `conftest.py`, garantindo isolamento entre casos de teste.
+## Execução Local
 
-**Resultado atual: 68/68 (100%) de aprovação.**
-Only, perfil, troca de senha |
-| `test_accounts.py` | CRUD de contas, isolamento entre usuários, cálculo de saldo (`is_paid`), exclusão com/sem transações vinculadas |
-| `test_transactions.py` | CRUD, parcelamento (cálculo de valores e datas), regras de conta de crédito, transferências, filtros |
-| `test_analytics.py` | Resumo, evolução mensal, por categoria, compromissos futuros, comparação de meses, despesas recorrentes |
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn src.main:app --reload
+```
 
-Os testes rodam contra um banco PostgreSQL dedicado (`valore_test`), criado e limpo automaticamente a cada execução via fixtures no `conftest.py`, garantindo isolamento entre casos de teste.
-
-**Resultado atual: 68/68 (100%) de aprovação.**
+API disponível em `http://127.0.0.1:8000`.
+Swagger em `http://127.0.0.1:8000/docs`.

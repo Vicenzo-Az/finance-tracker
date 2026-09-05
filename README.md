@@ -2,14 +2,14 @@
 
 Aplicação **fullstack** de gestão financeira pessoal desenvolvida como Trabalho de Conclusão de Curso (TCC) no Curso Superior de Tecnologia em Sistemas para Internet — IFSul.
 
-O sistema permite registrar receitas, despesas e transferências entre contas, categorizar gastos, acompanhar parcelas de compras no crédito e visualizar análises detalhadas do histórico financeiro.
+O sistema permite registrar receitas, despesas e transferências entre contas, categorizar gastos, acompanhar parcelas de compras no crédito, visualizar análises detalhadas do histórico financeiro e exportar dados para CSV.
 
 ---
 
 ## Produção
 
-- **Frontend:** https://valore-finance.vercel.app
-- **Backend:** https://valore-api-279d7c3cc379.herokuapp.com
+- **Frontend:** <https://valore-finance.vercel.app>
+- **Backend:** <https://valore-api-279d7c3cc379.herokuapp.com>
 
 ---
 
@@ -64,16 +64,17 @@ valore/
 
 ## Funcionalidades
 
-- **Autenticação** — registro, login e logout com JWT em cookie `httpOnly`
-- **Contas financeiras** — contas de débito e crédito com saldo calculado automaticamente
-- **Transações** — CRUD completo com categorias, filtros por período, conta e categoria, agrupamento mensal
+- **Autenticação** — registro, login e logout com JWT em cookie `httpOnly`; recuperação de senha via e-mail com token seguro (SHA-256, uso único, validade de 1 hora)
+- **Contas financeiras** — contas de débito e crédito com saldo calculado automaticamente; exclusão com opções de manter ou deletar transações vinculadas
+- **Transações** — CRUD completo com categorias, filtros por período, conta e categoria, agrupamento mensal e exportação em CSV
 - **Transferências** — movimentação entre contas do mesmo usuário
 - **Parcelamento** — compras parceladas em contas de crédito, com cálculo automático de valores e datas, controle de parcelas pagas/pendentes e edição individual ou em lote das parcelas restantes
-- **Categorias** — categorias do sistema + personalizadas pelo usuário
+- **Categorias** — categorias do sistema (somente leitura) e personalizadas pelo usuário (CRUD completo); página dedicada de gerenciamento
 - **Autocomplete de categorias** — sugestão automática de categoria com base no histórico de descrições do usuário
-- **Análises** — dashboard com gráficos, evolução mensal, ranking de categorias, despesas recorrentes, compromissos futuros (regime de competência) e comparativo entre meses específicos
-- **Perfil** — edição de nome, e-mail, senha e avatar
-- **Responsividade** — layout adaptado para desktop, tablet e mobile, com sidebar em overlay e listagens em cards no mobile
+- **Análises** — duas abas: Visão Geral (resumo anual, evolução mensal, ranking de categorias, recorrentes, compromissos futuros) e Por Mês (detalhamento mensal com comparativo vs mês anterior)
+- **Exportar CSV** — exportação de transações com filtro de período, compatível com Excel
+- **Perfil** — edição de nome, e-mail, senha, avatar e exclusão de conta com cascade completo
+- **Responsividade** — layout adaptado para desktop, tablet e mobile
 
 ---
 
@@ -102,6 +103,10 @@ DATABASE_URL=postgresql://postgres:senha@localhost:5432/valore
 SECRET_KEY=sua_chave_secreta
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+FRONTEND_URL=http://localhost:5173
+SMTP_USER=seu@gmail.com
+SMTP_PASSWORD=senha_de_app_gmail
+SMTP_FROM=Valore <seu@gmail.com>
 ```
 
 Aplique as migrações e inicie a API:
@@ -133,14 +138,23 @@ Após o deploy do backend, rode as migrações:
 heroku run "cd backend && alembic upgrade head" --app valore-api
 ```
 
+Variáveis de ambiente no Heroku:
+
+```bash
+heroku config:set SMTP_USER=seu@gmail.com --app valore-api
+heroku config:set SMTP_PASSWORD="senha_de_app" --app valore-api
+heroku config:set SMTP_FROM="Valore <seu@gmail.com>" --app valore-api
+heroku config:set FRONTEND_URL=https://valore-finance.vercel.app --app valore-api
+```
+
 ---
 
 ## Documentação da API
 
 Com o backend rodando localmente:
 
-- Swagger UI: http://127.0.0.1:8000/docs
-- ReDoc: http://127.0.0.1:8000/redoc
+- Swagger UI: <http://127.0.0.1:8000/docs>
+- ReDoc: <http://127.0.0.1:8000/redoc>
 
 ---
 
@@ -161,10 +175,6 @@ pytest
 cd frontend
 npm run test:run
 ```
-
-25 testes cobrindo funções utilitárias de formatação, camada de serviços (API mockada) e o contexto de transações.
-
-**Total: 93 testes automatizados, 100% de aprovação.**
 
 25 testes cobrindo funções utilitárias de formatação, camada de serviços (API mockada) e o contexto de transações.
 
